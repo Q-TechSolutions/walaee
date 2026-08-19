@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>ولائي — التحليل الشامل</title>
+<style>
+@page { size: A4; margin: 14mm 12mm 16mm 12mm; }
+@page :first { margin: 0; }
+* { box-sizing: border-box; }
+body { font-family: "Segoe UI", Tahoma, Arial, sans-serif; color:#1B1B3A; margin:0; font-size:10.5pt; line-height:1.75; }
+h1,h2,h3,h4 { margin:0; }
+.page-break { page-break-before: always; }
+.avoid { page-break-inside: avoid; }
+
+.cover { width:210mm; height:297mm; display:flex; flex-direction:column; justify-content:center; align-items:center;
+  background: linear-gradient(160deg,#3A1078 0%,#4B1E9E 55%,#2E0B63 100%); color:#fff; text-align:center;
+  margin:0; padding: 0 24mm; position:relative; }
+.cover .leafmark { font-size:30pt; letter-spacing:8px; margin-bottom:6mm; color:#F97316; }
+.cover h1 { font-size:44pt; font-weight:800; letter-spacing:-1px; }
+.cover .sub { font-size:15pt; color:#C9B6F5; margin-top:2mm; }
+.cover .rule { width:62mm; height:3px; background:linear-gradient(90deg,#F97316,#16A34A); margin:8mm auto; border-radius:2px;}
+.cover h2 { font-size:21pt; font-weight:700; line-height:1.6; }
+.cover .tags { margin-top:9mm; font-size:10.5pt; color:#DCCEFA; }
+.cover .tags span { margin:0 3mm; }
+.cover .meta { position:absolute; bottom:16mm; font-size:9.5pt; color:#B9A3EE; }
+
+.sec { margin: 9mm 0 5mm; padding-right:5mm; border-right:5px solid #4B1E9E; page-break-after:avoid; }
+.sec .kicker { font-size:8.5pt; letter-spacing:2px; color:#8B5CF6; font-weight:700; }
+.sec h2 { font-size:19pt; font-weight:800; color:#3A1078; }
+.sec p { margin:1.5mm 0 0; color:#5B5B7A; font-size:10pt; }
+h3.sub { font-size:13pt; color:#3A1078; margin:7mm 0 3mm; padding-bottom:1.5mm; border-bottom:2px solid #EDE6FB; page-break-after:avoid; }
+
+.verdict { background:#FFF8ED; border:2px solid #F97316; border-radius:8px; padding:5mm 6mm; margin:5mm 0; page-break-inside:avoid; }
+.verdict h3 { color:#B45309; font-size:14pt; margin-bottom:3mm; }
+.quote { background:#3A1078; color:#fff; border-radius:8px; padding:5mm 7mm; font-size:12pt; font-weight:600; text-align:center; margin:5mm 0; line-height:1.7; page-break-inside:avoid;}
+
+.card { border:1px solid #E3DCF3; border-right:5px solid #4B1E9E; border-radius:7px; padding:4mm 5mm; margin-bottom:4mm; background:#FDFCFF; page-break-inside:avoid; }
+.card.crit { border-right-color:#DC2626; background:#FEF6F6; }
+.card.high { border-right-color:#F97316; background:#FFFAF4; }
+.card.med  { border-right-color:#CA8A04; background:#FEFCF3; }
+.card.low  { border-right-color:#64748B; background:#FAFAFB; }
+.card.good { border-right-color:#16A34A; background:#F5FCF8; }
+.card .top { display:flex; justify-content:space-between; align-items:baseline; gap:4mm; margin-bottom:2mm; }
+.card h4 { font-size:12pt; color:#1B1B3A; font-weight:800; }
+.card h4 .num { color:#8B5CF6; margin-left:2mm; }
+.badge { font-size:8pt; font-weight:800; padding:1mm 3mm; border-radius:20px; white-space:nowrap; color:#fff; }
+.b-crit{background:#DC2626;} .b-high{background:#F97316;} .b-med{background:#CA8A04;} .b-low{background:#64748B;} .b-good{background:#16A34A;}
+.lbl { font-size:9pt; font-weight:800; color:#4B1E9E; display:block; margin-top:2.5mm; }
+.lbl.sol { color:#16A34A; }
+.lbl.why { color:#DC2626; }
+.card p { margin:0.8mm 0; font-size:10pt; }
+.card ol, .card ul { margin:1mm 5mm 1mm 0; padding:0 4mm 0 0; font-size:10pt; }
+.card li { margin-bottom:1.2mm; }
+.impact { margin-top:2.5mm; padding-top:2mm; border-top:1px dashed #D9D0F0; font-size:9.5pt; color:#15803D; font-weight:600; }
+
+table { width:100%; border-collapse:collapse; margin:3mm 0 5mm; font-size:9.5pt; page-break-inside:avoid; }
+th { background:#3A1078; color:#fff; padding:2.5mm 3mm; text-align:right; font-weight:700; font-size:9.5pt; }
+td { padding:2.2mm 3mm; border-bottom:1px solid #E9E4F5; vertical-align:top; }
+tr:nth-child(even) td { background:#FAF8FE; }
+tfoot td { background:#EDE6FB !important; font-weight:800; color:#3A1078; border-top:2px solid #4B1E9E; }
+td.num, th.num { text-align:center; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.note { font-size:9pt; color:#5B5B7A; background:#F5F3FB; border-right:3px solid #8B5CF6; border-radius:5px; padding:3mm 4mm; margin:3mm 0; page-break-inside:avoid; }
+
+.kpis { display:flex; gap:3mm; margin:4mm 0; page-break-inside:avoid; }
+.kpi { flex:1; border:1px solid #E3DCF3; border-radius:7px; padding:3.5mm 2mm; text-align:center; background:#FDFCFF; }
+.kpi .v { font-size:16pt; font-weight:800; color:#4B1E9E; line-height:1.2; }
+.kpi .k { font-size:8.5pt; color:#6B6B8A; margin-top:1mm; line-height:1.4; }
+.two { display:flex; gap:4mm; page-break-inside:avoid; }
+.two > div { flex:1; }
+.box { border:1px solid #E3DCF3; border-radius:7px; padding:4mm; background:#FDFCFF; }
+.box h4 { font-size:11.5pt; margin-bottom:2mm; }
+.box.g { border-color:#BBE7CE; background:#F5FCF8; } .box.g h4 { color:#15803D; }
+.box.r { border-color:#F6C9C9; background:#FEF6F6; } .box.r h4 { color:#B91C1C; }
+.box ul { margin:0; padding-right:5mm; font-size:9.5pt; }
+.box li { margin-bottom:1.5mm; }
+.footer-line { text-align:center; color:#8B5CF6; font-weight:700; font-size:11pt; margin-top:8mm; padding-top:3mm; border-top:2px solid #EDE6FB; }
+.toc { font-size:10.5pt; }
+.toc div { padding:2mm 0; border-bottom:1px dotted #D9D0F0; }
+.toc b { color:#4B1E9E; margin-left:3mm; }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <div class="leafmark">&#10022;&#10022;&#10022;</div>
+  <h1>walaee</h1>
+  <div class="sub">ولائي — كلنا كسبانين</div>
+  <div class="rule"></div>
+  <h2>التحليل الشامل للمشروع<br>المشاكل · الحلول · التكلفة · فرص النجاح</h2>
+  <div class="tags"><span>نقاط القوة</span>·<span>المشاكل الحرجة</span>·<span>الحل لكل مشكلة</span>·<span>التكلفة الكاملة</span>·<span>الجدوى</span></div>
+  <div class="meta">تحليل مبني على «Walaee Executive Brief Book» — 10 بريفات · أغسطس 2026</div>
+</div>
+
+<!-- ================= TOC ================= -->
+<div class="page-break"></div>
+<div class="sec"><div class="kicker">CONTENTS</div><h2>محتويات التقرير</h2></div>
+<div class="toc">
+<div><b>01</b> الملخص التنفيذي والحكم المبدئي</div>
+<div><b>02</b> نقاط القوة الحقيقية — 8 نقاط</div>
+<div><b>03</b> المشاكل والنقاط الحرجة + الحل المنطقي لكل منها — 16 مشكلة</div>
+<div><b>04</b> تكلفة المشروع الكاملة — التطوير · السيرفرات · الخدمات المدفوعة</div>
+<div><b>05</b> نموذج الإيرادات ونقطة التعادل</div>
+<div><b>06</b> هل الفكرة تنجح؟ — التحليل النهائي</div>
+<div><b>07</b> خارطة الطريق المقترحة والمؤشرات</div>
+</div>
+
+<!-- ================= 01 EXEC SUMMARY ================= -->
+<div class="sec" style="margin-top:12mm"><div class="kicker">SECTION 01</div><h2>الملخص التنفيذي والحكم المبدئي</h2>
+<p>خلاصة التحليل قبل الدخول في التفاصيل.</p></div>
+
+<p><strong>ولائي</strong> منصة SaaS لإدارة برامج الولاء متعددة المتاجر، تتكوّن من تطبيق عميل (PWA)، ولوحة تحكم للتاجر، ولوحة إدارة للمنصة، وواجهات برمجية، ومحرك تحليلات. الرهان الجوهري للمشروع — كما يظهر بين سطور البريفات العشرة — هو <strong>رهان على أثر الشبكة</strong>: بطاقة ولاء رقمية واحدة تعمل عبر عدة متاجر، فكل متجر جديد يرفع قيمة المنصة لكل العملاء، وكل عميل جديد يرفع جاذبيتها لكل التجار.</p>
+<p>وهذا الرهان هو <strong>أقوى ما في المشروع وأخطر ما فيه في آن واحد</strong>: إن نجح بنى خندقًا دفاعيًا يصعب اختراقه، وإن فشل تحوّل المنتج إلى «أداة نقاط» عادية يتفوّق عليها أي نظام نقاط بيع بولاء مدمج.</p>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">8</div><div class="k">نقاط قوة حقيقية</div></div>
+  <div class="kpi"><div class="v">16</div><div class="k">مشكلة موثّقة بحل</div></div>
+  <div class="kpi"><div class="v">6</div><div class="k">منها حرجة تُبطل النموذج</div></div>
+  <div class="kpi"><div class="v">18-24</div><div class="k">شهرًا حتى نقطة التعادل</div></div>
+</div>
+
+<div class="verdict">
+<h3>الحكم المبدئي</h3>
+<p><strong>الفكرة قابلة للنجاح — لكن ليست بالصيغة الحالية.</strong> المستند يجيب بامتياز على سؤال «لماذا»، ويكاد لا يلمس «كيف» و«بكم» و«متى». وهناك فجوتان تشغيليتان تُبطلان النموذج بأكمله إن لم تُحسما <em>قبل</em> كتابة أول سطر كود:</p>
+<ul style="margin:2mm 5mm 0 0; padding-right:4mm">
+<li><strong>كيف يُثبَت أن عملية الشراء تمت فعلًا؟</strong> — المستند يعد بـ«لا أجهزة إضافية» دون شرح الآلية.</li>
+<li><strong>هل رصيد النقاط خاص بكل متجر أم مشترك عبر الشبكة؟</strong> — الإجابة تحدد إن كنت أمام منتج برمجي أم أمام نظام مقاصة مالية.</li>
+</ul>
+<p style="margin-top:3mm"><strong>احتمالية النجاح:</strong> بالصيغة الحالية <strong style="color:#DC2626">15% – 20%</strong> &nbsp;|&nbsp; بعد تطبيق التعديلات الواردة في هذا التقرير <strong style="color:#16A34A">40% – 50%</strong>. (المتوسط العام لنجاح الشركات الناشئة لا يتجاوز 10%.)</p>
+</div>
+
+<h3 class="sub">التكلفة في سطر واحد</h3>
+<table>
+<thead><tr><th>السيناريو</th><th class="num">تكلفة MVP</th><th class="num">إجمالي السنة الأولى</th><th class="num">بالجنيه المصري</th><th>مناسب لـ</th></tr></thead>
+<tbody>
+<tr><td><strong>الاقتصادي (Bootstrap)</strong></td><td class="num">20,800 $</td><td class="num">57,300 $</td><td class="num">~2.9 مليون</td><td>مؤسسون تقنيون ينفّذون بأنفسهم</td></tr>
+<tr><td><strong>القياسي (الموصى به)</strong></td><td class="num">65,900 $</td><td class="num">180,700 $</td><td class="num">~9.0 مليون</td><td>فريق كامل + مبيعات ميدانية</td></tr>
+<tr><td><strong>الطموح (مموَّل)</strong></td><td class="num">110,000 $</td><td class="num">390,000 $</td><td class="num">~19.5 مليون</td><td>سوقان + توسّع سريع</td></tr>
+</tbody>
+</table>
+<div class="note"><strong>افتراضات التكلفة:</strong> أسعار السوق المصري/العربي لعام 2026 · سعر صرف افتراضي 50 جنيه للدولار · الأرقام تقديرية وتتغيّر بتغيّر السوق وسعر الصرف ومستوى الفريق. التفصيل الكامل في القسم الرابع.</div>
+
+<div class="quote">«أفضل الشركات لا تبدأ بمنتج… بل تبدأ بمشكلة تستحق الحل»<br><span style="font-size:9.5pt;color:#C9B6F5;font-weight:400">— من البريف الأول. والمشكلة هنا حقيقية فعلًا. التحدي كله في التنفيذ، لا في الفكرة.</span></div>
+
+<!-- ================= 02 STRENGTHS ================= -->
+<div class="page-break"></div>
+<div class="sec"><div class="kicker">SECTION 02</div><h2>نقاط القوة الحقيقية</h2>
+<p>ليست مجاملات — هذه أصول فعلية يمكن البناء عليها والدفاع بها أمام مستثمر أو تاجر.</p></div>
+
+<div class="card good"><div class="top"><h4><span class="num">01</span> المشكلة التي يعالجها حقيقية وموجعة</h4><span class="badge b-good">أصل استراتيجي</span></div>
+<p>تكلفة اكتساب عميل جديد ترتفع باستمرار، والاحتفاظ بالعميل الحالي أرخص بمراحل من جذب بديل عنه. ومعظم المتاجر الصغيرة والمتوسطة تفقد عملاءها دون أن تعرف السبب أصلًا. هذه ليست مشكلة مُختلَقة لتبرير منتج — هي وجع يومي حقيقي لدى التاجر.</p></div>
+
+<div class="card good"><div class="top"><h4><span class="num">02</span> التموضع الصحيح: علاقة وليس نقاطًا</h4><span class="badge b-good">تمايز</span></div>
+<p>المستند يكرر في ثلاثة بريفات مختلفة: «لسنا نظام نقاط ولا منصة خصومات». هذا تموضع ذكي لأنه يخرج المنتج من حرب الأسعار مع أدوات النقاط الرخيصة، ويضعه في خانة «أداة نمو» التي يُدفع مقابلها أكثر.</p></div>
+
+<div class="card good"><div class="top"><h4><span class="num">03</span> ستة نماذج ولاء داخل نظام واحد</h4><span class="badge b-good">ميزة بيع</span></div>
+<p>نقاط · أختام · زيارات · كاش باك · مكافآت · هدايا. هذه <strong>أقوى ميزة منتَج قابلة للبيع في المستند كله</strong>، لأن الكافيه يريد أختامًا، والصيدلية تريد نقاطًا، والمطعم يريد كاش باك. معظم المنافسين يفرضون نموذجًا واحدًا.</p>
+<p class="impact">توصية: اجعل هذه الميزة هي عنوان رسالة البيع، لا «إدارة الولاء» العامة.</p></div>
+
+<div class="card good"><div class="top"><h4><span class="num">04</span> اختيار PWA قرار اقتصادي وتشغيلي ذكي</h4><span class="badge b-good">كفاءة رأس مال</span></div>
+<p>لا رسوم متاجر تطبيقات، لا دورات مراجعة، لا فريقَي iOS و Android منفصلين، تحديث فوري للجميع، واحتكاك تحميل شبه معدوم — وهو عامل حاسم لمنتج يُطلب من العميل تبنّيه واقفًا عند الكاشير. يوفّر هذا القرار وحده ما بين 25,000 و 40,000 دولار في السنة الأولى.</p></div>
+
+<div class="card good"><div class="top"><h4><span class="num">05</span> فصل رحلة العميل عن رحلة التاجر</h4><span class="badge b-good">نضج منتَجي</span></div>
+<p>البريفان 03 و 04 يعالجان الرحلتين بشكل مستقل بمبادئ حاكمة لكل منهما. معظم المستندات المشابهة تخلطهما وتنتهي بمنتج يخدم طرفًا ويهمل الآخر. هذا الفصل يدل على تفكير منتَجي حقيقي.</p></div>
+
+<div class="card good"><div class="top"><h4><span class="num">06</span> هوية بصرية متماسكة وشعار يلخّص النموذج</h4><span class="badge b-good">أصل تسويقي</span></div>
+<p>«كلنا كسبانين» ليس شعارًا تسويقيًا فارغًا — هو وصف دقيق لنموذج القيمة ثلاثي الأطراف. والهوية (بنفسجي / أخضر / برتقالي) مطبّقة باتساق تام عبر 11 صفحة. هذا أصل جاهز يوفّر تكلفة ووقتًا.</p></div>
+
+<div class="card good"><div class="top"><h4><span class="num">07</span> نموذج إيراد متكرر قابل للتنبؤ</h4><span class="badge b-good">جاذبية استثمارية</span></div>
+<p>الاشتراك الشهري (SaaS) يُقيَّم بمضاعفات أعلى بكثير من نماذج العمولة أو البيع لمرة واحدة، ويسمح بالتنبؤ بالإيراد والتخطيط للتوظيف. اختيار سليم للنموذج.</p></div>
+
+<div class="card good"><div class="top"><h4><span class="num">08</span> بنية تقنية معقولة وقابلة للتوسع</h4><span class="badge b-good">جاهزية تنفيذ</span></div>
+<p>المكوّنات الخمسة (تطبيق عميل / لوحة تاجر / لوحة إدارة / APIs / تحليلات) هي التقسيم الصحيح فعليًا لهذا النوع من المنتجات، ولا تحتوي على تعقيد زائد. البنية قابلة للتنفيذ بفريق صغير.</p></div>
+
+<!-- ================= 03 PROBLEMS ================= -->
+<div class="page-break"></div>
+<div class="sec"><div class="kicker">SECTION 03</div><h2>المشاكل والنقاط الحرجة — والحل المنطقي لكل منها</h2>
+<p>16 مشكلة مرتّبة بالخطورة. كل مشكلة تتبعها: لماذا هي خطيرة، ثم الحل التنفيذي، ثم الأثر المتوقع.</p></div>
+
+<table>
+<thead><tr><th class="num">الخطورة</th><th>المعنى</th><th class="num">العدد</th><th>التوقيت</th></tr></thead>
+<tbody>
+<tr><td class="num"><span class="badge b-crit">حرجة جدًا</span></td><td>تُبطل النموذج بالكامل إن لم تُحسم</td><td class="num">2</td><td>قبل بدء التطوير</td></tr>
+<tr><td class="num"><span class="badge b-crit">حرجة</span></td><td>تحدد نجاح أو فشل السنة الأولى</td><td class="num">4</td><td>قبل الإطلاق</td></tr>
+<tr><td class="num"><span class="badge b-high">عالية</span></td><td>خسائر مالية أو قانونية أو فقدان ثقة</td><td class="num">4</td><td>مع الإطلاق</td></tr>
+<tr><td class="num"><span class="badge b-med">متوسطة</span></td><td>تحدّ من النمو أو تُكلف إعادة بناء لاحقًا</td><td class="num">5</td><td>خلال 6 أشهر</td></tr>
+<tr><td class="num"><span class="badge b-low">منخفضة</span></td><td>إصلاحات سريعة عالية العائد</td><td class="num">1</td><td>هذا الأسبوع</td></tr>
+</tbody>
+</table>
+
+<h3 class="sub">المستوى الأول — حرجة جدًا (تُبطل النموذج)</h3>
+
+<div class="card crit"><div class="top"><h4><span class="num">م-01</span> آلية إثبات عملية الشراء غير معرّفة إطلاقًا</h4><span class="badge b-crit">حرجة جدًا</span></div>
+<p><span class="lbl">المشكلة</span>البريف 08 يعد بـ«لا تحتاج إلى أجهزة إضافية»، والبريف 03 يقول إن العميل «بعد إتمام عملية الشراء يحصل مباشرة على أول تقدم». لكن لا توجد في أي صفحة من الـ11 آلية موصوفة تربط عملية بيع حقيقية بتسجيل النقطة. هل الكاشير يمسح رمزًا من هاتف العميل؟ أم العميل يمسح رمزًا من الفاتورة؟ أم يُدخل الكاشير رقم الهاتف يدويًا؟</p>
+<p><span class="lbl why">لماذا هي حرجة جدًا</span>كل شيء آخر يعتمد عليها: دقة البيانات، منع الاحتيال، سرعة طابور الكاشير، وثقة التاجر. وهي حرفيًا <strong>أول سؤال</strong> يطرحه أي تاجر جاد أو مستثمر خلال الدقائق الخمس الأولى. وجود المنتج كله معلّق على إجابتها.</p>
+<p><span class="lbl sol">الحل المنطقي — ثلاثة مسارات متدرجة</span></p>
+<ol>
+<li><strong>المسار الافتراضي (من اليوم الأول): رمز QR ديناميكي من جهة التاجر.</strong> لوحة التاجر تعرض رمزًا يتغيّر كل 30–60 ثانية على شاشة/تابلت رخيص أو حتى هاتف الكاشير. العميل يمسحه من تطبيقه ويُدخل قيمة الفاتورة، ويؤكّد التاجر بضغطة واحدة من لوحته. لا أجهزة جديدة فعلًا — والوعد يصبح صادقًا.</li>
+<li><strong>المسار البديل: إدخال رقم هاتف العميل من الكاشير</strong> مع تأكيد OTP للمبالغ فوق حد معيّن فقط (لتقليل تكلفة الرسائل).</li>
+<li><strong>المسار المتقدّم (المرحلة الثانية): تكامل مع أنظمة نقاط البيع</strong> الأكثر انتشارًا في السوق المستهدف. هذا يلغي الاحتكاك تمامًا، ويتحول من تكلفة إلى <em>أقوى ميزة بيع</em> أمام السلاسل.</li>
+</ol>
+<p><span class="lbl sol">ضوابط مصاحبة إلزامية</span>ربط كل عملية منح برقم الفاتورة وقيمتها · سقف يومي للنقاط لكل عميل ولكل كاشير · سجل تدقيق كامل غير قابل للتعديل · نافذة زمنية للصلاحية (الرمز يُستهلك مرة واحدة).</p>
+<p class="impact">الأثر: يغلق أكبر فجوة مصداقية في المشروع، ويحوّل «لا أجهزة إضافية» من ادعاء تسويقي إلى ميزة موثّقة قابلة للعرض.</p></div>
+
+<div class="card crit"><div class="top"><h4><span class="num">م-02</span> غموض قاتل: النقاط خاصة بكل متجر أم مشتركة عبر الشبكة؟</h4><span class="badge b-crit">حرجة جدًا</span></div>
+<p><span class="lbl">المشكلة</span>البريف 09 يتحدث عن «المتاجر المشتركة»، والبريف 06 عن «اكتشاف متاجر جديدة»، والبريف 02 عن «شبكة متنامية من العملاء والمتاجر» — دون تحديد ولو مرة واحدة هل رصيد العميل واحد عبر المنصة كلها أم منفصل لكل متجر.</p>
+<p><span class="lbl why">لماذا هي حرجة جدًا</span>الإجابة تحدد نوع الشركة التي تبنيها:</p>
+<ul>
+<li><strong>لو مشتركة:</strong> أنت أمام <strong>نظام مقاصة مالية بين تجّار</strong> — من يدفع لمن؟ ما القيمة النقدية للنقطة؟ من يتحمّل فرق الاستبدال؟ هذا يقترب من التنظيم المالي وقد يستلزم ترخيصًا، ويضاعف التعقيد التقني والمحاسبي والقانوني.</li>
+<li><strong>لو منفصلة:</strong> أثر الشبكة — الذي بُنيت عليه رؤية المشروع كلها — يضعف بشدة، ويصبح المنتج أداة ولاء عادية.</li>
+</ul>
+<p><span class="lbl sol">الحل المنطقي — نموذج هجين على ثلاث مراحل</span></p>
+<ol>
+<li><strong>المرحلة 1 (الإطلاق): رصيد منفصل لكل متجر.</strong> الأبسط تشغيليًا وقانونيًا ومحاسبيًا. وتظهر «الشبكة» في: هوية واحدة، تطبيق واحد، محفظة بطاقات موحّدة، اكتشاف متاجر، وعروض متقاطعة — <em>دون أي تبادل قيمة مالية</em>.</li>
+<li><strong>المرحلة 2: عملة شبكة منفصلة</strong> («نقاط ولائي») تمنحها <em>المنصة نفسها</em> كحوافز تسويقية وتتحمل تكلفتها من ميزانيتها. تعطيك سردية الشبكة الحقيقية بلا مقاصة بين التجار.</li>
+<li><strong>المرحلة 3 (اختيارية، بعد إثبات الطلب): مقاصة حقيقية</strong> بعقود واضحة ومحفظة تسوية ومراجعة قانونية للترخيص.</li>
+</ol>
+<p class="impact">الأثر: يحفظ سردية «الشبكة» أمام المستثمر دون فتح باب التعقيد المالي والقانوني في السنة الأولى.</p></div>
+
+<h3 class="sub">المستوى الثاني — حرجة (تحدد السنة الأولى)</h3>
+
+<div class="card crit"><div class="top"><h4><span class="num">م-03</span> «منصة لكل الأنشطة التجارية» = بلا تركيز</h4><span class="badge b-crit">حرجة</span></div>
+<p><span class="lbl">المشكلة</span>البريف 02 يعرض «منصة واحدة تخدم جميع أنواع الأنشطة التجارية» باعتبارها ميزة. في مرحلة ما قبل إثبات المنتج، هذه <strong>نقطة ضعف لا قوة</strong>.</p>
+<p><span class="lbl why">لماذا</span>رسالة بيع مائعة لا تخاطب أحدًا بعينه · متطلبات متضاربة (مطعم ≠ صيدلية ≠ صالون ≠ محطة وقود) · تشتيت موارد فريق صغير · واستحالة بناء كثافة في أي قطاع.</p>
+<p><span class="lbl sol">الحل المنطقي</span>اختر <strong>قطاعًا واحدًا</strong> للسنة الأولى بمعايير موضوعية: تكرار شراء عالٍ · قيمة فاتورة صغيرة · قرار شراء فردي لا مؤسسي · كثافة جغرافية عالية. المرشحون الأقوى: <strong>الكافيهات، المخابز والحلويات، الصالونات ومراكز التجميل، غسيل السيارات</strong>. ابنِ قوالب ولاء جاهزة ورسالة بيع مخصّصة لذلك القطاع، ووسّع أفقيًا فقط بعد إثبات معدل احتفاظ.</p>
+<p class="impact">الأثر: تقصير دورة البيع، رفع معدل التحويل، وبناء حالات نجاح مرجعية يمكن عرضها على القطاع التالي.</p></div>
+
+<div class="card crit"><div class="top"><h4><span class="num">م-04</span> مشكلة البيضة والدجاجة غير معالَجة</h4><span class="badge b-crit">حرجة</span></div>
+<p><span class="lbl">المشكلة</span>كيف تُقنع أول 50 متجرًا بالانضمام وقاعدة العملاء صفر؟ وكيف تُقنع العملاء بتحميل تطبيق لا يعمل إلا مع 3 متاجر؟ البريف 09 يقول «مجتمع من المتاجر الرائدة التي تؤمن بالفكرة» — لكن هذه <em>نتيجة</em> وليست <em>خطة</em>.</p>
+<p><span class="lbl why">لماذا</span>معظم منصات الشبكة تموت هنا تحديدًا، لا في التقنية ولا في التمويل.</p>
+<p><span class="lbl sol">الحل المنطقي — استراتيجية الكثافة الجغرافية</span></p>
+<ol>
+<li>اختر <strong>بقعة واحدة</strong>: حي أو شارع تجاري واحد بمساحة لا تتجاوز 2 كم.</li>
+<li>الهدف: <strong>20–30 متجرًا داخل تلك البقعة</strong> قبل التفكير في أي توسّع.</li>
+<li>اجعل المنتج قيّمًا للتاجر <strong>حتى لو كان وحده</strong> — أي أن قيمة النموذج المنفرد (تعرف عملاءك، تقيس عودتهم) يجب أن تبرر الاشتراك بذاتها، وتكون الشبكة مكافأة إضافية لا شرطًا للقيمة.</li>
+<li>حملة إطلاق موضعية داخل البقعة، ثم كرّر النموذج في البقعة التالية.</li>
+</ol>
+<p class="impact">الأثر: تحويل مشكلة غير قابلة للحل على مستوى مدينة إلى مشكلة قابلة للحل على مستوى شارع.</p></div>
+
+<div class="card crit"><div class="top"><h4><span class="num">م-05</span> نموذج Freemium بلا جدار محدد ولا محفّز تحويل</h4><span class="badge b-crit">حرجة</span></div>
+<p><span class="lbl">المشكلة</span>البريف 05 يصف المسار: مجاني ← يرى النتائج ← يشترك. لكن لا يوجد أي تحديد لما يفصل المجاني عن المدفوع.</p>
+<p><span class="lbl why">لماذا</span>بدون جدار واضح، كل تاجر سيبقى مجانيًا إلى الأبد. والخطة المجانية ليست مجانية عليك: رسائل OTP، تخزين، دعم فني، بنية تحتية. تتحوّل إلى <strong>تكلفة تشغيل صافية بلا إيراد</strong>.</p>
+<p><span class="lbl sol">الحل المنطقي</span></p>
+<ul>
+<li><strong>جدار كمّي صريح للمجاني:</strong> حتى 200 عميل نشط · فرع واحد · نموذج ولاء واحد · تقارير آخر 30 يومًا فقط · بدون حملات · بدون تصدير بيانات.</li>
+<li><strong>خلف الجدار:</strong> نماذج الولاء المتعددة، الفروع، التقارير الكاملة، التصدير، الحملات، الواجهات البرمجية.</li>
+<li><strong>قاعدة ثابتة:</strong> أي شيء له تكلفة متغيرة مباشرة (SMS / WhatsApp) لا يكون مجانيًا أبدًا — يُباع بنظام الرصيد المستهلك.</li>
+<li><strong>أضف رسوم تفعيل لمرة واحدة</strong> (50–100 دولار) تغطي جزءًا من تكلفة الاستحواذ وتصفّي غير الجادين، وترفع الالتزام النفسي للتاجر.</li>
+</ul>
+<p class="impact">الأثر: تحويل الخطة المجانية من نزيف مالي إلى قناة استحواذ مضبوطة التكلفة.</p></div>
+
+<div class="card crit"><div class="top"><h4><span class="num">م-06</span> لا يوجد رقم واحد في المستند كله</h4><span class="badge b-crit">حرجة</span></div>
+<p><span class="lbl">المشكلة</span>11 صفحة بلا: حجم سوق، تسعير، عدد متاجر مستهدف، تكلفة استحواذ، قيمة عمر العميل، معدل تحويل، أو أي مؤشر أداء.</p>
+<p><span class="lbl why">لماذا</span>هذا يجعل الملف <strong>وثيقة رؤية ممتازة ووثيقة استثمار غير صالحة</strong>. أي مستثمر سيغلقها عند الصفحة الثالثة. كما أن غياب الأرقام داخليًا يعني أنك تبني بلا هدف قابل للقياس.</p>
+<p><span class="lbl sol">الحل المنطقي</span>أضف صفحة «الأرقام» تحتوي على: حجم السوق المستهدف (عدد المتاجر في القطاع والمدينة المختارة) · التسعير المقترح · أهداف 12 و 36 شهرًا · التكلفة المتوقعة للاستحواذ على تاجر · قيمة عمر التاجر · ونقطة التعادل. (نموذج جاهز في القسمين الرابع والخامس من هذا التقرير.)</p>
+<p class="impact">الأثر: يرفع جاهزية المستند للاستثمار من 3/10 إلى 7/10 بصفحة واحدة.</p></div>
+
+<h3 class="sub">المستوى الثالث — عالية (خسائر مالية أو قانونية)</h3>
+
+<div class="card high"><div class="top"><h4><span class="num">م-07</span> الاحتيال الداخلي من الكاشير أو التاجر</h4><span class="badge b-high">عالية</span></div>
+<p><span class="lbl">المشكلة</span>أي نظام ولاء بلا ضوابط يُستغَل خلال أسابيع: كاشير يمنح نقاطًا لرقم هاتفه أو لأصدقائه، أو تاجر ينفخ الأرقام لسبب ما.</p>
+<p><span class="lbl why">لماذا</span>فقدان ثقة التاجر في النظام = إلغاء الاشتراك فورًا. والأخطر: تلوث البيانات التي يُفترض أن يُبنى عليها «محرك الذكاء الاصطناعي».</p>
+<p><span class="lbl sol">الحل المنطقي</span>حساب مستقل لكل كاشير (لا حساب واحد للمتجر) · ربط كل منح برقم الفاتورة وقيمتها · سقوف يومية لكل كاشير ولكل رقم عميل · كشف شذوذ آلي (تكرار غير طبيعي لنفس الرقم، منح خارج ساعات العمل، نسبة منح مرتفعة لكاشير بعينه) · تقرير «عمليات تحتاج مراجعة» ظاهر في لوحة التاجر · وسجل تدقيق غير قابل للحذف.</p>
+<p class="impact">الأثر: حماية ثقة التاجر وسلامة البيانات — وهي ميزة بيع بحد ذاتها أمام السلاسل.</p></div>
+
+<div class="card high"><div class="top"><h4><span class="num">م-08</span> مسؤولية النقاط غير المستبدلة — التزام مالي مؤجل</h4><span class="badge b-high">عالية</span></div>
+<p><span class="lbl">المشكلة</span>كل نقطة مُنحت ولم تُستبدَل هي <strong>التزام مالي قائم</strong> في دفاتر التاجر. لا ذكر في المستند لسياسة انتهاء، ولا لسقف، ولا لمعالجة المرتجعات.</p>
+<p><span class="lbl why">لماذا</span>تاجر يكتشف بعد عام أن عليه التزامًا بعشرات الآلاف من قيمة المكافآت غير المستبدلة سيلغي الاشتراك ويحمّلك المسؤولية. وقد يتحول الأمر إلى نزاع.</p>
+<p><span class="lbl sol">الحل المنطقي</span>سياسة انتهاء صلاحية افتراضية (6–12 شهرًا) مع تنبيه للعميل قبل الانتهاء · سقف أعلى للرصيد · <strong>عرض «قيمة الالتزام القائم» بالعملة المحلية في لوحة التاجر</strong> كمؤشر رئيسي · قواعد آلية لعكس النقاط عند المرتجع أو إلغاء الفاتورة · وتقرير شهري بالالتزام والاستبدال.</p>
+<p class="impact">الأثر: يحوّل مخاطرة خفية إلى ميزة شفافية — ولا يوجد منافس صغير يقدّمها.</p></div>
+
+<div class="card high"><div class="top"><h4><span class="num">م-09</span> حماية البيانات والامتثال غائبة تمامًا</h4><span class="badge b-high">عالية</span></div>
+<p><span class="lbl">المشكلة</span>المنتج يجمع اسمًا ورقم هاتف وسلوك شراء تفصيليًا لمئات الآلاف من الأفراد. البريف 08 يذكر «حماية بيانات المستخدمين» كمبدأ عام في سطر واحد، ولا شيء غير ذلك.</p>
+<p><span class="lbl why">لماذا</span>ثلاثة أخطار متزامنة: (1) مخالفة قانون حماية البيانات المصري 151/2020 أو نظام حماية البيانات السعودي PDPL حسب السوق، بغرامات فعلية. (2) <strong>سؤال «من يملك بيانات العميل؟»</strong> هو نقطة تفاوض حاسمة مع أي سلسلة كبيرة، وغيابه يعني خسارة الصفقة. (3) حادثة تسريب واحدة تقتل علامة قائمة على «الثقة».</p>
+<p><span class="lbl sol">الحل المنطقي</span>تحديد الأدوار بوضوح في عقد معالجة بيانات (التاجر «متحكّم» والمنصة «معالِج») · موافقة صريحة ومسجّلة عند التسجيل · سياسة احتفاظ وحذف معلنة · تشفير عند النقل وعند التخزين · عزل منطقي لبيانات كل متجر · حق العميل في الاطلاع والحذف من داخل التطبيق · ومراجعة قانونية لمرة واحدة (تكلفتها 1,000–3,000 دولار، وتوفّر أضعافها).</p>
+<p class="impact">الأثر: يزيل عائقًا قانونيًا ويفتح باب التفاوض مع السلاسل والعملاء المؤسسيين.</p></div>
+
+<div class="card high"><div class="top"><h4><span class="num">م-10</span> تكلفة الرسائل قد تلتهم الوحدة الاقتصادية</h4><span class="badge b-high">عالية</span></div>
+<p><span class="lbl">المشكلة</span>منتج ولاء = إعادة تفاعل = رسائل. بالإضافة إلى OTP لكل تسجيل. ولا ذكر لهذه التكلفة في المستند إطلاقًا.</p>
+<p><span class="lbl why">لماذا</span>الفرق بين مزوّد رسائل دولي ومزوّد محلي قد يصل إلى <strong>10 أضعاف</strong>. عند 200,000 عميل، تكلفة OTP وحدها تتراوح بين 600 دولار (مزوّد محلي) و 8,000 دولار (مزوّد دولي). هذا الفارق وحده كفيل بقلب الجدوى.</p>
+<p><span class="lbl sol">الحل المنطقي — ترتيب القنوات بالتكلفة</span></p>
+<ol>
+<li><strong>Web Push</strong> — مجاني تمامًا. اجعله القناة الافتراضية ووجّه كل جهدك لرفع نسبة تفعيله.</li>
+<li><strong>WhatsApp (رسائل خدمية)</strong> — أرخص بكثير من الرسائل التسويقية ومعدل قراءتها أعلى من SMS.</li>
+<li><strong>SMS من مزوّد محلي</strong> — ملاذ أخير لـ OTP فقط، بعد التعاقد المباشر مع مزوّد في السوق المستهدف.</li>
+<li><strong>الحملات التسويقية:</strong> تُباع للتاجر بنظام رصيد مستهلك مع هامش — تتحوّل من تكلفة إلى <em>مصدر إيراد ثانٍ</em>.</li>
+</ol>
+<p class="impact">الأثر: خفض التكلفة المتغيرة لكل عميل بنسبة تتجاوز 80% وفتح مصدر إيراد إضافي.</p></div>
+
+<h3 class="sub">المستوى الرابع — متوسطة (تحدّ من النمو أو تُكلف إعادة بناء)</h3>
+
+<div class="card med"><div class="top"><h4><span class="num">م-11</span> نموذج البيانات لا يستوعب الفروع والسلاسل</h4><span class="badge b-med">متوسطة · معمارية</span></div>
+<p><span class="lbl">المشكلة</span>كل المستند مكتوب بافتراض «متجر واحد وصاحب متجر واحد». والسلاسل متعددة الفروع هي <strong>أعلى شرائح العملاء قيمة وأقلها انسحابًا</strong>.</p>
+<p><span class="lbl why">لماذا</span>هذا أخطر بند تقني في التقرير: تعديل نموذج البيانات <em>بعد</em> الإطلاق يعني ترحيل بيانات مؤلمًا وإعادة كتابة صلاحيات وتقارير — تكلفته تُقاس بالشهور لا بالأيام.</p>
+<p><span class="lbl sol">الحل المنطقي</span>ابنِ التسلسل الهرمي من اليوم الأول حتى لو لم تستخدمه: <strong>مؤسسة ← علامة تجارية ← فرع ← نقطة بيع ← مستخدم</strong>، مع صلاحيات على كل مستوى وتقارير قابلة للتجميع والتفصيل. التكلفة الإضافية الآن أيام معدودة.</p>
+<p class="impact">الأثر: يفتح شريحة السلاسل من اليوم الأول ويتجنّب إعادة بناء تكلف 3–6 أشهر لاحقًا.</p></div>
+
+<div class="card med"><div class="top"><h4><span class="num">م-12</span> «محرك ذكاء اصطناعي» بلا مضمون + مشكلة البيانات الباردة</h4><span class="badge b-med">متوسطة</span></div>
+<p><span class="lbl">المشكلة</span>مذكور في بريفين كمكوّن أساسي من المنصة، دون تحديد ما يفعله. والذكاء الاصطناعي يحتاج حجم بيانات لن يتوفر قبل 12 شهرًا على الأقل.</p>
+<p><span class="lbl why">لماذا</span>الوعد بما لا يمكن تسليمه يضر بالمصداقية أمام المستثمر المتمرّس، ويستنزف موارد الفريق في اتجاه خاطئ مبكرًا.</p>
+<p><span class="lbl sol">الحل المنطقي</span>اخفض التسمية في السنة الأولى إلى <strong>«تحليلات وتوصيات ذكية»</strong>، وحدّد ثلاث حالات استخدام تعمل بقواعد إحصائية بسيطة ولا تحتاج تعلّمًا آليًا:</p>
+<ul>
+<li>تنبيه بالعملاء المعرّضين للفقدان (لم يعودوا خلال ضعف متوسط فترة زيارتهم).</li>
+<li>اقتراح قيمة المكافأة المثلى بناءً على متوسط الفاتورة وهامش القطاع.</li>
+<li>أفضل يوم وساعة لإرسال الحملة بناءً على تاريخ زيارات العميل.</li>
+</ul>
+<p>ثم ارفعها إلى نماذج تعلّم آلي حقيقية بعد تراكم 6–12 شهرًا من البيانات.</p>
+<p class="impact">الأثر: قيمة حقيقية للتاجر من الشهر الأول، بلا وعود مؤجّلة ولا استنزاف موارد.</p></div>
+
+<div class="card med"><div class="top"><h4><span class="num">م-13</span> قيود إشعارات PWA على iOS</h4><span class="badge b-med">متوسطة · تقنية</span></div>
+<p><span class="lbl">المشكلة</span>منتج الولاء يعيش على إعادة التفاعل، وإشعارات الويب على iOS لا تعمل إلا بعد أن يضيف المستخدم التطبيق إلى الشاشة الرئيسية يدويًا. وشريحة iOS هي غالبًا الأعلى إنفاقًا.</p>
+<p><span class="lbl sol">الحل المنطقي</span>اطلب «إضافة إلى الشاشة الرئيسية» صراحة في خطوة التسجيل مقابل مكافأة فورية صغيرة (نقاط ترحيبية) · اجعل WhatsApp قناة بديلة معتمدة لهذه الشريحة · اعرض حالة الرصيد والتقدم على شاشة داخل المتجر عند الكاشير · وقِس نسبة تفعيل الإشعارات كمؤشر رئيسي.</p>
+<p class="impact">الأثر: تعويض قيد تقني خارج سيطرتك بقنوات بديلة مقيسة.</p></div>
+
+<div class="card med"><div class="top"><h4><span class="num">م-14</span> لا يوجد تحليل منافسة ولا تمايز مُثبت</h4><span class="badge b-med">متوسطة</span></div>
+<p><span class="lbl">المشكلة</span>صفر ذكر للمنافسين في 11 صفحة. والسوق مزدحم فعلًا: أنظمة نقاط بيع بولاء مدمج، إضافات منصات المتاجر الإلكترونية، تطبيقات الكوبونات والخصومات، والحلول المخصصة التي تبنيها السلاسل لنفسها.</p>
+<p><span class="lbl why">لماذا</span>غياب المنافسة من المستند يُقرأ كضعف في دراسة السوق، لا كثقة في التفوّق.</p>
+<p><span class="lbl sol">الحل المنطقي</span>جدول مقارنة صريح على 6 محاور: تعدد نماذج الولاء · العمل بلا أجهزة · الشبكة المشتركة بين المتاجر · السعر · سهولة الإعداد · دعم اللغة العربية والسوق المحلي. وحدّد بوضوح <strong>ما لا يستطيع أي منافس فعله</strong> — وهو على الأرجح: تعدد نماذج الولاء داخل نظام واحد + الهوية الموحّدة للعميل عبر متاجر مختلفة.</p></div>
+
+<div class="card med"><div class="top"><h4><span class="num">م-15</span> غائب عن المستند: الفريق، خارطة الطريق، طلب التمويل، المؤشرات</h4><span class="badge b-med">متوسطة</span></div>
+<p><span class="lbl">المشكلة</span>لا ذكر لمن ينفّذ، ولا لمتى، ولا لكم المطلوب، ولا لما سيُقاس.</p>
+<p><span class="lbl why">لماذا</span>المستثمر يستثمر في الفريق قبل الفكرة. وغياب خارطة الطريق يجعل التقييم مستحيلًا.</p>
+<p><span class="lbl sol">الحل المنطقي</span>أضف أربع صفحات: <strong>الأرقام</strong> · <strong>خارطة الطريق</strong> (4 أرباع) · <strong>الفريق</strong> (من وماذا فعل سابقًا) · <strong>الطلب</strong> (كم ولماذا وما الذي سيحققه). نماذج جاهزة في القسمين 4 و 7.</p></div>
+
+<h3 class="sub">المستوى الخامس — إصلاحات سريعة عالية العائد</h3>
+
+<div class="card low"><div class="top"><h4><span class="num">م-16</span> عيوب في ملف البريف نفسه</h4><span class="badge b-low">منخفضة · تُصلح في ساعات</span></div>
+<ul>
+<li><strong>تناقض في كتابة الاسم:</strong> الغلاف يكتب <code>walaee</code> ورؤوس الصفحات تكتب <code>WALAAEE</code> بألف زائدة — والتناقض ظاهر في <strong>كل صفحة من العشر</strong>. وحّدها فورًا واحجز النطاق والعلامة على الصيغة المعتمدة.</li>
+<li><strong>لا توجد طبقة نص:</strong> كل صفحة صورة JPEG. الملف غير قابل للنسخ ولا للبحث ولا للقراءة بقارئ شاشة ولا للفهرسة — عيب حقيقي لمستند تنفيذي يُرسل بالبريد.</li>
+<li><strong>الميتاداتا فارغة:</strong> العنوان <code>untitled</code> والمؤلف <code>anonymous</code>.</li>
+<li><strong>الحجم 3.75 ميجابايت</strong> لـ11 صفحة — قابل للخفض إلى أقل من 1 ميجابايت بضغط أفضل.</li>
+<li><strong>لا أرقام صفحات ولا فهرس ولا صفحة تواصل ولا تاريخ إصدار ولا إشعار سرية.</strong></li>
+<li><strong>تكرار:</strong> البريفات 01 و 06 و 10 متداخلة بنسبة كبيرة (الرؤية / القيمة / المستقبل). يمكن ضغطها إلى بريفين وتحرير مساحة لصفحتَي «الأرقام» و«كيف تعمل فعليًا».</li>
+</ul>
+<p class="impact">الأثر: يوم عمل واحد يرفع احترافية المستند بشكل ملحوظ.</p></div>
+
+<!-- ================= 04 COST ================= -->
+<div class="page-break"></div>
+<div class="sec"><div class="kicker">SECTION 04</div><h2>تكلفة المشروع الكاملة</h2>
+<p>التطوير · البنية التحتية والسيرفرات · الخدمات المدفوعة · التشغيل — بثلاثة سيناريوهات.</p></div>
+
+<div class="note"><strong>أساس التقدير:</strong> أسعار السوق المصري والعربي لعام 2026 · سعر صرف افتراضي <strong>50 جنيه = 1 دولار</strong> · الأرقام شاملة للرواتب والأعباء · تختلف التكلفة صعودًا في الخليج (زد 60–120%) ونزولًا مع فريق أقل خبرة (مع رفع مخاطر التنفيذ).</div>
+
+<h3 class="sub">4.1 — تكلفة التطوير: السيناريو الاقتصادي (Bootstrap)</h3>
+<p>مؤسس تقني يشارك في التنفيذ + مطوّران. مدة MVP: <strong>5 أشهر</strong>.</p>
+<table>
+<thead><tr><th>البند</th><th class="num">الشهري $</th><th class="num">الأشهر</th><th class="num">الإجمالي $</th></tr></thead>
+<tbody>
+<tr><td>مطوّر خلفية (Django / DRF)</td><td class="num">1,600</td><td class="num">5</td><td class="num">8,000</td></tr>
+<tr><td>مطوّر واجهات (PWA + لوحة التاجر)</td><td class="num">1,400</td><td class="num">5</td><td class="num">7,000</td></tr>
+<tr><td>مصمم UI/UX (جزئي)</td><td class="num">700</td><td class="num">3</td><td class="num">2,100</td></tr>
+<tr><td>اختبار وجودة (جزئي)</td><td class="num">600</td><td class="num">2</td><td class="num">1,200</td></tr>
+<tr><td>إعداد DevOps ونشر (لمرة واحدة)</td><td class="num">—</td><td class="num">—</td><td class="num">1,000</td></tr>
+<tr><td>بنية تحتية وأدوات أثناء التطوير</td><td class="num">140</td><td class="num">5</td><td class="num">700</td></tr>
+<tr><td>تأسيس قانوني وتسجيل</td><td class="num">—</td><td class="num">—</td><td class="num">800</td></tr>
+</tbody>
+<tfoot><tr><td>إجمالي MVP — اقتصادي</td><td class="num"></td><td class="num">5 أشهر</td><td class="num">20,800 $</td></tr></tfoot>
+</table>
+
+<h3 class="sub">4.2 — تكلفة التطوير: السيناريو القياسي (الموصى به)</h3>
+<p>فريق كامل يبني منتجًا جاهزًا للسوق بضوابط احتيال وتقارير حقيقية. مدة MVP: <strong>6 أشهر</strong>.</p>
+<table>
+<thead><tr><th>الدور</th><th class="num">الشهري $</th><th class="num">الأشهر</th><th class="num">الإجمالي $</th></tr></thead>
+<tbody>
+<tr><td>قائد تقني / مهندس معماري</td><td class="num">2,500</td><td class="num">6</td><td class="num">15,000</td></tr>
+<tr><td>مطوّر خلفية أول (Django / DRF)</td><td class="num">2,000</td><td class="num">6</td><td class="num">12,000</td></tr>
+<tr><td>مطوّر خلفية متوسط</td><td class="num">1,300</td><td class="num">5</td><td class="num">6,500</td></tr>
+<tr><td>مطوّر واجهة تطبيق العميل (PWA)</td><td class="num">1,700</td><td class="num">6</td><td class="num">10,200</td></tr>
+<tr><td>مطوّر لوحتَي التاجر والإدارة</td><td class="num">1,500</td><td class="num">6</td><td class="num">9,000</td></tr>
+<tr><td>مصمم UI/UX</td><td class="num">1,400</td><td class="num">4</td><td class="num">5,600</td></tr>
+<tr><td>اختبار وجودة</td><td class="num">1,000</td><td class="num">4</td><td class="num">4,000</td></tr>
+<tr><td>DevOps (جزئي)</td><td class="num">1,200</td><td class="num">3</td><td class="num">3,600</td></tr>
+</tbody>
+<tfoot><tr><td>إجمالي تطوير MVP — قياسي</td><td class="num"></td><td class="num">6 أشهر</td><td class="num">65,900 $</td></tr></tfoot>
+</table>
+<div class="note"><strong>البديل: التعاقد مع شركة تطوير (Outsource)</strong> — شركة في مصر أو الأردن لنفس النطاق: <strong>45,000 – 90,000 دولار</strong> تسليم مفتاح في اليد. شركة خليجية: <strong>120,000 دولار فأكثر</strong>. الفارق الجوهري ليس السعر بل <em>الملكية المعرفية</em>: التعاقد الخارجي يترك الشركة بلا فريق تقني داخلي، وهو خطر وجودي لمنتج SaaS يحتاج تطويرًا مستمرًا.</div>
+
+<h3 class="sub">4.3 — البنية التحتية والسيرفرات (تكلفة شهرية)</h3>
+<p>ثلاث مراحل نمو. الأسعار على مزوّدين اقتصاديين (Hetzner / DigitalOcean)؛ اضرب في 1.6–2.2 تقريبًا على AWS أو Azure.</p>
+<table>
+<thead><tr><th>المكوّن</th><th class="num">مرحلة 1<br><span style="font-weight:400">50 متجرًا · 20 ألف عميل</span></th><th class="num">مرحلة 2<br><span style="font-weight:400">500 متجر · 200 ألف عميل</span></th><th class="num">مرحلة 3<br><span style="font-weight:400">5000 متجر · 2 مليون عميل</span></th></tr></thead>
+<tbody>
+<tr><td>خوادم التطبيق</td><td class="num">45 $</td><td class="num">110 $</td><td class="num">520 $</td></tr>
+<tr><td>قاعدة بيانات PostgreSQL</td><td class="num">مدمجة</td><td class="num">130 $</td><td class="num">420 $</td></tr>
+<tr><td>Redis (تخزين مؤقت وطوابير)</td><td class="num">مدمج</td><td class="num">35 $</td><td class="num">120 $</td></tr>
+<tr><td>موزّع الأحمال</td><td class="num">—</td><td class="num">15 $</td><td class="num">40 $</td></tr>
+<tr><td>تخزين الملفات + شبكة توصيل CDN</td><td class="num">8 $</td><td class="num">45 $</td><td class="num">160 $</td></tr>
+<tr><td>نسخ احتياطي وتعافي من الكوارث</td><td class="num">10 $</td><td class="num">35 $</td><td class="num">110 $</td></tr>
+<tr><td>مراقبة وتتبّع الأخطاء وسجلات</td><td class="num">26 $</td><td class="num">95 $</td><td class="num">280 $</td></tr>
+<tr><td>مستودع بيانات وتحليلات</td><td class="num">—</td><td class="num">—</td><td class="num">220 $</td></tr>
+</tbody>
+<tfoot><tr><td>الإجمالي الشهري</td><td class="num">~90 $</td><td class="num">~465 $</td><td class="num">~1,870 $</td></tr></tfoot>
+</table>
+<div class="note">البنية التحتية <strong>ليست بند التكلفة المقلق</strong> في هذا المشروع — عند 500 متجر تمثل أقل من 3% من الإيراد المتوقع. البند المقلق فعلًا هو <strong>تكلفة الاستحواذ على التاجر</strong> (المبيعات الميدانية) و<strong>تكلفة الرسائل</strong>.</div>
+
+<h3 class="sub">4.4 — الخدمات المدفوعة الأخرى</h3>
+<table>
+<thead><tr><th>الخدمة</th><th>الغرض</th><th class="num">التكلفة</th><th>ملاحظة حاسمة</th></tr></thead>
+<tbody>
+<tr><td><strong>رسائل SMS / OTP</strong></td><td>تأكيد التسجيل</td><td class="num">0.003 – 0.05 $<br>للرسالة</td><td>مزوّد محلي أرخص من الدولي بما يصل إلى 10 أضعاف. تفاوض مباشر إلزامي.</td></tr>
+<tr><td><strong>WhatsApp Business API</strong></td><td>تنبيهات وحملات</td><td class="num">0.01 – 0.05 $<br>للمحادثة</td><td>الرسائل الخدمية أرخص بكثير من التسويقية. صنّف رسائلك بعناية.</td></tr>
+<tr><td>Web Push</td><td>القناة الأساسية</td><td class="num">مجاني</td><td>وجّه أقصى جهد لرفع نسبة التفعيل — كل نقطة مئوية توفّر مالًا.</td></tr>
+<tr><td>بريد إلكتروني (SES / Postmark)</td><td>تقارير ومعاملات</td><td class="num">5 – 25 $ / شهر</td><td>تكلفة مهملة عمليًا.</td></tr>
+<tr><td>بوابة دفع (Paymob / Fawry / Stripe)</td><td>تحصيل الاشتراكات</td><td class="num">2.5% – 2.9% + رسم ثابت</td><td>احسبها ضمن الهامش، لا تنساها.</td></tr>
+<tr><td>Sentry (تتبع الأخطاء)</td><td>جودة</td><td class="num">26 – 80 $ / شهر</td><td>غير قابل للاستغناء في SaaS.</td></tr>
+<tr><td>Figma + GitHub + مساحة عمل</td><td>أدوات الفريق</td><td class="num">25 – 40 $ / شهر / فرد</td><td>—</td></tr>
+<tr><td>نطاق + شهادة SSL</td><td>أساسيات</td><td class="num">15 $ / سنة + مجاني</td><td>Let's Encrypt مجانية.</td></tr>
+<tr><td><strong>تسجيل علامة تجارية</strong></td><td>حماية الاسم</td><td class="num">300 – 800 $</td><td>افعلها قبل الإطلاق — بعد النجاح تصبح مكلفة أو مستحيلة.</td></tr>
+<tr><td>تأسيس شركة وتراخيص</td><td>قانوني</td><td class="num">500 – 1,500 $</td><td>—</td></tr>
+<tr><td><strong>مراجعة امتثال حماية البيانات</strong></td><td>قانوني</td><td class="num">1,000 – 3,000 $</td><td>لمرة واحدة — توفّر أضعافها. راجع المشكلة م-09.</td></tr>
+<tr><td>محاسبة ومراجعة</td><td>تشغيل</td><td class="num">150 – 400 $ / شهر</td><td>—</td></tr>
+<tr><td><strong>عُدّة تفعيل المتجر</strong></td><td>ستاندات QR وملصقات</td><td class="num">5 – 15 $ / متجر</td><td>بند يُنسى دائمًا ويتراكم بسرعة مع النمو.</td></tr>
+</tbody>
+</table>
+
+<h3 class="sub">4.5 — إجمالي السنة الأولى</h3>
+<table>
+<thead><tr><th>البند</th><th class="num">اقتصادي $</th><th class="num">قياسي $</th><th class="num">طموح $</th></tr></thead>
+<tbody>
+<tr><td>تطوير MVP</td><td class="num">20,800</td><td class="num">65,900</td><td class="num">110,000</td></tr>
+<tr><td>تطوير وتحسين بعد الإطلاق (6 أشهر)</td><td class="num">18,000</td><td class="num">42,000</td><td class="num">96,000</td></tr>
+<tr><td>بنية تحتية (12 شهرًا)</td><td class="num">900</td><td class="num">1,800</td><td class="num">4,500</td></tr>
+<tr><td>أدوات واشتراكات برمجية</td><td class="num">800</td><td class="num">2,400</td><td class="num">6,000</td></tr>
+<tr><td>رسائل SMS و WhatsApp</td><td class="num">1,500</td><td class="num">5,000</td><td class="num">18,000</td></tr>
+<tr><td>قانوني وتسجيل وعلامة ومحاسبة</td><td class="num">2,500</td><td class="num">6,000</td><td class="num">12,000</td></tr>
+<tr><td>تسويق ومبيعات ميدانية</td><td class="num">6,000</td><td class="num">25,000</td><td class="num">85,000</td></tr>
+<tr><td>دعم فني وخدمة عملاء</td><td class="num">—</td><td class="num">6,000</td><td class="num">16,000</td></tr>
+<tr><td>عُدد تفعيل المتاجر</td><td class="num">800</td><td class="num">3,000</td><td class="num">9,000</td></tr>
+<tr><td>احتياطي طوارئ (15%)</td><td class="num">7,700</td><td class="num">23,600</td><td class="num">50,000</td></tr>
+</tbody>
+<tfoot>
+<tr><td>الإجمالي بالدولار</td><td class="num">57,000</td><td class="num">180,700</td><td class="num">406,500</td></tr>
+<tr><td>الإجمالي بالجنيه المصري (× 50)</td><td class="num">2.85 مليون</td><td class="num">9.04 مليون</td><td class="num">20.3 مليون</td></tr>
+<tr><td>معدل الحرق الشهري بعد الإطلاق</td><td class="num">~4,000</td><td class="num">~13,000</td><td class="num">~30,000</td></tr>
+</tfoot>
+</table>
+
+<div class="verdict">
+<h3>أهم ثلاث ملاحظات على التكلفة</h3>
+<ol style="margin:0 5mm 0 0; padding-right:4mm">
+<li><strong>السيرفرات ليست المشكلة.</strong> تمثل 1–3% من إجمالي التكلفة. من يقلق بشأن تكلفة الاستضافة في هذا المشروع يقلق من الشيء الخطأ.</li>
+<li><strong>المبيعات الميدانية هي البند الأثقل بعد التطوير.</strong> بيع الولاء للمتاجر الصغيرة يتم وجهًا لوجه، والزيارة الميدانية باهظة. أي نموذج نمو لا يحسبها يكون متفائلًا بشكل غير واقعي.</li>
+<li><strong>التكلفة المتغيرة (الرسائل) تقرر مصير الهامش.</strong> اتفاق واحد جيد مع مزوّد رسائل محلي قد يفرق بين مشروع رابح ومشروع خاسر.</li>
+</ol>
+</div>
+
+<!-- ================= 05 REVENUE ================= -->
+<div class="page-break"></div>
+<div class="sec"><div class="kicker">SECTION 05</div><h2>نموذج الإيرادات ونقطة التعادل</h2>
+<p>المستند لم يذكر أي سعر. هذا نموذج تسعير مقترح مبني على النطاق الموصوف.</p></div>
+
+<h3 class="sub">5.1 — هيكل التسعير المقترح</h3>
+<table>
+<thead><tr><th>الباقة</th><th class="num">السعر الشهري</th><th>الحدود</th><th>الفئة المستهدفة</th></tr></thead>
+<tbody>
+<tr><td><strong>مجاني</strong></td><td class="num">0 $</td><td>200 عميل نشط · فرع واحد · نموذج ولاء واحد · تقارير 30 يومًا · بدون حملات</td><td>تجربة وتحويل</td></tr>
+<tr><td><strong>Starter</strong></td><td class="num">25 $ / 1,250 ج</td><td>1,500 عميل · فرعان · كل نماذج الولاء · تقارير كاملة</td><td>متجر مستقل</td></tr>
+<tr><td><strong>Growth</strong></td><td class="num">60 $ / 3,000 ج</td><td>10,000 عميل · 5 فروع · حملات · تصدير · تحليلات متقدمة</td><td>متجر ناجح / سلسلة صغيرة</td></tr>
+<tr><td><strong>Chain</strong></td><td class="num">150 $+ / 7,500 ج+</td><td>فروع غير محدودة · API · تكامل POS · حساب مخصص</td><td>السلاسل</td></tr>
+</tbody>
+</table>
+<div class="note">إيرادات إضافية موصى بها: <strong>رسوم تفعيل لمرة واحدة</strong> 50–100 $ · <strong>رصيد الحملات</strong> (رسائل) بهامش 30–50% · <strong>تكامل POS</strong> كإضافة مدفوعة. هذه البنود قد ترفع متوسط الإيراد لكل تاجر بنسبة 30–40%.</div>
+
+<h3 class="sub">5.2 — حساب نقطة التعادل</h3>
+<p>بافتراض متوسط إيراد شهري لكل تاجر مدفوع = <strong>45 دولارًا</strong>، ومعدل تحويل من المجاني إلى المدفوع بين <strong>4%</strong> (متحفظ، متوسط قطاع SaaS للشركات الصغيرة) و<strong>10%</strong> (متفائل، مع مبيعات ميدانية نشطة).</p>
+<table>
+<thead><tr><th>السيناريو</th><th class="num">الحرق الشهري</th><th class="num">تجّار مدفوعون مطلوبون</th><th class="num">إجمالي تجّار (تحويل 10%)</th><th class="num">إجمالي تجّار (تحويل 4%)</th></tr></thead>
+<tbody>
+<tr><td>الاقتصادي</td><td class="num">4,000 $</td><td class="num">89</td><td class="num">890</td><td class="num">2,225</td></tr>
+<tr><td>القياسي</td><td class="num">13,000 $</td><td class="num">289</td><td class="num">2,890</td><td class="num">7,225</td></tr>
+<tr><td>الطموح</td><td class="num">30,000 $</td><td class="num">667</td><td class="num">6,670</td><td class="num">16,675</td></tr>
+</tbody>
+</table>
+
+<div class="verdict">
+<h3>القراءة الصادقة لهذه الأرقام</h3>
+<p>مندوب مبيعات ميداني نشط يضم واقعيًا <strong>30–50 متجرًا شهريًا</strong>. أي أن مندوبين اثنين يضمان 60–100 متجر شهريًا.</p>
+<ul style="margin:2mm 5mm 0 0; padding-right:4mm">
+<li><strong>السيناريو الاقتصادي:</strong> الوصول إلى 890 متجرًا يحتاج ~10–12 شهرًا من البيع النشط ← <strong>التعادل واقعيًا بين الشهر 15 و 20</strong>. قابل للتحقيق.</li>
+<li><strong>السيناريو القياسي:</strong> 2,890 متجرًا يحتاج فريق مبيعات أكبر ووقتًا أطول ← <strong>التعادل بين الشهر 24 و 36</strong>. يتطلب تمويلًا.</li>
+<li><strong>السيناريو الطموح:</strong> غير مبرر قبل إثبات معدل الاحتفاظ. لا تدخله بلا بيانات.</li>
+</ul>
+<p style="margin-top:3mm"><strong>الاستنتاج الحاسم:</strong> بمتوسط إيراد 45 دولارًا للتاجر، تحتاج <em>آلاف</em> المتاجر للتعادل، واكتساب المتجر عملية ميدانية بطيئة ومكلفة. <strong>هذه هي المخاطرة رقم واحد في المشروع كله</strong> — أكبر من أي مخاطرة تقنية.</p>
+<p><strong>ثلاثة علاجات مباشرة:</strong> (1) ارفع متوسط الإيراد عبر رسوم التفعيل ورصيد الحملات وتكامل POS. (2) استهدف السلاسل متعددة الفروع — عقد واحد يعادل 20 متجرًا مستقلًا. (3) ابنِ قناة بيع غير مباشرة عبر شركاء (موزّعو أنظمة نقاط البيع ووكلاؤهم) بدل الاعتماد الكامل على المندوبين.</p>
+</div>
+
+<!-- ================= 06 WILL IT SUCCEED ================= -->
+<div class="page-break"></div>
+<div class="sec"><div class="kicker">SECTION 06</div><h2>هل الفكرة تنجح؟ — التحليل النهائي</h2>
+<p>إجابة صريحة بشروطها، لا تفاؤل مجاني ولا تشاؤم مجاني.</p></div>
+
+<div class="two">
+<div class="box g"><h4>&#10003; عوامل تصب في صالح النجاح</h4>
+<ul>
+<li>المشكلة حقيقية وموجعة ومتكررة يوميًا لدى التاجر.</li>
+<li>نموذج إيراد متكرر قابل للتنبؤ وعالي التقييم.</li>
+<li>تكلفة تقنية منخفضة نسبيًا — لا تحتاج بحثًا وتطويرًا مكلفًا ولا أجهزة.</li>
+<li>سوق عربي ناقص الخدمة، ومعظم الحلول القائمة إما مستوردة وغير مناسبة ثقافيًا أو بدائية جدًا.</li>
+<li>الهوية والرؤية والتموضع جاهزة ومتماسكة — أصل حقيقي يوفر وقتًا ومالًا.</li>
+<li>احتكاك التبني منخفض بفضل قرار PWA.</li>
+<li>إمكانية توسّع أفقي واضحة (قطاعات) ورأسي (سلاسل) وجغرافي (أسواق عربية).</li>
+</ul></div>
+<div class="box r"><h4>&#10007; عوامل تصب ضد النجاح</h4>
+<ul>
+<li><strong>حاجز الدخول التقني منخفض</strong> — أي فريق كفء يبني نسخة مشابهة في 4 أشهر. الخندق الوحيد الممكن هو الشبكة والتوزيع، لا الكود.</li>
+<li><strong>أنظمة نقاط البيع تستطيع إضافة ولاء مدمج مجانًا</strong> وهي أقرب لنقطة البيع منك.</li>
+<li><strong>البيع للمتاجر الصغيرة بطيء ومكلف</strong> ومعدل الانسحاب فيه مرتفع تاريخيًا.</li>
+<li><strong>متوسط إيراد منخفض يقابله جهد استحواذ مرتفع</strong> — أصعب معادلة في SaaS.</li>
+<li><strong>مشكلة البيضة والدجاجة</strong> تقتل معظم منصات الشبكة.</li>
+<li><strong>الرهان على قطاع «كل الأنشطة»</strong> يبدّد الموارد بلا تمركز.</li>
+<li><strong>الالتزام المالي للنقاط</strong> قد يرتد على المنصة سمعةً ومسؤوليةً.</li>
+</ul></div>
+</div>
+
+<h3 class="sub">6.1 — الشروط الخمسة التي لا نجاح بدونها</h3>
+<table>
+<thead><tr><th class="num">#</th><th>الشرط</th><th>إن لم يتحقق</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td><strong>حسم آلية إثبات الشراء</strong> بحل يعمل في أقل من 10 ثوانٍ عند الكاشير (م-01)</td><td>لن يتبناه أي تاجر جاد، ولن تكون البيانات موثوقة.</td></tr>
+<tr><td class="num">2</td><td><strong>التركيز على قطاع واحد وبقعة جغرافية واحدة</strong> حتى التشبّع (م-03 و م-04)</td><td>انتشار سطحي بلا كثافة = لا شبكة = لا خندق.</td></tr>
+<tr><td class="num">3</td><td><strong>تسعير مصحّح</strong> يرفع متوسط الإيراد فوق 45 دولارًا ويلغي المجاني اللانهائي (م-05 و م-06)</td><td>تعادل مستحيل أو مؤجّل لسنوات.</td></tr>
+<tr><td class="num">4</td><td><strong>قيمة مستقلة للتاجر المنفرد</strong> — المنتج يستحق سعره حتى لو كان المتجر الوحيد</td><td>لن تعبر مرحلة البداية الباردة أصلًا.</td></tr>
+<tr><td class="num">5</td><td><strong>تمويل أو نقد تشغيلي يغطي 18–24 شهرًا</strong> على الأقل</td><td>نفاد النقد قبل الوصول لكثافة الشبكة — السبب الأول لموت هذا النوع من المنصات.</td></tr>
+</tbody>
+</table>
+
+<h3 class="sub">6.2 — الحكم النهائي</h3>
+<div class="kpis">
+<div class="kpi"><div class="v" style="color:#DC2626">15–20%</div><div class="k">احتمالية النجاح<br>بالصيغة الحالية</div></div>
+<div class="kpi"><div class="v" style="color:#16A34A">40–50%</div><div class="k">بعد تطبيق<br>تعديلات هذا التقرير</div></div>
+<div class="kpi"><div class="v">~10%</div><div class="k">المتوسط العام<br>لنجاح الناشئة</div></div>
+<div class="kpi"><div class="v">18–24</div><div class="k">شهرًا نقدًا تشغيليًا<br>مطلوبة كحد أدنى</div></div>
+</div>
+
+<div class="verdict">
+<h3>الخلاصة الصريحة</h3>
+<p><strong>نعم، الفكرة تنجح — لكن ليست كما هي مكتوبة، ولن ينجح فيها المنتج وحده.</strong></p>
+<p style="margin-top:2mm">هذا المشروع ليس رهانًا تقنيًا؛ التقنية فيه واضحة ومحلولة ومتوسطة الصعوبة. هو <strong>رهان توزيع ومبيعات</strong> بامتياز. من سيفوز في هذا السوق ليس من يبني أفضل منتج، بل <strong>من يضم أكبر عدد من المتاجر في أضيق بقعة جغرافية بأسرع وقت وبأقل تكلفة استحواذ</strong>.</p>
+<p style="margin-top:2mm">ولذلك، فإن أخطر ما في المستند الحالي أنه <em>مستند منتج بالكامل</em> — عشرة بريفات عن الرؤية والقيمة والتجربة، وصفر عن التوزيع والتسعير والاستحواذ. وهذا انعكاس لخطر حقيقي في التفكير، لا مجرد نقص في التوثيق.</p>
+<p style="margin-top:2mm"><strong>التوصية العملية:</strong> ابدأ بالسيناريو الاقتصادي (57 ألف دولار / ~2.9 مليون جنيه)، بقطاع واحد وحي واحد وهدف 30 متجرًا مفعّلًا خلال 6 أشهر بعد الإطلاق. لا تجمع تمويلًا كبيرًا ولا توظّف فريق مبيعات قبل أن تُثبت رقمين فقط: <strong>معدل احتفاظ التاجر بعد 3 أشهر فوق 80%</strong>، و<strong>ارتفاع قابل للقياس في معدل تكرار شراء العميل داخل المتاجر المشتركة</strong>. هذان الرقمان — لا حجم السوق ولا جمال المنتج — هما ما يقرر إن كان المشروع يستحق مليون دولار أم لا شيء.</p>
+</div>
+
+<!-- ================= 07 ROADMAP ================= -->
+<div class="page-break"></div>
+<div class="sec"><div class="kicker">SECTION 07</div><h2>خارطة الطريق المقترحة والمؤشرات</h2>
+<p>ترتيب تنفيذي مبني على أولويات المشاكل الواردة في القسم الثالث.</p></div>
+
+<table>
+<thead><tr><th class="num">المرحلة</th><th>الهدف</th><th>المخرجات</th><th class="num">المشاكل المعالَجة</th></tr></thead>
+<tbody>
+<tr><td class="num"><strong>الشهر 0</strong><br>قبل الكود</td><td>حسم القرارات الوجودية</td><td>تحديد آلية إثبات الشراء · حسم نموذج النقاط · اختيار القطاع والبقعة · التسعير النهائي · توحيد الاسم والعلامة</td><td class="num">م-01 · م-02<br>م-03 · م-06 · م-16</td></tr>
+<tr><td class="num"><strong>الأشهر 1–5</strong><br>البناء</td><td>MVP قابل للتشغيل الحقيقي</td><td>تطبيق PWA · لوحة التاجر · لوحة الإدارة · نماذج الولاء الستة · ضوابط الاحتيال · التسلسل الهرمي للفروع · تقارير أساسية</td><td class="num">م-07 · م-11<br>م-13</td></tr>
+<tr><td class="num"><strong>الشهر 6</strong><br>تجريب مغلق</td><td>إثبات صلاحية الآلية</td><td>5–10 متاجر تجريبية في البقعة المختارة · قياس زمن العملية عند الكاشير · تصحيح الاحتكاك</td><td class="num">م-01 · م-04</td></tr>
+<tr><td class="num"><strong>الأشهر 7–12</strong><br>الكثافة</td><td>30 متجرًا مفعّلًا في بقعة واحدة</td><td>مبيعات ميدانية · قياس الاحتفاظ · إطلاق الباقات المدفوعة · قنوات التواصل المتدرجة · الامتثال القانوني</td><td class="num">م-05 · م-09<br>م-10</td></tr>
+<tr><td class="num"><strong>الأشهر 13–18</strong><br>التكرار</td><td>تكرار النموذج في بقع جديدة</td><td>تكامل POS · التحليلات التنبؤية · استهداف السلاسل · قناة الشركاء غير المباشرة</td><td class="num">م-12 · م-14</td></tr>
+</tbody>
+</table>
+
+<h3 class="sub">المؤشرات التي يجب مراقبتها من اليوم الأول</h3>
+<table>
+<thead><tr><th>المؤشر</th><th>لماذا هو مهم</th><th class="num">الهدف الصحي</th></tr></thead>
+<tbody>
+<tr><td><strong>معدل تفعيل التاجر</strong><br><span style="font-size:8.5pt;color:#6B6B8A">نسبة من سجّل وسجّل فعليًا 10 عمليات في أول أسبوعين</span></td><td>أهم مؤشر مبكر على الإطلاق — يكشف إن كانت آلية إثبات الشراء تعمل فعلًا</td><td class="num">&gt; 60%</td></tr>
+<tr><td><strong>معدل احتفاظ التاجر بعد 3 أشهر</strong></td><td>يقرر إن كان المنتج يستحق البناء عليه أصلًا</td><td class="num">&gt; 80%</td></tr>
+<tr><td><strong>عدد العملاء المسجّلين لكل متجر</strong></td><td>يقيس فاعلية رحلة التسجيل عند الكاشير</td><td class="num">&gt; 100 / شهر</td></tr>
+<tr><td><strong>الارتفاع في معدل تكرار الشراء</strong></td><td>القيمة الوحيدة التي تبرر السعر — بلا هذا الرقم لا يوجد منتج</td><td class="num">&gt; 15%</td></tr>
+<tr><td><strong>معدل استبدال المكافآت</strong></td><td>يكشف إن كانت المكافآت واقعية أم بعيدة المنال</td><td class="num">25% – 45%</td></tr>
+<tr><td><strong>تكلفة الاستحواذ على تاجر</strong></td><td>مقابل قيمة عمره — معادلة البقاء المالية</td><td class="num">&lt; 3 أشهر استرداد</td></tr>
+<tr><td><strong>الإيراد الشهري المتكرر (MRR)</strong> ومعدل نموه</td><td>لغة المستثمر الوحيدة</td><td class="num">نمو &gt; 12% شهريًا</td></tr>
+<tr><td><strong>التكلفة المتغيرة لكل عميل نشط</strong></td><td>الرسائل والبنية — تحرس الهامش</td><td class="num">&lt; 0.05 $ / شهر</td></tr>
+</tbody>
+</table>
+
+<div class="quote">الخلاصة في جملة واحدة:<br>ولائي مشروع <strong>فكرته سليمة</strong> و<strong>وثيقته ناقصة</strong> و<strong>مخاطرته في التوزيع لا في التقنية</strong>.<br><span style="font-size:9.5pt;color:#C9B6F5;font-weight:400">احسم آلية إثبات الشراء ونموذج النقاط، وركّز على قطاع واحد وحي واحد، وصحّح التسعير — تتضاعف فرصك ثلاث مرات.</span></div>
+
+<div class="footer-line">ولائي… كلنا كسبانين.</div>
+
+</body>
+</html>

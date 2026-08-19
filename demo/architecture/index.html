@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ولائي — المخطط البرمجي والمعماري</title>
+<link rel="stylesheet" href="../assets/css/theme.css">
+<link rel="stylesheet" href="../assets/css/arch.css">
+</head>
+<body class="arch">
+<div class="wrap">
+
+<div class="ahead">
+  <a class="back" href="../index.html">&#8594; العودة لمعرض الواجهات</a>
+  <h1>المخطط البرمجي والمعماري</h1>
+  <p>كل ما يحتاجه المطوّر ليبدأ التنفيذ فورًا: طبقات النظام، نموذج البيانات كاملًا بعلاقاته،
+     تدفق تنفيذ العملية الحرجة سطرًا بسطر، واجهات API، بنية المشروع، الحاويات، والاختبارات.</p>
+  <div class="chipsrow">
+    <span>Django 5 + DRF</span><span>PostgreSQL 16</span><span>Redis 7</span>
+    <span>Celery 5</span><span>PWA</span><span>Docker</span><span>٢١ جدولًا</span><span>٤٧ نقطة API</span>
+  </div>
+</div>
+
+<nav class="toclist" id="toc">
+  <a href="#s1">المعمارية</a><a href="#s2">الحزمة التقنية</a><a href="#s3">بنية المشروع</a>
+  <a href="#s4">نموذج البيانات</a><a href="#s5">تدفق التنفيذ</a><a href="#s6">الكود الحرج</a>
+  <a href="#s7">واجهات API</a><a href="#s8">المهام الخلفية</a><a href="#s9">الأمان والصلاحيات</a>
+  <a href="#s10">Docker والنشر</a><a href="#s11">متغيرات البيئة</a><a href="#s12">الاختبارات</a>
+</nav>
+
+<!-- ═══════════ 1 · المعمارية ═══════════ -->
+<h2 class="as" id="s1"><span class="n">١</span> معمارية النظام</h2>
+<p class="lead">خمس طبقات. كل طبقة تتحدث مع التي تحتها فقط — لا اختصارات ولا وصول مباشر من الواجهة لقاعدة البيانات.</p>
+
+<div class="layers">
+  <div class="layer l1">
+    <div class="lh"><div class="ibox v">◱</div><b>طبقة العرض — Clients</b><span class="tag">JavaScript</span></div>
+    <div class="boxes">
+      <div class="bx">تطبيق العميل <small>PWA · Service Worker</small></div>
+      <div class="bx">لوحة صاحب المتجر <small>SPA</small></div>
+      <div class="bx">لوحة إدارة المنصة <small>SPA</small></div>
+      <div class="bx">شاشة الكاشير <small>Terminal Mode</small></div>
+    </div>
+  </div>
+  <div class="arrowdn">▼ HTTPS / JSON</div>
+
+  <div class="layer l5">
+    <div class="lh"><div class="ibox b">◲</div><b>طبقة الحافة — Edge</b><span class="tag">Nginx / Traefik</span></div>
+    <div class="boxes">
+      <div class="bx">إنهاء TLS</div><div class="bx">ضغط gzip / brotli</div>
+      <div class="bx">تحديد المعدل <small>Rate Limit</small></div>
+      <div class="bx">الملفات الثابتة</div><div class="bx">رؤوس الأمان</div>
+    </div>
+  </div>
+  <div class="arrowdn">▼ WSGI</div>
+
+  <div class="layer l2">
+    <div class="lh"><div class="ibox g">◈</div><b>طبقة التطبيق — Django + DRF</b><span class="tag">Python 3.12</span></div>
+    <div class="boxes">
+      <div class="bx">المصادقة <small>JWT + OTP</small></div>
+      <div class="bx">الصلاحيات <small>Object-level</small></div>
+      <div class="bx">محرك النقاط <small>ledger</small></div>
+      <div class="bx">محرك القواعد <small>fraud</small></div>
+      <div class="bx">موجّه القنوات <small>campaigns</small></div>
+      <div class="bx">واجهات عامة <small>publicapi</small></div>
+    </div>
+  </div>
+  <div class="arrowdn">▼</div>
+
+  <div class="layer l3">
+    <div class="lh"><div class="ibox o">◉</div><b>طبقة المهام غير المتزامنة — Celery</b><span class="tag">Worker + Beat</span></div>
+    <div class="boxes">
+      <div class="bx">تدوير رموز QR</div><div class="bx">إرسال الرسائل</div>
+      <div class="bx">إطلاق Webhooks</div><div class="bx">انتهاء صلاحية النقاط</div>
+      <div class="bx">تجميع التقارير</div><div class="bx">التحليلات الذكية</div>
+    </div>
+  </div>
+  <div class="arrowdn">▼</div>
+
+  <div class="layer l4">
+    <div class="lh"><div class="ibox b">◫</div><b>طبقة التخزين — Data</b><span class="tag">Stateful</span></div>
+    <div class="boxes">
+      <div class="bx">PostgreSQL <small>المصدر الوحيد للحقيقة</small></div>
+      <div class="bx">Redis <small>رموز QR · كاش · طوابير</small></div>
+      <div class="bx">Object Storage <small>شعارات · تقارير</small></div>
+    </div>
+  </div>
+</div>
+
+<div class="nt"><b>قاعدة معمارية غير قابلة للكسر:</b> كل تعديل على الرصيد يمر عبر <b>خدمة واحدة</b>
+(<code style="font-family:Consolas">ledger.services.apply_entry</code>). لا يوجد في المشروع كله أي سطر آخر
+يكتب في جدول <code style="font-family:Consolas">Balance</code> مباشرة. هذا ما يجعل الرصيد قابلًا للتدقيق والإصلاح.</div>
+
+<!-- ═══════════ 2 · الحزمة التقنية ═══════════ -->
+<h2 class="as" id="s2"><span class="n">٢</span> الحزمة التقنية والبرامج المستخدمة</h2>
+<table class="at">
+<thead><tr><th>الطبقة</th><th>الأداة</th><th>الإصدار</th><th>لماذا هذه تحديدًا</th></tr></thead>
+<tbody>
+<tr><td rowspan="6"><b>الخلفية</b></td><td><code>Django</code></td><td>5.x LTS</td><td>ORM ناضج، هجرات موثوقة، لوحة إدارة جاهزة — توفّر شهورًا من العمل</td></tr>
+<tr><td><code>djangorestframework</code></td><td>3.15</td><td>سيريالايزر وصلاحيات على مستوى الكائن</td></tr>
+<tr><td><code>djangorestframework-simplejwt</code></td><td>5.3</td><td>توكن وصول قصير + تحديث — مناسب لـ PWA</td></tr>
+<tr><td><code>celery</code> + <code>django-celery-beat</code></td><td>5.4</td><td>مهام مؤجلة ومجدولة بجدولة قابلة للتعديل من اللوحة</td></tr>
+<tr><td><code>psycopg[binary]</code></td><td>3.2</td><td>محرك PostgreSQL الحديث</td></tr>
+<tr><td><code>drf-spectacular</code></td><td>0.27</td><td>توليد توثيق OpenAPI تلقائيًا — مطلوب للباقة المتقدمة</td></tr>
+<tr><td rowspan="4"><b>الواجهات</b></td><td><code>Vite</code></td><td>5.x</td><td>بناء سريع وحجم ناتج صغير</td></tr>
+<tr><td><code>React</code> أو <code>Vue 3</code></td><td>18 / 3.4</td><td>حسب خبرة الفريق — لا فرق جوهري لهذا النطاق</td></tr>
+<tr><td><code>vite-plugin-pwa</code> (Workbox)</td><td>0.20</td><td>Service Worker وعمل دون اتصال وتثبيت على الشاشة</td></tr>
+<tr><td><code>html5-qrcode</code></td><td>2.3</td><td>قراءة QR من كاميرا المتصفح بلا تطبيق أصلي</td></tr>
+<tr><td rowspan="4"><b>التخزين</b></td><td><code>PostgreSQL</code></td><td>16</td><td>معاملات ACID و<code>SELECT FOR UPDATE</code> — أساس صحة الرصيد</td></tr>
+<tr><td><code>Redis</code></td><td>7</td><td>رموز QR بـ TTL، كاش، وسيط طوابير Celery</td></tr>
+<tr><td><code>MinIO</code> / S3</td><td>—</td><td>شعارات المتاجر والتقارير المُصدَّرة</td></tr>
+<tr><td><code>pgBackRest</code> / pg_dump</td><td>—</td><td>نسخ احتياطي يومي + استرجاع لحظي</td></tr>
+<tr><td rowspan="4"><b>التشغيل</b></td><td><code>Docker</code> + <code>Compose</code></td><td>26+</td><td>بيئة موحّدة بين التطوير والإنتاج</td></tr>
+<tr><td><code>Nginx</code> / <code>Traefik</code></td><td>1.27 / 3</td><td>Traefik مدمج داخل Dokploy مع شهادات تلقائية</td></tr>
+<tr><td><code>gunicorn</code> + <code>uvicorn worker</code></td><td>22 / 0.30</td><td>خادم WSGI/ASGI مستقر</td></tr>
+<tr><td><code>Sentry</code> + <code>Prometheus</code></td><td>—</td><td>تتبّع الأخطاء ومقاييس التشغيل</td></tr>
+<tr><td rowspan="4"><b>الجودة</b></td><td><code>pytest</code> + <code>pytest-django</code></td><td>8.x</td><td>اختبارات سريعة مع تثبيتات قابلة لإعادة الاستخدام</td></tr>
+<tr><td><code>factory-boy</code></td><td>3.3</td><td>توليد بيانات اختبار واقعية</td></tr>
+<tr><td><code>ruff</code> + <code>black</code></td><td>—</td><td>فحص وتنسيق تلقائي قبل كل التزام</td></tr>
+<tr><td><code>pre-commit</code> + GitHub Actions</td><td>—</td><td>لا يدخل كود غير مفحوص إلى الفرع الرئيسي</td></tr>
+<tr><td rowspan="3"><b>القنوات</b></td><td><code>pywebpush</code></td><td>2.0</td><td>إشعارات ويب مجانية — القناة الافتراضية</td></tr>
+<tr><td>WhatsApp Cloud API</td><td>v20</td><td>رسائل خدمية بمعدل قراءة مرتفع</td></tr>
+<tr><td>مزوّد SMS محلي</td><td>—</td><td>OTP فقط — أرخص من الدولي بما يصل لعشرة أضعاف</td></tr>
+</tbody>
+</table>
+
+<!-- ═══════════ 3 · بنية المشروع ═══════════ -->
+<h2 class="as" id="s3"><span class="n">٣</span> بنية المشروع البرمجي</h2>
+<p class="lead">تقسيم بالمجال (Domain-driven) لا بالنوع. كل تطبيق يملك نماذجه وخدماته واختباراته.</p>
+<div class="ftree">
+walaee/<br>
+├── <b>config/</b>                      <i># إعدادات المشروع</i><br>
+│   ├── settings/<b>base.py</b> · <b>dev.py</b> · <b>prod.py</b><br>
+│   ├── <b>urls.py</b> · <b>celery.py</b> · <b>asgi.py</b> · <b>wsgi.py</b><br>
+│<br>
+├── <b>apps/</b><br>
+│   ├── <b>accounts/</b>                <i># User · Customer · OTP · الموافقة والخصوصية</i><br>
+│   │   ├── models.py  serializers.py  views.py  services.py<br>
+│   │   └── tests/<br>
+│   ├── <b>tenancy/</b>                 <i># Organization → Brand → Branch → Terminal → StaffUser</i><br>
+│   ├── <b>loyalty/</b>                 <i># Program · Rule · Reward · Membership · Balance</i><br>
+│   ├── <b>ledger/</b>   <u>◆ القلب</u>       <i># Transaction · LedgerEntry (append-only) · Redemption</i><br>
+│   │   ├── models.py<br>
+│   │   ├── <u>services.py</u>           <i># apply_entry() — المكان الوحيد الذي يعدّل الرصيد</i><br>
+│   │   └── tests/test_concurrency.py<br>
+│   ├── <b>pos/</b>                     <i># تدوير الرموز · resolve · confirm · المسار اليدوي</i><br>
+│   ├── <b>fraud/</b>                   <i># محرك القواعد · FraudSignal · المراجعة</i><br>
+│   ├── <b>campaigns/</b>               <i># Campaign · MessageJob · موجّه القنوات بالتكلفة</i><br>
+│   ├── <b>billing/</b>                 <i># Subscription · Invoice · MessageCredit · الجدار المجاني</i><br>
+│   ├── <b>insights/</b>   <u>الشاملة</u>     <i># التحليلات والتوصيات والذكاء الاصطناعي</i><br>
+│   ├── <b>publicapi/</b>  <u>المتقدمة</u>    <i># ApiKey · Webhook · التوثيق العام</i><br>
+│   └── <b>audit/</b>                   <i># AuditLog + middleware يلتقط كل تغيير</i><br>
+│<br>
+├── <b>frontend/</b><br>
+│   ├── customer-pwa/            <i># Vite + PWA</i><br>
+│   ├── merchant-dashboard/<br>
+│   └── admin-panel/<br>
+│<br>
+├── <b>deploy/</b><br>
+│   ├── Dockerfile · Dockerfile.web · docker-compose.yml<br>
+│   ├── nginx/ · scripts/entrypoint.sh<br>
+│<br>
+├── requirements/base.txt · dev.txt · prod.txt<br>
+├── .env.example · pytest.ini · ruff.toml · .pre-commit-config.yaml<br>
+└── manage.py
+</div>
+
+<div class="nt ok"><b>قاعدة تنظيمية:</b> منطق الأعمال يعيش في <code style="font-family:Consolas">services.py</code> داخل كل تطبيق —
+لا في <code style="font-family:Consolas">views.py</code> ولا في <code style="font-family:Consolas">models.py</code>.
+الـ View يستقبل ويتحقق ويستدعي الخدمة فقط. هذا يجعل نفس المنطق قابلًا للاستدعاء من API ومن Celery ومن أوامر الإدارة بلا تكرار.</div>
+
+<!-- ═══════════ 4 · نموذج البيانات ═══════════ -->
+<h2 class="as" id="s4"><span class="n">٤</span> نموذج البيانات والعلاقات</h2>
+<p class="lead">٢١ جدولًا. أهم قرار في المشروع كله — بناؤه صحيحًا الآن يكلّف أيامًا، وتعديله بعد الإطلاق يكلّف شهورًا.</p>
+
+<div class="legend">
+  <span><i style="background:#4B1E9E"></i> الهيكل والحسابات</span>
+  <span><i style="background:#16A34A"></i> الولاء</span>
+  <span><i style="background:#DC2626"></i> القيود (append-only)</span>
+  <span><i style="background:#F97316"></i> التشغيل</span>
+  <span><i style="background:#2563EB"></i> الفوترة</span>
+  <span><i style="background:#6B6B8A"></i> التكاملات</span>
+  <span><span class="k pk">PK</span> مفتاح أساسي</span>
+  <span><span class="k fk">FK</span> مفتاح خارجي</span>
+  <span><span class="k uq">UQ</span> فريد</span>
+  <span><span class="k ix">IX</span> فهرس</span>
+</div>
+
+<h3 class="h3">٤.١ — الهيكل التنظيمي والحسابات</h3>
+<div class="erd">
+  <div class="ent c-core"><div class="eh">Organization <small>المؤسسة</small></div><ul>
+    <li><span class="k pk">PK</span> id <span class="t">uuid</span></li>
+    <li>name <span class="t">varchar</span></li>
+    <li>legal_name · tax_id <span class="t">varchar</span></li>
+    <li>billing_email <span class="t">email</span></li>
+    <li>status <span class="t">enum</span></li>
+    <li>created_at <span class="t">timestamptz</span></li>
+  </ul><div class="note2">كيان التعاقد والفوترة. أعلى مستوى في الشجرة.</div></div>
+
+  <div class="ent c-core"><div class="eh">Brand <small>العلامة التجارية</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> org_id <span class="t">→ Organization</span></li>
+    <li><span class="k uq">UQ</span> slug</li>
+    <li>name · logo · category</li>
+    <li>primary_color <span class="t">varchar(7)</span></li>
+  </ul><div class="note2">وحدة عزل البيانات. عميل العلامة أ لا يظهر للعلامة ب.</div></div>
+
+  <div class="ent c-core"><div class="eh">Branch <small>الفرع</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> brand_id <span class="t">→ Brand</span></li>
+    <li>name · address</li>
+    <li><span class="k ix">IX</span> lat · lng <span class="t">decimal</span></li>
+    <li>opening_hours <span class="t">jsonb</span></li>
+    <li>is_active <span class="t">bool</span></li>
+  </ul><div class="note2">فهرس جغرافي لخاصية «متاجر قريبة منك».</div></div>
+
+  <div class="ent c-core"><div class="eh">Terminal <small>نقطة البيع</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> branch_id <span class="t">→ Branch</span></li>
+    <li>label <span class="t">varchar</span></li>
+    <li>current_code <span class="t">varchar(12)</span></li>
+    <li>code_expires_at <span class="t">timestamptz</span></li>
+    <li>is_active</li>
+  </ul><div class="note2">الرمز الفعّال يعيش في Redis بـ TTL؛ العمود نسخة للتدقيق فقط.</div></div>
+
+  <div class="ent c-core"><div class="eh">StaffUser <small>الكاشير والموظف</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> branch_id <span class="t">→ Branch</span></li>
+    <li><span class="k fk">FK</span> user_id <span class="t">→ User</span></li>
+    <li>role <span class="t">owner|manager|cashier</span></li>
+    <li>pin_hash · is_active</li>
+  </ul><div class="note2 warn">حساب مستقل لكل كاشير — شرط كشف الاحتيال (م‑07).</div></div>
+
+  <div class="ent c-core"><div class="eh">User <small>حساب النظام</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k uq">UQ</span> phone <span class="t">varchar(20)</span></li>
+    <li>email · password_hash</li>
+    <li>full_name · last_login</li>
+    <li>is_active · is_superuser</li>
+  </ul><div class="note2">لأصحاب المتاجر وفريق المنصة — منفصل عن Customer.</div></div>
+
+  <div class="ent c-core"><div class="eh">Customer <small>العميل النهائي</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k uq">UQ</span> phone <span class="t">varchar(20)</span></li>
+    <li>full_name · birth_date</li>
+    <li>consent_at · consent_version</li>
+    <li>push_subscription <span class="t">jsonb</span></li>
+    <li>deleted_at <span class="t">timestamptz</span></li>
+  </ul><div class="note2">هوية واحدة عبر المنصة كلها. <code>consent_*</code> مطلوب للامتثال (م‑09).</div></div>
+</div>
+
+<h3 class="h3">٤.٢ — الولاء</h3>
+<div class="erd">
+  <div class="ent c-loy"><div class="eh">LoyaltyProgram <small>البرنامج</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> brand_id <span class="t">→ Brand</span></li>
+    <li>type <span class="t">points|stamps|visits|<br>cashback|rewards|gifts</span></li>
+    <li>name · is_active</li>
+    <li>starts_at · ends_at</li>
+  </ul><div class="note2">النماذج الستة. علامة واحدة قد تُشغّل أكثر من برنامج معًا.</div></div>
+
+  <div class="ent c-loy"><div class="eh">ProgramRule <small>القواعد</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> program_id <span class="t">→ Program 1:1</span></li>
+    <li>earn_rate <span class="t">decimal</span></li>
+    <li>min_invoice · max_per_day</li>
+    <li>expiry_months <span class="t">int</span></li>
+    <li>reversal_policy <span class="t">enum</span></li>
+    <li>welcome_bonus <span class="t">int</span></li>
+  </ul><div class="note2 warn"><code>expiry_months</code> و<code>max_per_day</code> يعالجان م‑08 و م‑07.</div></div>
+
+  <div class="ent c-loy"><div class="eh">Membership <small>العضوية</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> customer_id <span class="t">→ Customer</span></li>
+    <li><span class="k fk">FK</span> brand_id <span class="t">→ Brand</span></li>
+    <li><span class="k uq">UQ</span> (customer_id, brand_id)</li>
+    <li>joined_at · status · tier</li>
+  </ul><div class="note2">جدول الربط N↔N. هو ما يجعل الرصيد <b>منفصلًا لكل علامة</b> (م‑02).</div></div>
+
+  <div class="ent c-loy"><div class="eh">Balance <small>الرصيد</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> membership_id</li>
+    <li><span class="k fk">FK</span> program_id</li>
+    <li><span class="k uq">UQ</span> (membership_id, program_id)</li>
+    <li>amount <span class="t">decimal(12,2)</span></li>
+    <li>expires_at · updated_at</li>
+  </ul><div class="note2 warn">لقطة محسوبة فقط — مصدر الحقيقة هو LedgerEntry.</div></div>
+
+  <div class="ent c-loy"><div class="eh">Reward <small>المكافأة</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> program_id</li>
+    <li>title · cost_amount · cost_unit</li>
+    <li>merchant_cost <span class="t">decimal</span></li>
+    <li>stock <span class="t">int | null</span></li>
+    <li>is_active</li>
+  </ul><div class="note2"><code>merchant_cost</code> يُستخدم لحساب «الالتزام القائم» وعائد البرنامج.</div></div>
+</div>
+
+<h3 class="h3">٤.٣ — القيود والعمليات <span style="font-size:11.5px;color:var(--red-600);font-weight:700">◆ append-only</span></h3>
+<div class="erd">
+  <div class="ent c-led"><div class="eh">Transaction <small>العملية</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> terminal_id · staff_user_id</li>
+    <li><span class="k fk">FK</span> customer_id <span class="t">null</span></li>
+    <li><span class="k uq">UQ</span> (terminal_id, invoice_no)</li>
+    <li>invoice_amount <span class="t">decimal</span></li>
+    <li>code_used <span class="t">varchar(12)</span></li>
+    <li>status <span class="t">pending|confirmed|<br>rejected|reversed</span></li>
+    <li><span class="k ix">IX</span> created_at</li>
+  </ul><div class="note2 warn">القيد الفريد على (terminal, invoice_no) يمنع تسجيل نفس الفاتورة مرتين.</div></div>
+
+  <div class="ent c-led"><div class="eh">LedgerEntry <small>قيد الرصيد</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> transaction_id <span class="t">null</span></li>
+    <li><span class="k fk">FK</span> membership_id · program_id</li>
+    <li>delta <span class="t">decimal(12,2)</span></li>
+    <li>reason <span class="t">earn|redeem|expire|<br>reverse|adjust|welcome</span></li>
+    <li><span class="k fk">FK</span> reverses_id <span class="t">→ self</span></li>
+    <li>balance_after <span class="t">decimal</span></li>
+    <li><span class="k ix">IX</span> created_at</li>
+  </ul><div class="note2 warn"><b>لا UPDATE ولا DELETE أبدًا.</b> أي تصحيح يتم بقيد عكسي جديد يشير عبر <code>reverses_id</code>.</div></div>
+
+  <div class="ent c-led"><div class="eh">Redemption <small>الاستبدال</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> reward_id · membership_id</li>
+    <li><span class="k fk">FK</span> ledger_entry_id</li>
+    <li><span class="k uq">UQ</span> code <span class="t">varchar(10)</span></li>
+    <li>status <span class="t">pending|used|expired</span></li>
+    <li>expires_at · used_at</li>
+    <li><span class="k fk">FK</span> used_by_staff_id</li>
+  </ul><div class="note2">الكود صالح ١٥ دقيقة ومرة واحدة فقط.</div></div>
+
+  <div class="ent c-led"><div class="eh">AuditLog <small>سجل التدقيق</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li>actor_type · actor_id</li>
+    <li>action <span class="t">varchar</span></li>
+    <li><span class="k ix">IX</span> entity_type · entity_id</li>
+    <li>before · after <span class="t">jsonb</span></li>
+    <li>ip · user_agent</li>
+    <li><span class="k ix">IX</span> created_at</li>
+  </ul><div class="note2 warn">صلاحيات قاعدة البيانات تمنع الحذف. يُحفظ ٢٤ شهرًا.</div></div>
+</div>
+
+<h3 class="h3">٤.٤ — التشغيل والفوترة والتكاملات</h3>
+<div class="erd">
+  <div class="ent c-ops"><div class="eh">FraudSignal <small>إشارة شذوذ</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> transaction_id</li>
+    <li>rule_code <span class="t">varchar</span></li>
+    <li>severity <span class="t">low|medium|high</span></li>
+    <li>details <span class="t">jsonb</span></li>
+    <li>status <span class="t">open|accepted|rejected</span></li>
+    <li><span class="k fk">FK</span> reviewed_by · reviewed_at</li>
+  </ul><div class="note2">تُولَّد لحظيًا داخل نفس معاملة التأكيد.</div></div>
+
+  <div class="ent c-ops"><div class="eh">Campaign <small>الحملة</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> brand_id · created_by</li>
+    <li>name · message_template</li>
+    <li>segment_query <span class="t">jsonb</span></li>
+    <li>channel_priority <span class="t">text[]</span></li>
+    <li>status · scheduled_at</li>
+    <li>estimated_cost <span class="t">decimal</span></li>
+  </ul><div class="note2">التكلفة تُحسب وتُعرض <b>قبل</b> الإرسال (م‑10).</div></div>
+
+  <div class="ent c-ops"><div class="eh">MessageJob <small>رسالة</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> campaign_id · customer_id</li>
+    <li>channel <span class="t">push|whatsapp|sms</span></li>
+    <li>status <span class="t">queued|sent|failed|read</span></li>
+    <li>cost <span class="t">decimal(8,4)</span></li>
+    <li>provider_msg_id · sent_at</li>
+  </ul><div class="note2">تسلسل القنوات: push (مجاني) ← whatsapp ← sms.</div></div>
+
+  <div class="ent c-biz"><div class="eh">Subscription <small>الاشتراك</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> org_id <span class="t">1:1</span></li>
+    <li>plan <span class="t">free|starter|growth|chain</span></li>
+    <li>status · mrr</li>
+    <li>current_period_start / _end</li>
+    <li>gateway_ref <span class="t">varchar</span></li>
+  </ul><div class="note2">حدود الجدار المجاني تُقرأ من الباقة عند كل طلب.</div></div>
+
+  <div class="ent c-biz"><div class="eh">Invoice · MessageCredit</div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> subscription_id / org_id</li>
+    <li>amount · balance <span class="t">decimal</span></li>
+    <li>status · issued_at · paid_at</li>
+    <li>pdf_url <span class="t">varchar</span></li>
+  </ul><div class="note2">رصيد الرسائل يُخصم لحظيًا عند كل MessageJob ناجح.</div></div>
+
+  <div class="ent c-ext"><div class="eh">ApiKey · WebhookEndpoint <small>المتقدمة</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> org_id</li>
+    <li>key_hash <span class="t">varchar(128)</span></li>
+    <li>scopes <span class="t">text[]</span></li>
+    <li>url · events <span class="t">text[]</span></li>
+    <li>secret · last_used_at · revoked_at</li>
+  </ul><div class="note2">المفتاح يُخزَّن مُجزّأً ويُعرض مرة واحدة فقط عند الإنشاء.</div></div>
+
+  <div class="ent c-ext"><div class="eh">AiInsight <small>الشاملة</small></div><ul>
+    <li><span class="k pk">PK</span> id</li>
+    <li><span class="k fk">FK</span> brand_id</li>
+    <li>kind <span class="t">churn_risk|reward_value|<br>best_time|segment</span></li>
+    <li>payload <span class="t">jsonb</span></li>
+    <li>confidence <span class="t">decimal</span></li>
+    <li>generated_at</li>
+  </ul><div class="note2">تُولَّد ليليًا. تبدأ بقواعد إحصائية ثم تتطور إلى نماذج (م‑12).</div></div>
+</div>
+
+<h3 class="h3">٤.٥ — خريطة العلاقات</h3>
+<table class="at">
+<thead><tr><th>من</th><th>النوع</th><th>إلى</th><th>عند الحذف</th><th>الغرض</th></tr></thead>
+<tbody>
+<tr><td><code>Organization</code></td><td>1 — N</td><td><code>Brand</code></td><td>PROTECT</td><td>مؤسسة قد تملك أكثر من علامة</td></tr>
+<tr><td><code>Brand</code></td><td>1 — N</td><td><code>Branch</code></td><td>CASCADE</td><td>فروع العلامة</td></tr>
+<tr><td><code>Branch</code></td><td>1 — N</td><td><code>Terminal</code></td><td>CASCADE</td><td>نقاط البيع داخل الفرع</td></tr>
+<tr><td><code>Branch</code></td><td>1 — N</td><td><code>StaffUser</code></td><td>CASCADE</td><td>الكاشيرون</td></tr>
+<tr><td><code>Brand</code></td><td>1 — N</td><td><code>LoyaltyProgram</code></td><td>CASCADE</td><td>أكثر من نموذج ولاء معًا</td></tr>
+<tr><td><code>LoyaltyProgram</code></td><td>1 — 1</td><td><code>ProgramRule</code></td><td>CASCADE</td><td>قواعد المنح والصلاحية</td></tr>
+<tr><td><code>Customer</code> ↔ <code>Brand</code></td><td><b>N — N</b></td><td><code>Membership</code></td><td>PROTECT</td><td><b>جوهر النموذج:</b> رصيد منفصل لكل علامة</td></tr>
+<tr><td><code>Membership</code></td><td>1 — N</td><td><code>Balance</code></td><td>CASCADE</td><td>رصيد لكل برنامج داخل العلامة</td></tr>
+<tr><td><code>Transaction</code></td><td>1 — N</td><td><code>LedgerEntry</code></td><td><b>PROTECT</b></td><td>عملية قد تنتج أكثر من قيد</td></tr>
+<tr><td><code>LedgerEntry</code></td><td>1 — 1</td><td><code>LedgerEntry</code> (self)</td><td>PROTECT</td><td><code>reverses_id</code> — قيد عكسي للتصحيح</td></tr>
+<tr><td><code>Reward</code></td><td>1 — N</td><td><code>Redemption</code></td><td>PROTECT</td><td>سجل الاستبدالات</td></tr>
+<tr><td><code>Transaction</code></td><td>1 — N</td><td><code>FraudSignal</code></td><td>CASCADE</td><td>قد تُخالف أكثر من قاعدة</td></tr>
+<tr><td><code>Campaign</code></td><td>1 — N</td><td><code>MessageJob</code></td><td>CASCADE</td><td>رسالة لكل مستلم بتكلفتها</td></tr>
+<tr><td><code>Organization</code></td><td>1 — 1</td><td><code>Subscription</code></td><td>CASCADE</td><td>باقة واحدة لكل مؤسسة</td></tr>
+</tbody>
+</table>
+<div class="nt dn"><b>لماذا PROTECT على LedgerEntry؟</b> لأن حذف عملية بعد منح نقاطها يجعل الرصيد غير قابل للتفسير.
+النظام يرفض الحذف ويفرض التصحيح بقيد عكسي — وهذا بالضبط ما يجعل رقم «الالتزام القائم» قابلًا للدفاع عنه أمام محاسب التاجر.</div>
+
+<!-- ═══════════ 5 · تدفق التنفيذ ═══════════ -->
+<h2 class="as" id="s5"><span class="n">٥</span> تدفق تنفيذ العملية الحرجة</h2>
+<p class="lead">دورة «رمز ← مسح ← تأكيد ← نقطة» — الطريق الذي يمر به كل جنيه في النظام.</p>
+
+<div class="flow">
+  <div class="fstep"><div class="num">١</div><div class="fc">
+    <b>تدوير رمز نقطة البيع</b>
+    <p>مهمة Celery Beat كل ٣٠ ثانية تولّد رمزًا جديدًا لكل <code>Terminal</code> نشط وتخزّنه في Redis
+    بمفتاح <code>pos:code:{code} → terminal_id</code> مع <code>TTL=35s</code>.
+    شاشة الكاشير تسحبه عبر <code>GET /pos/code</code> أو قناة SSE.</p>
+  </div></div>
+
+  <div class="fstep"><div class="num">٢</div><div class="fc">
+    <b>العميل يمسح الرمز</b>
+    <p><code>POST /scan/resolve {code}</code> — الخادم يقرأ Redis. غير موجود أو منتهٍ ← <code>410 Gone</code>.
+    ناجح ← يرجع بيانات العلامة والفرع والبرامج النشطة ومعاينة الرصيد الحالي.</p>
+  </div></div>
+
+  <div class="fstep"><div class="num">٣</div><div class="fc">
+    <b>إدخال قيمة الفاتورة</b>
+    <p><code>POST /transactions {terminal_id, invoice_amount, invoice_no}</code> ← ينشئ سجلًا بحالة
+    <code>pending</code>. لا تُمنح أي نقطة في هذه الخطوة. يُستهلك الرمز من Redis فورًا حتى لا يُعاد استخدامه.</p>
+  </div></div>
+
+  <div class="fstep crit"><div class="num">٤</div><div class="fc">
+    <b>التاجر يؤكّد — المعاملة الذرية</b>
+    <p><code>POST /pos/transactions/{id}/confirm</code> يفتح معاملة قاعدة بيانات واحدة تنفّذ:
+    قفل صف العضوية ← تطبيق القاعدة ← فحص السقوف ← كتابة القيد ← تحديث الرصيد ← سجل التدقيق ← قواعد الاحتيال.
+    <b>إما أن ينجح كل ذلك أو لا يحدث شيء.</b></p>
+  </div></div>
+
+  <div class="fstep async"><div class="num">٥</div><div class="fc">
+    <b>ما بعد التأكيد — غير متزامن</b>
+    <p>بعد نجاح المعاملة تُطلق مهام Celery: إشعار Web Push للعميل، إطلاق Webhook للأنظمة المرتبطة،
+    تحديث المؤشرات المجمّعة، وإعادة حساب «الالتزام القائم» للفرع.
+    <b>فشل أي منها لا يؤثر على صحة الرصيد.</b></p>
+  </div></div>
+
+  <div class="fstep"><div class="num">٦</div><div class="fc">
+    <b>الاستبدال</b>
+    <p><code>POST /redemptions {reward_id}</code> ← نفس النمط الذري: قيد بـ <code>delta</code> سالب
+    و<code>reason=redeem</code>، ثم توليد كود صالح ١٥ دقيقة يعرضه العميل على الكاشير.</p>
+  </div></div>
+
+  <div class="fstep async"><div class="num">٧</div><div class="fc">
+    <b>انتهاء الصلاحية — مهمة ليلية</b>
+    <p>مهمة يومية تبحث عن الأرصدة المنتهية وتكتب قيدًا بـ <code>reason=expire</code>،
+    وترسل تنبيهًا مجانيًا قبل الانتهاء بثلاثين يومًا.</p>
+  </div></div>
+</div>
+
+<!-- ═══════════ 6 · الكود الحرج ═══════════ -->
+<h2 class="as" id="s6"><span class="n">٦</span> الكود الحرج — محرك القيود</h2>
+<p class="lead">هذه الدالة هي المكان الوحيد في المشروع الذي يعدّل الرصيد. أي مسار آخر يمر عبرها.</p>
+
+<div class="codehd"><i></i> apps/ledger/services.py</div>
+<pre class="code"><span class="kw">from</span> django.db <span class="kw">import</span> transaction
+<span class="kw">from</span> django.db.models <span class="kw">import</span> F
+
+<span class="kw">class</span> <span class="fn">LedgerError</span>(Exception): ...
+<span class="kw">class</span> <span class="fn">DailyCapExceeded</span>(LedgerError): ...
+
+<span class="cm">@transaction.atomic</span>
+<span class="kw">def</span> <span class="fn">apply_entry</span>(*, membership, program, delta, reason,
+                transaction_obj=<span class="kw">None</span>, reverses=<span class="kw">None</span>, actor=<span class="kw">None</span>):
+    <span class="st">"""المكان الوحيد الذي يُعدَّل فيه الرصيد. ذرّي ومقاوم للتزامن."""</span>
+
+<span class="hi">    <span class="cm"># 1) قفل صف الرصيد — يمنع التنفيذ المتوازي لنفس العضوية</span>
+    balance = (Balance.objects
+               .select_for_update()                 <span class="cm"># ← يقفل الصف حتى COMMIT</span>
+               .get_or_create(membership=membership, program=program,
+                              defaults={<span class="st">"amount"</span>: <span class="nu">0</span>})[<span class="nu">0</span>])</span>
+
+    rule = program.rule
+
+    <span class="cm"># 2) السقف اليومي — يحمي من الاحتيال الداخلي (م‑07)</span>
+    <span class="kw">if</span> delta &gt; <span class="nu">0</span> <span class="kw">and</span> rule.max_per_day:
+        earned_today = LedgerEntry.objects.filter(
+            membership=membership, program=program, reason=<span class="st">"earn"</span>,
+            created_at__date=timezone.localdate(),
+        ).aggregate(s=Sum(<span class="st">"delta"</span>))[<span class="st">"s"</span>] <span class="kw">or</span> <span class="nu">0</span>
+        <span class="kw">if</span> earned_today + delta &gt; rule.max_per_day:
+            <span class="kw">raise</span> DailyCapExceeded(membership.id)
+
+    <span class="cm"># 3) منع الرصيد السالب</span>
+    new_amount = balance.amount + delta
+    <span class="kw">if</span> new_amount &lt; <span class="nu">0</span>:
+        <span class="kw">raise</span> LedgerError(<span class="st">"insufficient_balance"</span>)
+
+<span class="hi">    <span class="cm"># 4) القيد — إضافة فقط، لا تعديل ولا حذف أبدًا</span>
+    entry = LedgerEntry.objects.create(
+        membership=membership, program=program, delta=delta,
+        reason=reason, transaction=transaction_obj,
+        reverses=reverses, balance_after=new_amount,
+    )</span>
+
+    <span class="cm"># 5) تحديث اللقطة ذرّيًا على مستوى قاعدة البيانات</span>
+    Balance.objects.filter(pk=balance.pk).update(
+        amount=F(<span class="st">"amount"</span>) + delta,
+        expires_at=compute_expiry(rule),
+        updated_at=timezone.now(),
+    )
+
+    <span class="cm"># 6) سجل تدقيق غير قابل للحذف</span>
+    AuditLog.record(actor=actor, action=<span class="st">f"ledger.{reason}"</span>,
+                    entity=entry, after={<span class="st">"delta"</span>: delta,
+                                        <span class="st">"balance_after"</span>: new_amount})
+    <span class="kw">return</span> entry
+
+
+<span class="cm">@transaction.atomic</span>
+<span class="kw">def</span> <span class="fn">reverse_entry</span>(entry, *, actor=<span class="kw">None</span>):
+    <span class="st">"""التصحيح الوحيد المسموح: قيد عكسي جديد — لا UPDATE ولا DELETE."""</span>
+    <span class="kw">if</span> entry.reversed_by.exists():
+        <span class="kw">raise</span> LedgerError(<span class="st">"already_reversed"</span>)
+    <span class="kw">return</span> apply_entry(
+        membership=entry.membership, program=entry.program,
+        delta=-entry.delta, reason=<span class="st">"reverse"</span>,
+        reverses=entry, actor=actor,
+    )
+</pre>
+
+<div class="codehd"><i></i> apps/pos/services.py — تأكيد العملية</div>
+<pre class="code"><span class="cm">@transaction.atomic</span>
+<span class="kw">def</span> <span class="fn">confirm_transaction</span>(txn_id, *, staff_user):
+    txn = Transaction.objects.select_for_update().get(pk=txn_id)
+
+    <span class="kw">if</span> txn.status != <span class="st">"pending"</span>:
+        <span class="kw">raise</span> LedgerError(<span class="st">"not_pending"</span>)          <span class="cm"># حماية من التأكيد المزدوج</span>
+    <span class="kw">if</span> staff_user.branch_id != txn.terminal.branch_id:
+        <span class="kw">raise</span> PermissionDenied                     <span class="cm"># كاشير فرع آخر</span>
+
+    membership, _ = Membership.objects.get_or_create(
+        customer=txn.customer, brand=txn.terminal.branch.brand)
+
+    entries = []
+    <span class="kw">for</span> program <span class="kw">in</span> active_programs(txn.terminal.branch.brand):
+        delta = compute_delta(program.rule, txn.invoice_amount)   <span class="cm"># حسب النموذج</span>
+        <span class="kw">if</span> delta:
+            entries.append(apply_entry(
+                membership=membership, program=program, delta=delta,
+                reason=<span class="st">"earn"</span>, transaction_obj=txn, actor=staff_user))
+
+    txn.status = <span class="st">"confirmed"</span>
+    txn.save(update_fields=[<span class="st">"status"</span>])
+
+<span class="hi">    <span class="cm"># قواعد الاحتيال داخل نفس المعاملة — لا تُؤجَّل</span>
+    fraud.evaluate(txn)</span>
+
+    <span class="cm"># المهام غير المتزامنة تُطلق بعد نجاح COMMIT فقط</span>
+    transaction.on_commit(<span class="kw">lambda</span>: notify_customer.delay(txn.id))
+    transaction.on_commit(<span class="kw">lambda</span>: dispatch_webhook.delay(<span class="st">"transaction.created"</span>, txn.id))
+    <span class="kw">return</span> entries
+</pre>
+
+<div class="nt dn"><b>السطر الأهم في المشروع كله:</b> <code style="font-family:Consolas">select_for_update()</code>.
+بدونه، لو ضغط الكاشير «تأكيد» مرتين بسرعة، أو مسح عميلان في نفس اللحظة، ستُمنح النقاط مرتين ويختل الرصيد.
+هذا سيناريو <b>يجب</b> أن يغطيه اختبار تزامن صريح قبل الإطلاق.</div>
+
+<!-- ═══════════ 7 · API ═══════════ -->
+<h2 class="as" id="s7"><span class="n">٧</span> واجهات API</h2>
+<p class="lead">جميعها تحت <code>/api/v1/</code> وتُوثَّق تلقائيًا بـ OpenAPI عبر drf-spectacular.</p>
+
+<h3 class="h3">٧.١ — تطبيق العميل</h3>
+<table class="at">
+<thead><tr><th>الطريقة</th><th>المسار</th><th>الغرض</th><th>المصادقة</th></tr></thead>
+<tbody>
+<tr><td><span class="m post">POST</span></td><td><code>/auth/otp/request</code></td><td>طلب كود تحقق — محدود بالمعدل</td><td>عام</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/auth/otp/verify</code></td><td>تأكيد الكود وإصدار JWT</td><td>عام</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/me</code> · <code>/me/cards</code></td><td>الملف الشخصي ومحفظة البطاقات</td><td>JWT</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/me/cards/{brand_id}</code></td><td>تفاصيل بطاقة علامة واحدة</td><td>JWT</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/scan/resolve</code></td><td>ترجمة رمز QR إلى نقطة بيع</td><td>JWT</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/transactions</code></td><td>إنشاء عملية بحالة معلّقة</td><td>JWT</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/me/rewards</code></td><td>المكافآت الجاهزة والقريبة</td><td>JWT</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/redemptions</code></td><td>استبدال مكافأة وتوليد كود</td><td>JWT</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/me/activity</code></td><td>سجل النشاط مع ترقيم</td><td>JWT</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/stores/nearby?lat&amp;lng</code></td><td>متاجر قريبة — استعلام جغرافي</td><td>JWT</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/me/push-subscription</code></td><td>تسجيل اشتراك Web Push</td><td>JWT</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/me/export</code></td><td>تحميل نسخة من البيانات (م‑09)</td><td>JWT</td></tr>
+<tr><td><span class="m del">DELETE</span></td><td><code>/me</code></td><td>حذف الحساب — يتطلب OTP</td><td>JWT</td></tr>
+</tbody>
+</table>
+
+<h3 class="h3">٧.٢ — لوحة التاجر ونقطة البيع</h3>
+<table class="at">
+<thead><tr><th>الطريقة</th><th>المسار</th><th>الغرض</th><th>الصلاحية</th></tr></thead>
+<tbody>
+<tr><td><span class="m get">GET</span></td><td><code>/pos/code</code></td><td>الرمز الفعّال للطرفية</td><td>cashier</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/pos/code/rotate</code></td><td>تجديد فوري للرمز</td><td>cashier</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/pos/pending</code></td><td>العمليات المعلّقة — SSE أو استطلاع</td><td>cashier</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/pos/transactions/{id}/confirm</code></td><td><b>تأكيد ومنح النقاط</b></td><td>cashier</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/pos/manual</code></td><td>المسار اليدوي: هاتف + فاتورة</td><td>cashier</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/pos/redemptions/{code}/use</code></td><td>صرف كود استبدال</td><td>cashier</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/merchant/dashboard</code></td><td>المؤشرات الستة ومنها الالتزام القائم</td><td>manager</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/merchant/customers?segment=</code></td><td>العملاء وشرائحهم</td><td>manager</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/merchant/liability</code></td><td>قيمة النقاط غير المستبدلة</td><td>owner</td></tr>
+<tr><td><span class="m put">PUT</span></td><td><code>/merchant/programs/{id}/rule</code></td><td>تعديل قواعد المنح والصلاحية</td><td>owner</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/merchant/rewards</code></td><td>إدارة المكافآت</td><td>manager</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/merchant/fraud-signals</code></td><td>عمليات تحتاج مراجعة</td><td>owner</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/merchant/fraud-signals/{id}/resolve</code></td><td>قبول أو إلغاء وعكس القيد</td><td>owner</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/merchant/branches</code> · <code>/terminals</code> · <code>/staff</code></td><td>الهيكل التنظيمي</td><td>owner</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/merchant/campaigns</code></td><td>إنشاء حملة — يُرجع التكلفة قبل الإرسال</td><td>manager</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/merchant/reports/{kind}</code></td><td>تقارير قابلة للتصدير</td><td>manager</td></tr>
+</tbody>
+</table>
+
+<h3 class="h3">٧.٣ — الواجهات العامة و Webhooks <span style="font-size:11.5px;color:var(--orange-600)">— الباقة المتقدمة</span></h3>
+<table class="at">
+<thead><tr><th>الطريقة</th><th>المسار / الحدث</th><th>الغرض</th></tr></thead>
+<tbody>
+<tr><td><span class="m get">GET</span></td><td><code>/public/v1/customers/{phone}/balance</code></td><td>قراءة رصيد عميل من نظام خارجي</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/public/v1/transactions</code></td><td>تسجيل عملية من نظام نقاط بيع</td></tr>
+<tr><td><span class="m post">POST</span></td><td><code>/public/v1/redemptions/{code}/use</code></td><td>صرف مكافأة من نظام خارجي</td></tr>
+<tr><td><span class="m get">GET</span></td><td><code>/public/v1/schema</code></td><td>توثيق OpenAPI تفاعلي</td></tr>
+<tr><td>⇢</td><td><code>transaction.created</code></td><td>عند تأكيد أي عملية</td></tr>
+<tr><td>⇢</td><td><code>reward.redeemed</code></td><td>عند استبدال مكافأة</td></tr>
+<tr><td>⇢</td><td><code>customer.joined</code></td><td>عند انضمام عميل جديد للعلامة</td></tr>
+<tr><td>⇢</td><td><code>balance.expiring</code></td><td>قبل انتهاء الرصيد بثلاثين يومًا</td></tr>
+</tbody>
+</table>
+<div class="nt"><b>أمان Webhooks:</b> كل طلب يحمل رأس <code>X-Walaee-Signature</code> = HMAC-SHA256 للجسم بمفتاح الوجهة،
+مع <code>X-Walaee-Timestamp</code> لمنع إعادة التشغيل. إعادة المحاولة بتراجع أسّي حتى ٦ مرات، ثم تعطيل الوجهة تلقائيًا.</div>
+
+<!-- ═══════════ 8 · المهام الخلفية ═══════════ -->
+<h2 class="as" id="s8"><span class="n">٨</span> المهام غير المتزامنة</h2>
+<table class="at">
+<thead><tr><th>المهمة</th><th>الجدولة</th><th>الطابور</th><th>الوظيفة</th></tr></thead>
+<tbody>
+<tr><td><code>pos.rotate_codes</code></td><td>كل ٣٠ ثانية</td><td><code>realtime</code></td><td>توليد رموز جديدة لكل طرفية نشطة</td></tr>
+<tr><td><code>notify.push</code></td><td>عند الحدث</td><td><code>realtime</code></td><td>إشعار Web Push — القناة المجانية</td></tr>
+<tr><td><code>webhooks.dispatch</code></td><td>عند الحدث</td><td><code>webhooks</code></td><td>إطلاق مع توقيع وإعادة محاولة</td></tr>
+<tr><td><code>campaigns.send</code></td><td>عند الجدولة</td><td><code>messaging</code></td><td>توجيه القنوات بالتكلفة وخصم الرصيد</td></tr>
+<tr><td><code>ledger.expire_balances</code></td><td>يوميًا ٠٣:٠٠</td><td><code>maintenance</code></td><td>قيد <code>expire</code> للأرصدة المنتهية</td></tr>
+<tr><td><code>ledger.notify_expiring</code></td><td>يوميًا ١٠:٠٠</td><td><code>messaging</code></td><td>تنبيه مجاني قبل الانتهاء بثلاثين يومًا</td></tr>
+<tr><td><code>reports.rollup</code></td><td>كل ساعة</td><td><code>analytics</code></td><td>تجميع المؤشرات لتسريع اللوحات</td></tr>
+<tr><td><code>fraud.rescan</code></td><td>يوميًا ٠٢:٠٠</td><td><code>analytics</code></td><td>أنماط لا تُكتشف لحظيًا</td></tr>
+<tr><td><code>insights.generate</code></td><td>يوميًا ٠٤:٠٠</td><td><code>analytics</code></td><td>التوصيات الذكية — الباقة الشاملة</td></tr>
+<tr><td><code>billing.charge</code></td><td>يوميًا ٠٦:٠٠</td><td><code>billing</code></td><td>تحصيل الاشتراكات وإصدار الفواتير</td></tr>
+<tr><td><code>db.backup</code></td><td>يوميًا ٠١:٠٠</td><td><code>maintenance</code></td><td>نسخة احتياطية مشفّرة إلى التخزين البعيد</td></tr>
+</tbody>
+</table>
+<div class="nt ok"><b>عزل الطوابير:</b> طابور <code>realtime</code> له عمّاله المستقلون — حتى لا تعطّل حملة رسائل ضخمة
+تدوير رموز الكاشير. هذا الفصل غير قابل للتفاوض.</div>
+
+<!-- ═══════════ 9 · الأمان ═══════════ -->
+<h2 class="as" id="s9"><span class="n">٩</span> الأمان والصلاحيات</h2>
+<div class="cols2">
+  <div>
+    <h3 class="h3">مصفوفة الأدوار</h3>
+    <table class="at">
+    <thead><tr><th>الدور</th><th>النطاق</th><th>يستطيع</th></tr></thead>
+    <tbody>
+    <tr><td><code>customer</code></td><td>نفسه فقط</td><td>بطاقاته، مسح، استبدال، حذف حسابه</td></tr>
+    <tr><td><code>cashier</code></td><td>فرع واحد</td><td>تأكيد العمليات وصرف الأكواد — <b>لا يرى التقارير</b></td></tr>
+    <tr><td><code>manager</code></td><td>فرع أو أكثر</td><td>العملاء، المكافآت، الحملات، التقارير</td></tr>
+    <tr><td><code>owner</code></td><td>العلامة كاملة</td><td>القواعد، الفروع، الاحتيال، الفوترة</td></tr>
+    <tr><td><code>platform_admin</code></td><td>المنصة</td><td>المتاجر والاشتراكات — <b>لا يرى بيانات شراء الأفراد</b></td></tr>
+    </tbody>
+    </table>
+  </div>
+  <div>
+    <h3 class="h3">الضوابط المطبّقة</h3>
+    <table class="at">
+    <thead><tr><th>الضابط</th><th>التنفيذ</th></tr></thead>
+    <tbody>
+    <tr><td>عزل بيانات العلامات</td><td><code>BrandScopedQuerySet</code> يُطبَّق على مستوى المدير الافتراضي</td></tr>
+    <tr><td>تحديد معدل OTP</td><td>٣ محاولات / ١٥ دقيقة لكل رقم + لكل IP</td></tr>
+    <tr><td>عمر التوكن</td><td>وصول ١٥ دقيقة · تحديث ٣٠ يومًا مع إبطال</td></tr>
+    <tr><td>تشفير عند التخزين</td><td>قرص مشفّر + تجزئة أرقام الهواتف في السجلات</td></tr>
+    <tr><td>حماية الحقن</td><td>ORM حصرًا — لا SQL خام في أي مسار</td></tr>
+    <tr><td>سجل تدقيق</td><td>Middleware يلتقط كل تغيير مع الفاعل و IP</td></tr>
+    <tr><td>حق الحذف</td><td>حذف ناعم ٣٠ يومًا ثم إخفاء هوية القيود نهائيًا</td></tr>
+    <tr><td>الأسرار</td><td>متغيرات بيئة فقط — لا شيء داخل المستودع</td></tr>
+    </tbody>
+    </table>
+  </div>
+</div>
+<div class="nt dn"><b>تعارض متعمّد:</b> حق العميل في الحذف يصطدم بقاعدة «القيود لا تُحذف».
+الحل: تُحذف بيانات الهوية (الاسم والهاتف والتوكنات) وتبقى القيود بمعرّف مجهول —
+فيُحترم حق العميل ويظل رصيد التاجر متوازنًا. هذا القرار يُوثَّق في عقد معالجة البيانات.</div>
+
+<!-- ═══════════ 10 · Docker ═══════════ -->
+<h2 class="as" id="s10"><span class="n">١٠</span> البنية على Docker والنشر</h2>
+<p class="lead">نموذج العرض الحالي حاوية واحدة. الإنتاج الكامل ست حاويات.</p>
+
+<h3 class="h3">١٠.١ — نموذج العرض الحالي <span style="font-size:11.5px;color:var(--green-600)">— جاهز الآن</span></h3>
+<div class="cols3">
+  <div class="dc"><div class="dh"><div class="ibox g">◱</div><b>web</b></div>
+    <span class="im">nginx:1.27-alpine</span>
+    <p>يخدم معرض الواجهات والعرض التقديمي والتقارير. ضغط، كاش، رؤوس أمان، فحص صحي.</p>
+    <div class="res">~٦٠ ميجابايت صورة · &lt;٢٠ ميجابايت ذاكرة</div></div>
+  <div class="dc"><div class="dh"><div class="ibox v">◈</div><b>Traefik</b></div>
+    <span class="im">مدمج في Dokploy</span>
+    <p>توجيه النطاق وإصدار شهادة Let's Encrypt تلقائيًا. لا يحتاج إعدادًا يدويًا.</p>
+    <div class="res">يُدار بواسطة Dokploy</div></div>
+  <div class="dc"><div class="dh"><div class="ibox o">◉</div><b>الملفات</b></div>
+    <span class="im">Dockerfile · nginx.conf</span>
+    <p><code>docker-compose.yml</code> و<code>DEPLOY.md</code> في جذر المشروع مع خطوات Dokploy كاملة.</p>
+    <div class="res">بناء أقل من ثانيتين</div></div>
+</div>
+
+<h3 class="h3">١٠.٢ — تركيبة الإنتاج الكاملة</h3>
+<div class="dstack">
+  <div class="dc"><div class="dh"><div class="ibox v">◱</div><b>nginx</b></div>
+    <span class="im">nginx:1.27-alpine</span>
+    <p>الملفات الثابتة، إنهاء TLS، تحديد المعدل، توجيه <code>/api</code> إلى التطبيق.</p>
+    <div class="res">128 MB · 0.25 CPU</div></div>
+  <div class="dc"><div class="dh"><div class="ibox g">◈</div><b>api</b></div>
+    <span class="im">python:3.12-slim</span>
+    <p>Django + gunicorn بعمّال uvicorn. عدد العمّال = ‎2×CPU+1‎.</p>
+    <div class="res">1 GB · 1.0 CPU</div></div>
+  <div class="dc"><div class="dh"><div class="ibox o">◉</div><b>worker</b></div>
+    <span class="im">نفس صورة api</span>
+    <p>عامل Celery. يُشغَّل نسختان: واحدة لـ <code>realtime</code> وأخرى للباقي.</p>
+    <div class="res">512 MB · 0.5 CPU</div></div>
+  <div class="dc"><div class="dh"><div class="ibox o">◷</div><b>beat</b></div>
+    <span class="im">نفس صورة api</span>
+    <p>مجدول Celery. <b>نسخة واحدة فقط</b> — نسختان تعنيان تنفيذًا مزدوجًا.</p>
+    <div class="res">256 MB · 0.1 CPU</div></div>
+  <div class="dc"><div class="dh"><div class="ibox b">◫</div><b>postgres</b></div>
+    <span class="im">postgres:16-alpine</span>
+    <p>مجلد بيانات دائم + نسخ احتياطي يومي مشفّر إلى تخزين بعيد.</p>
+    <div class="res">2 GB · 1.0 CPU · volume</div></div>
+  <div class="dc"><div class="dh"><div class="ibox r">◇</div><b>redis</b></div>
+    <span class="im">redis:7-alpine</span>
+    <p>رموز QR بـ TTL، كاش الجلسات، وسيط طوابير Celery. <code>appendonly yes</code>.</p>
+    <div class="res">256 MB · 0.25 CPU</div></div>
+</div>
+
+<div class="codehd"><i></i> deploy/docker-compose.prod.yml — مقتطف</div>
+<pre class="code"><span class="kw">services</span>:
+  <span class="fn">api</span>:
+    build: { context: ., dockerfile: deploy/Dockerfile }
+    command: gunicorn config.asgi:application -k uvicorn.workers.UvicornWorker
+             --bind 0.0.0.0:8000 --workers <span class="nu">4</span> --max-requests <span class="nu">1000</span>
+    env_file: [.env]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis:    { condition: service_started }
+    healthcheck:
+      test: [<span class="st">"CMD"</span>, <span class="st">"curl"</span>, <span class="st">"-fsS"</span>, <span class="st">"http://localhost:8000/healthz"</span>]
+      interval: 30s
+
+<span class="hi">  <span class="fn">worker-realtime</span>:                  <span class="cm"># عامل معزول للطابور الحسّاس</span>
+    command: celery -A config worker -Q realtime -c <span class="nu">4</span> --max-tasks-per-child <span class="nu">200</span></span>
+
+  <span class="fn">worker-default</span>:
+    command: celery -A config worker -Q messaging,webhooks,analytics,billing,maintenance -c <span class="nu">2</span>
+
+  <span class="fn">beat</span>:
+    command: celery -A config beat --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    deploy: { replicas: <span class="nu">1</span> }      <span class="cm"># نسخة واحدة فقط — إلزامي</span>
+
+  <span class="fn">postgres</span>:
+    image: postgres:16-alpine
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: [<span class="st">"CMD-SHELL"</span>, <span class="st">"pg_isready -U $$POSTGRES_USER"</span>]
+</pre>
+
+<h3 class="h3">١٠.٣ — خط النشر</h3>
+<table class="at">
+<thead><tr><th class="c">#</th><th>الخطوة</th><th>الأداة</th><th>يفشل البناء إذا</th></tr></thead>
+<tbody>
+<tr><td class="c">١</td><td>فحص التنسيق والأنماط</td><td><code>ruff</code> + <code>black --check</code></td><td>أي مخالفة</td></tr>
+<tr><td class="c">٢</td><td>تشغيل الاختبارات</td><td><code>pytest --cov</code></td><td>تغطية <code>ledger</code> أقل من ١٠٠٪</td></tr>
+<tr><td class="c">٣</td><td>فحص الهجرات</td><td><code>makemigrations --check</code></td><td>وجود هجرة غير مُولَّدة</td></tr>
+<tr><td class="c">٤</td><td>فحص أمني</td><td><code>pip-audit</code> + <code>bandit</code></td><td>ثغرة عالية الخطورة</td></tr>
+<tr><td class="c">٥</td><td>بناء الصورة ودفعها</td><td>Docker Buildx → السجل</td><td>فشل البناء</td></tr>
+<tr><td class="c">٦</td><td>تطبيق الهجرات</td><td><code>migrate --noinput</code></td><td>خطأ في الهجرة ← تراجع تلقائي</td></tr>
+<tr><td class="c">٧</td><td>نشر متدرّج</td><td>Dokploy (Zero-downtime)</td><td>فشل الفحص الصحي</td></tr>
+</tbody>
+</table>
+
+<!-- ═══════════ 11 · متغيرات البيئة ═══════════ -->
+<h2 class="as" id="s11"><span class="n">١١</span> متغيرات البيئة</h2>
+<div class="codehd"><i></i> .env.example</div>
+<pre class="code"><span class="cm"># ── أساسي ─────────────────────────────────────────</span>
+DJANGO_SETTINGS_MODULE=config.settings.prod
+SECRET_KEY=<span class="st">"غيّرها — 50 حرفًا عشوائيًا"</span>
+DEBUG=<span class="nu">0</span>
+ALLOWED_HOSTS=walaee.app,api.walaee.app
+CSRF_TRUSTED_ORIGINS=https://walaee.app
+
+<span class="cm"># ── قاعدة البيانات ────────────────────────────────</span>
+POSTGRES_DB=walaee
+POSTGRES_USER=walaee
+POSTGRES_PASSWORD=<span class="st">"سر قوي"</span>
+DATABASE_URL=postgresql://walaee:PASS@postgres:5432/walaee
+CONN_MAX_AGE=<span class="nu">60</span>
+
+<span class="cm"># ── Redis و Celery ────────────────────────────────</span>
+REDIS_URL=redis://redis:6379/0
+CELERY_BROKER_URL=redis://redis:6379/1
+CELERY_RESULT_BACKEND=redis://redis:6379/2
+
+<span class="cm"># ── الرموز والولاء ────────────────────────────────</span>
+POS_CODE_TTL_SECONDS=<span class="nu">35</span>
+POS_CODE_ROTATE_SECONDS=<span class="nu">30</span>
+REDEMPTION_CODE_TTL_MINUTES=<span class="nu">15</span>
+DEFAULT_EXPIRY_MONTHS=<span class="nu">12</span>
+
+<span class="cm"># ── القنوات ───────────────────────────────────────</span>
+VAPID_PUBLIC_KEY= <span class="cm"># Web Push — مجاني</span>
+VAPID_PRIVATE_KEY=
+WHATSAPP_PHONE_ID=
+WHATSAPP_TOKEN=
+SMS_PROVIDER=local_eg   <span class="cm"># مزوّد محلي — أرخص بعشرة أضعاف</span>
+SMS_API_KEY=
+SMS_SENDER_ID=WALAEE
+
+<span class="cm"># ── الدفع والمراقبة ───────────────────────────────</span>
+PAYMENT_GATEWAY=paymob
+PAYMENT_API_KEY=
+SENTRY_DSN=
+LOG_LEVEL=INFO
+
+<span class="cm"># ── مفاتيح الميزات حسب الباقة ─────────────────────</span>
+FEATURE_PUBLIC_API=<span class="nu">0</span>    <span class="cm"># 1 في الباقة المتقدمة</span>
+FEATURE_AI_INSIGHTS=<span class="nu">0</span>   <span class="cm"># 1 في الباقة الشاملة</span>
+</pre>
+<div class="nt"><b>مفاتيح الميزات</b> تجعل الباقات الثلاث <b>قاعدة كود واحدة</b> — لا فروع ولا نسخ منفصلة.
+الترقية من الأساسية إلى المتقدمة أو الشاملة تصبح تغيير متغيّر بيئة ونشر، لا مشروعًا جديدًا.</div>
+
+<!-- ═══════════ 12 · الاختبارات ═══════════ -->
+<h2 class="as" id="s12"><span class="n">١٢</span> استراتيجية الاختبار</h2>
+<table class="at">
+<thead><tr><th>الطبقة</th><th>الأداة</th><th>التغطية المطلوبة</th><th>ماذا تحمي</th></tr></thead>
+<tbody>
+<tr><td>وحدة — محرك القيود</td><td><code>pytest</code></td><td><b>١٠٠٪ إلزامي</b></td><td>صحة كل جنيه في النظام</td></tr>
+<tr><td>تزامن</td><td><code>pytest</code> + خيوط متوازية</td><td>سيناريوهات محددة</td><td>التأكيد المزدوج والمنح المتوازي</td></tr>
+<tr><td>تكامل — دورة المنح</td><td><code>pytest-django</code></td><td>المسارات الكاملة</td><td>رمز ← مسح ← تأكيد ← قيد</td></tr>
+<tr><td>عقد API</td><td><code>schemathesis</code></td><td>كل النقاط</td><td>عدم كسر العملاء المرتبطين</td></tr>
+<tr><td>صلاحيات</td><td><code>pytest</code></td><td>كل دور × كل نقطة</td><td>تسريب بيانات بين العلامات</td></tr>
+<tr><td>حِمل</td><td><code>locust</code></td><td>قبل كل توسّع</td><td>ثبات الأداء تحت الضغط</td></tr>
+<tr><td>ميداني</td><td>بشري + ساعة إيقاف</td><td>كل إصدار</td><td><b>أقل من ١٠ ثوانٍ عند الكاشير</b></td></tr>
+</tbody>
+</table>
+
+<div class="codehd"><i></i> apps/ledger/tests/test_concurrency.py — الاختبار الذي لا يُتنازل عنه</div>
+<pre class="code"><span class="kw">def</span> <span class="fn">test_double_confirm_grants_points_once</span>(txn, cashier):
+    <span class="st">"""ضغطتان متزامنتان على «تأكيد» = منح واحد فقط."""</span>
+    errors = []
+    <span class="kw">def</span> <span class="fn">worker</span>():
+        <span class="kw">try</span>: confirm_transaction(txn.id, staff_user=cashier)
+        <span class="kw">except</span> LedgerError <span class="kw">as</span> e: errors.append(e)
+
+    threads = [Thread(target=worker) <span class="kw">for</span> _ <span class="kw">in</span> range(<span class="nu">2</span>)]
+    [t.start() <span class="kw">for</span> t <span class="kw">in</span> threads]; [t.join() <span class="kw">for</span> t <span class="kw">in</span> threads]
+
+<span class="hi">    <span class="kw">assert</span> LedgerEntry.objects.filter(transaction=txn).count() == <span class="nu">1</span>
+    <span class="kw">assert</span> len(errors) == <span class="nu">1</span>                    <span class="cm"># الثانية رُفضت</span>
+    <span class="kw">assert</span> Balance.objects.get(...).amount == expected_once</span>
+</pre>
+
+<div class="nt dn"><b>معيار الإطلاق:</b> لا يُنشر أي إصدار وتغطية <code>apps/ledger</code> أقل من ١٠٠٪،
+أو واختبار التزامن أعلاه راسب. خطأ واحد في الرصيد يساوي فقدان ثقة التاجر نهائيًا — وهي خسارة لا تُسترد بإصلاح لاحق.</div>
+
+<div class="foot">ولائي… كلنا كسبانين.</div>
+</div>
+
+<script src="../assets/js/switcher.js"></script>
+<script>
+/* إبراز القسم الحالي في الفهرس اللاصق */
+(function () {
+  var links = [].slice.call(document.querySelectorAll('.toclist a'));
+  var secs  = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  function sync() {
+    var y = window.scrollY + 120, cur = 0;
+    secs.forEach(function (s, i) { if (s && s.offsetTop <= y) cur = i; });
+    links.forEach(function (a, i) { a.classList.toggle('on', i === cur); });
+    var act = links[cur];
+    if (act) act.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }
+  window.addEventListener('scroll', sync, { passive: true });
+  sync();
+})();
+</script>
+</body>
+</html>

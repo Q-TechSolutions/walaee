@@ -1,0 +1,26 @@
+# التطبيع الافتراضي: LF داخل المستودع
+* text=auto eol=lf
+
+# ملفات نصية صريحة
+*.html   text eol=lf
+*.css    text eol=lf
+*.js     text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+*.conf   text eol=lf
+Dockerfile text eol=lf
+
+# ملفات ثنائية — ممنوع أي تحويل أسطر
+*.pdf    binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary
+
+# استبعاد من أرشيف التصدير
+.gitattributes export-ignore
+.gitignore     export-ignore

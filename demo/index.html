@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ولائي — معرض الواجهات</title>
+<link rel="stylesheet" href="assets/css/theme.css">
+<style>
+body{background:#0B0918;color:#fff;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 80px;}
+
+/* Hero */
+.hero{padding:70px 0 46px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-180px;left:50%;transform:translateX(-50%);
+  width:760px;height:520px;background:radial-gradient(ellipse,rgba(109,59,214,.34),transparent 68%);pointer-events:none;}
+.hero .mk{width:76px;height:76px;border-radius:26px;background:linear-gradient(140deg,#6D3BD6,#3A1078);
+  display:grid;place-items:center;margin:0 auto 22px;box-shadow:0 18px 44px rgba(109,59,214,.5);position:relative;}
+.hero .mk svg{width:40px;height:40px;color:#fff;}
+.hero h1{font-size:54px;letter-spacing:-2px;position:relative;}
+.hero .tag{color:#A995DE;font-size:15px;font-weight:600;margin-top:6px;position:relative;}
+.hero h2{font-size:22px;font-weight:700;margin-top:26px;position:relative;}
+.hero p{color:#9A8CC0;max-width:590px;margin:10px auto 0;line-height:1.9;font-size:14px;position:relative;}
+.startbtn{display:inline-flex;align-items:center;gap:11px;margin-top:34px;position:relative;
+  padding:16px 32px;border-radius:16px;font-size:17px;font-weight:800;color:#fff;
+  background:linear-gradient(120deg,#6D3BD6,#4B1E9E);box-shadow:0 16px 42px rgba(109,59,214,.5);
+  transition:var(--t);}
+.startbtn:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 22px 54px rgba(109,59,214,.65);}
+.startbtn svg{width:20px;height:20px;}
+.startbtn .sm{font-size:11px;font-weight:600;opacity:.7;border-inline-start:1px solid rgba(255,255,255,.28);
+  padding-inline-start:13px;margin-inline-start:4px;}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:26px;position:relative;}
+.chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#CFC3EC;
+  padding:6px 15px;border-radius:99px;font-size:12.5px;font-weight:700;}
+
+/* Section titles */
+.st{display:flex;align-items:center;gap:13px;margin:52px 0 20px;}
+.st b{font-size:19px;}
+.st span{font-size:11px;letter-spacing:2px;color:#7E6FA8;font-weight:800;}
+.st .ln{flex:1;height:1px;background:rgba(255,255,255,.1);}
+
+/* App cards */
+.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.app{background:linear-gradient(165deg,rgba(255,255,255,.075),rgba(255,255,255,.028));
+  border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:24px;transition:var(--t);
+  display:flex;flex-direction:column;position:relative;overflow:hidden;}
+.app::after{content:'';position:absolute;inset-inline-end:-56px;top:-56px;width:170px;height:170px;
+  border-radius:50%;opacity:.16;transition:var(--t);}
+.app.a1::after{background:#6D3BD6;} .app.a2::after{background:#16A34A;} .app.a3::after{background:#F97316;}
+.app:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.24);box-shadow:0 22px 50px rgba(0,0,0,.45);}
+.app:hover::after{opacity:.3;}
+.app .ic{width:52px;height:52px;border-radius:17px;display:grid;place-items:center;margin-bottom:16px;position:relative;}
+.app.a1 .ic{background:rgba(109,59,214,.24);color:#B9A3EE;}
+.app.a2 .ic{background:rgba(22,163,74,.24);color:#6EE7A8;}
+.app.a3 .ic{background:rgba(249,115,22,.24);color:#FDBA74;}
+.app .ic svg{width:26px;height:26px;}
+.app h3{font-size:19px;margin-bottom:6px;position:relative;}
+.app .sub{color:#9A8CC0;font-size:12.5px;line-height:1.8;flex:1;position:relative;}
+.app ul{margin:16px 0;position:relative;}
+.app li{font-size:12.5px;color:#CFC3EC;padding:4px 0;display:flex;gap:8px;align-items:center;font-weight:600;}
+.app li svg{width:14px;height:14px;color:#6EE7A8;flex:none;}
+.app .go{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:13px;
+  font-weight:800;font-size:14px;transition:var(--t);position:relative;}
+.app.a1 .go{background:#4B1E9E;color:#fff;} .app.a1 .go:hover{background:#6D3BD6;}
+.app.a2 .go{background:#16A34A;color:#fff;} .app.a2 .go:hover{background:#12833C;}
+.app.a3 .go{background:#F97316;color:#fff;} .app.a3 .go:hover{background:#EA640B;}
+.app .cnt{position:absolute;top:22px;inset-inline-end:22px;font-size:11px;color:#7E6FA8;font-weight:800;}
+
+/* Feature matrix */
+.mx{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:20px;overflow:hidden;}
+.mx table{width:100%;border-collapse:collapse;font-size:13px;}
+.mx th{background:rgba(255,255,255,.05);color:#B9A3EE;padding:13px 16px;text-align:start;font-weight:800;font-size:12px;}
+.mx td{padding:12px 16px;border-top:1px solid rgba(255,255,255,.07);color:#CFC3EC;}
+.mx td:first-child{font-weight:700;color:#fff;}
+.mx .ok{color:#6EE7A8;font-weight:800;}
+.mx .ref{color:#FDBA74;font-size:11.5px;font-weight:800;white-space:nowrap;}
+
+/* Docs */
+.docs{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.doc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+  padding:20px;display:flex;gap:15px;align-items:flex-start;transition:var(--t);}
+.doc:hover{background:rgba(255,255,255,.09);transform:translateY(-3px);}
+.doc .ic{width:44px;height:44px;border-radius:14px;background:rgba(109,59,214,.24);color:#B9A3EE;
+  display:grid;place-items:center;flex:none;}
+.doc b{font-size:15px;display:block;margin-bottom:4px;}
+.doc span{font-size:12.5px;color:#9A8CC0;line-height:1.75;}
+
+.foot{text-align:center;margin-top:64px;padding-top:26px;border-top:1px solid rgba(255,255,255,.09);
+  color:#7E6FA8;font-size:12.5px;}
+.foot b{color:#B9A3EE;font-size:15px;display:block;margin-bottom:5px;}
+
+@media(max-width:1000px){.docs{grid-template-columns:1fr;}}
+@media(max-width:900px){.apps{grid-template-columns:1fr;}.hero h1{font-size:38px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="mk"><svg viewBox="0 0 24 24"><path d="M21 3v7.5A10.5 10.5 0 0 1 10.5 21H3v-7.5A10.5 10.5 0 0 1 13.5 3z" fill="currentColor" opacity=".32"/><path d="M21 3c-2 10-8.5 16.5-18 18C5 11 11.5 4.5 21 3z" fill="currentColor"/></svg></div>
+    <h1>walaee</h1>
+    <div class="tag">ولائي — كلنا كسبانين</div>
+    <h2>معرض الواجهات التفاعلي</h2>
+    <p>ثلاث واجهات كاملة قابلة للتصفح، مبنية على نتائج التحليل الشامل — كل شاشة تجيب على مشكلة موثّقة في التقرير.
+       اضغط أي واجهة وتنقّل داخلها كأنها منتج حقيقي.</p>
+    <a class="startbtn" href="present/index.html">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>
+      ابدأ العرض التقديمي
+      <span class="sm">١٨ شريحة · انتقالات 3D · تنقّل بالكيبورد</span>
+    </a>
+    <div class="chips">
+      <span class="chip">١٨ شريحة عرض</span>
+      <span class="chip">Docker جاهز</span>
+      <span class="chip">٢٤ شاشة</span>
+      <span class="chip">٣ واجهات</span>
+      <span class="chip">تفاعلي بالكامل</span>
+      <span class="chip">عربي RTL</span>
+      <span class="chip">بدون إنترنت</span>
+    </div>
+  </div>
+
+  <div class="st"><span>APPS</span><b>الواجهات</b><div class="ln"></div></div>
+  <div class="apps">
+
+    <a class="app a1" href="customer/index.html">
+      <span class="cnt">١٠ شاشات</span>
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M10.5 5.6h3M11 18.6h2"/></svg></div>
+      <h3>تطبيق العميل</h3>
+      <div class="sub">تطبيق ويب تقدّمي (PWA) — بدون تحميل من المتجر، وباحتكاك تبنٍّ شبه معدوم عند الكاشير.</div>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> محفظة بطاقات متعددة المتاجر</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> رحلة المسح والكسب كاملة</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> تسجيل في ١٥ ثانية + أونبوردنج</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> استبدال المكافآت والخصوصية</li>
+      </ul>
+      <div class="go">افتح تطبيق العميل ←</div>
+    </a>
+
+    <a class="app a2" href="merchant/index.html">
+      <span class="cnt">١١ شاشة</span>
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V6.5A1.5 1.5 0 0 1 4.5 5h15A1.5 1.5 0 0 1 21 6.5V9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg></div>
+      <h3>لوحة صاحب المتجر</h3>
+      <div class="sub">مركز التشغيل اليومي: الكاشير، العملاء، البرنامج، الحملات، التقارير، والحوكمة.</div>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> وضع الكاشير — QR متغيّر كل ٣٠ ثانية</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> نماذج الولاء الستة في نظام واحد</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> مركز كشف الاحتيال + الالتزام المالي</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> حملات بتكلفة ظاهرة لكل قناة</li>
+      </ul>
+      <div class="go">افتح لوحة التاجر ←</div>
+    </a>
+
+    <a class="app a3" href="admin/index.html">
+      <span class="cnt">٧ شاشات</span>
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></div>
+      <h3>لوحة إدارة المنصة</h3>
+      <div class="sub">رؤية المؤسّس: الإيراد، المتاجر، مؤشرات الصحة التي تقرر مصير المشروع.</div>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> الإيراد الشهري المتكرر ومصادره</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> المؤشرات الثمانية بأهدافها</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> الامتثال ونموذج النقاط المتدرّج</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg> تكلفة البنية التحتية الفعلية</li>
+      </ul>
+      <div class="go">افتح لوحة الإدارة ←</div>
+    </a>
+  </div>
+
+  <div class="st"><span>TRACEABILITY</span><b>كل مشكلة في التقرير ← شاشة في الواجهة</b><div class="ln"></div></div>
+  <div class="mx">
+    <table>
+      <thead><tr><th>المشكلة في التقرير</th><th>الحل داخل الواجهة</th><th>أين تراه</th><th>الحالة</th></tr></thead>
+      <tbody>
+        <tr><td>م‑01 · آلية إثبات الشراء</td><td>QR ديناميكي كل ٣٠ ثانية + إدخال يدوي + ربط برقم الفاتورة</td><td class="ref">التاجر ← وضع الكاشير</td><td class="ok">✓ مُنفّذة</td></tr>
+        <tr><td>م‑02 · النقاط خاصة أم مشتركة</td><td>نموذج متدرّج ٣ مراحل، والمرحلة الحالية «رصيد منفصل لكل متجر»</td><td class="ref">الإدارة ← إعدادات المنصة</td><td class="ok">✓ مُنفّذة</td></tr>
+        <tr><td>م‑05 · Freemium بلا جدار</td><td>٤ باقات بحدود كمّية صريحة + شريط استهلاك + رسوم تفعيل</td><td class="ref">التاجر ← الاشتراك</td><td class="ok">✓ مُنفّذة</td></tr>
+        <tr><td>م‑07 · الاحتيال الداخلي</td><td>كشف شذوذ، سقوف يومية، حساب لكل كاشير، سجل تدقيق</td><td class="ref">التاجر ← المراجعة والاحتيال</td><td class="ok">✓ مُنفّذة</td></tr>
+        <tr><td>م‑08 · التزام النقاط المؤجل</td><td>«الالتزام القائم» بالجنيه كمؤشر + سياسة صلاحية + عكس تلقائي</td><td class="ref">التاجر ← لوحة المعلومات</td><td class="ok">✓ مُنفّذة</td></tr>
+        <tr><td>م‑09 · حماية البيانات</td><td>متحكّم/معالِج، موافقة، تحميل البيانات، حذف ذاتي، DPA</td><td class="ref">العميل ← حسابي · التاجر ← الإعدادات</td><td class="ok">✓ مُنفّذة</td></tr>
+        <tr><td>م‑10 · تكلفة الرسائل</td><td>ترتيب القنوات بالتكلفة + رصيد رسائل + التكلفة قبل الإرسال</td><td class="ref">التاجر ← الحملات</td><td class="ok">✓ مُنفّذة</td></tr>
+        <tr><td>م‑11 · الفروع والسلاسل</td><td>شجرة: مؤسسة ← علامة ← فرع ← كاشير</td><td class="ref">التاجر ← الفروع والكاشيرين</td><td class="ok">✓ مُنفّذة</td></tr>
+        <tr><td>م‑12 · AI بلا مضمون</td><td>«توصيات تحليلية» بقواعد إحصائية بدل وعود تعلّم آلي</td><td class="ref">التاجر ← المكافآت</td><td class="ok">✓ مُنفّذة</td></tr>
+        <tr><td>م‑13 · إشعارات iOS في PWA</td><td>طلب التثبيت على الشاشة الرئيسية مقابل مكافأة + قنوات بديلة</td><td class="ref">العميل ← الرئيسية</td><td class="ok">✓ مُنفّذة</td></tr>
+        <tr><td>م‑16 · توحيد الاسم</td><td>الاسم الموحّد <b>walaee</b> في كل الواجهات</td><td class="ref">كل الشاشات</td><td class="ok">✓ مُنفّذة</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="st"><span>DOCS</span><b>المستندات المصاحبة</b><div class="ln"></div></div>
+  <div class="docs">
+    <a class="doc" href="present/index.html" style="border-color:rgba(139,92,246,.42);background:rgba(109,59,214,.16)">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></div>
+      <div><b>العرض التقديمي (3D)</b><span>١٨ شريحة بانتقالات ثلاثية الأبعاد وواجهات حيّة مدمجة — تنقّل بالكيبورد، وضع تلقائي، وعرض شرائح.</span></div>
+    </a>
+    <a class="doc" href="plan/index.html">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4M8.5 13h7M8.5 17h5"/></svg></div>
+      <div><b>خطة التطوير الشاملة</b><span>الحزمة التقنية، نموذج البيانات، ٦ مراحل تنفيذ، الفريق، التكلفة، معايير القبول، والمخاطر.</span></div>
+    </a>
+    <a class="doc" href="architecture/index.html" style="border-color:rgba(74,222,128,.4);background:rgba(22,163,74,.12)">
+      <div class="ic" style="background:rgba(22,163,74,.24);color:#6EE7A8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 8-5 4 5 4M15 8l5 4-5 4"/></svg></div>
+      <div><b>المخطط البرمجي والمعماري</b><span>طبقات النظام، ٢١ جدولًا بعلاقاتها، تدفق التنفيذ، الكود الحرج، ٤٧ نقطة API، الحاويات، والاختبارات.</span></div>
+    </a>
+    <a class="doc" href="../Walaee_Analysis_Report_AR.pdf">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v13M6.5 11.5 12 17l5.5-5.5M4 20h16"/></svg></div>
+      <div><b>التحليل الشامل (PDF)</b><span>٢٤ صفحة: ٨ نقاط قوة، ١٦ مشكلة بحلولها، التكلفة الكاملة، نقطة التعادل، وتقييم الجدوى.</span></div>
+    </a>
+  </div>
+
+  <div class="foot">
+    <b>ولائي… كلنا كسبانين.</b>
+    نموذج عرض تفاعلي — البيانات المعروضة تجريبية لأغراض التقديم فقط.
+  </div>
+</div>
+<script src="assets/js/switcher.js"></script>
+</body>
+</html>

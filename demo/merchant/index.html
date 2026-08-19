@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ولائي — لوحة صاحب المتجر</title>
+<link rel="stylesheet" href="../assets/css/theme.css">
+<link rel="stylesheet" href="../assets/css/mobile.css">
+<link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body class="dash">
+
+<div class="shell">
+  <aside class="side" id="side">
+    <div class="brand">
+      <a class="logo" href="../index.html">
+        <span class="mark"><svg viewBox="0 0 24 24"><path d="M21 3v7.5A10.5 10.5 0 0 1 10.5 21H3v-7.5A10.5 10.5 0 0 1 13.5 3z" fill="currentColor" opacity=".32"/><path d="M21 3c-2 10-8.5 16.5-18 18C5 11 11.5 4.5 21 3z" fill="currentColor"/></svg></span>
+        <span class="txt"><b>ولائي</b><span>لوحة صاحب المتجر</span></span>
+      </a>
+    </div>
+    <nav id="nav"></nav>
+    <div class="foot">
+      <div class="row">
+        <div class="av av-sm">ب</div>
+        <div class="grow"><b style="font-size:12.5px;color:#fff">كافيه بن وسط</b>
+          <div style="font-size:10.5px;color:#A995DE">باقة Starter</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topnav">
+      <button class="iconbtn" onclick="document.getElementById('side').classList.toggle('open')" style="display:none" id="burger">☰</button>
+      <div class="grow"><h1 id="pt">لوحة المعلومات</h1><div class="crumb" id="ps"></div></div>
+      <button class="btn btn-line btn-sm" onclick="UI.toast('لا توجد تنبيهات جديدة')">🔔</button>
+      <button class="btn btn-primary btn-sm" onclick="MER.go('pos')">فتح وضع الكاشير</button>
+    </div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<script src="../assets/js/icons.js"></script>
+<script src="../assets/js/ui.js"></script>
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/merchant.js"></script>
+<script src="../assets/js/switcher.js"></script>
+<script>
+  MER.init();
+  if (innerWidth < 760) document.getElementById('burger').style.display = 'grid';
+</script>
+</body>
+</html>
