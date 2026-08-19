@@ -38,8 +38,20 @@
     var ready = D.REWARDS.filter(function (r) { return r.ready; }).length;
     return statusbar() + '<div class="view pad-b" data-scroll>' +
       head('أهلاً محمد 👋', 'عندك ' + UI.ar(ready) + ' مكافآت جاهزة للاستبدال',
-        '<button class="iconbtn" onclick="UI.toast(\'لا توجد إشعارات جديدة\')">' + ICO('bell') + '<span class="nd"></span></button>') +
+        '<button class="iconbtn" onclick="CUS.go(\'notifs\')">' + ICO('bell') + '<span class="nd"></span></button>') +
       '<div class="pad">' +
+        '<div class="tier mb-3" data-anim><div class="tb">' + D.TIER.icon + '</div>' +
+        '<div class="grow"><b>المستوى ' + D.TIER.name + '</b>' +
+        '<span>' + UI.ar(D.TIER.next - D.TIER.cur) + ' زيارات على المستوى ' + D.TIER.nextName + '</span>' +
+        '<div class="tp"><i style="width:' + Math.round(D.TIER.cur / D.TIER.next * 100) + '%"></i></div></div></div>' +
+
+        '<div class="card card-p mb-3" data-anim><div class="row between mb-2">' +
+        '<b class="t-sm">زياراتك هذا الأسبوع</b><span class="badge bg-g">٥ من ٧</span></div>' +
+        '<div class="streak">' + D.STREAK.map(function (d) {
+          return '<i class="' + (d.today ? 'today' : d.on ? 'on' : '') + '">' + d.d + '</i>';
+        }).join('') + '</div>' +
+        '<p class="hint mt-2">زُر ٣ أيام متتالية واكسب ٢٠ نقطة إضافية.</p></div>' +
+
         '<div class="a2hs" data-anim><div class="ic">' + ICO('phone') + '</div>' +
         '<div class="grow"><b>ثبّت ولائي على شاشتك</b><span>عشان توصلك إشعارات المكافآت — واكسب ٥٠ نقطة ترحيبية.</span></div>' +
         '<button class="btn btn-sm" style="background:#fff;color:var(--violet-700)" onclick="UI.toast(\'تم تثبيت التطبيق · +٥٠ نقطة\')">تثبيت</button></div>' +
@@ -173,7 +185,7 @@
     return statusbar() + '<div class="view pad-b" data-scroll>' + topbar('سجل النشاط') +
       '<div class="pad"><div class="card card-p" data-anim>' +
       D.ACTIVITY.concat(D.ACTIVITY).map(function (a) {
-        return '<div class="li"><div class="ibox ' + a.tone + '">' + ICO(a.icon) + '</div>' +
+        return '<div class="li" onclick="CUS.go(\'receipt\')"><div class="ibox ' + a.tone + '">' + ICO(a.icon) + '</div>' +
           '<div class="grow"><div class="li-t">' + a.title + '</div><div class="li-s">' + a.sub + '</div></div>' +
           '<div class="li-v">' + a.val + '</div></div>';
       }).join('') + '</div></div></div>';
@@ -193,9 +205,9 @@
         '<button class="btn btn-line btn-sm">' + ICO('edit') + '</button></div>' +
 
         '<div class="grid g3 mt-3" data-anim>' +
-          '<div class="card card-p center"><div class="t-lg w-8 num">٤</div><div class="t-xs muted w-7">بطاقة</div></div>' +
-          '<div class="card card-p center"><div class="t-lg w-8 num">٣٨</div><div class="t-xs muted w-7">زيارة</div></div>' +
-          '<div class="card card-p center"><div class="t-lg w-8 num">٥٩٤</div><div class="t-xs muted w-7">ج وفّرتها</div></div>' +
+          '<div class="card card-p center"><div class="t-lg w-8 num" data-n="4">٠</div><div class="t-xs muted w-7">بطاقة</div></div>' +
+          '<div class="card card-p center"><div class="t-lg w-8 num" data-n="38">٠</div><div class="t-xs muted w-7">زيارة</div></div>' +
+          '<div class="card card-p center"><div class="t-lg w-8 num" data-n="594">٠</div><div class="t-xs muted w-7">ج وفّرتها</div></div>' +
         '</div>' +
 
         '<div class="sec-t"><h3>الإشعارات</h3></div>' +
@@ -218,6 +230,16 @@
           '<button class="btn btn-line btn-sm c-red" onclick="UI.toast(\'تحتاج تأكيد بالـ OTP\',\'warn\')">' + ICO('trash') + '</button></div>' +
         '</div>' +
 
+        '<div class="sec-t"><h3>المزايا</h3></div>' +
+        '<div class="card card-p" data-anim>' +
+          '<div class="li" onclick="CUS.go(\'tiers\')"><div class="ibox v">' + ICO('star') + '</div>' +
+          '<div class="grow"><div class="li-t">مستوياتك ومزاياها</div>' +
+          '<div class="li-s">أنت في المستوى ' + D.TIER.name + '</div></div>' + ICO('fwd', 'faint', 18) + '</div>' +
+          '<div class="li" onclick="CUS.go(\'invite\')"><div class="ibox o">' + ICO('users') + '</div>' +
+          '<div class="grow"><div class="li-t">ادعُ صديقًا واكسب ١٠٠ نقطة</div>' +
+          '<div class="li-s">٣ أصدقاء انضموا بكودك</div></div>' + ICO('fwd', 'faint', 18) + '</div>' +
+        '</div>' +
+
         '<div class="sec-t"><h3>عام</h3></div>' +
         '<div class="card card-p" data-anim>' +
           '<div class="li"><div class="ibox v">' + ICO('doc') + '</div><div class="grow"><div class="li-t">الشروط والأحكام</div></div>' + ICO('fwd', 'faint', 18) + '</div>' +
@@ -225,6 +247,113 @@
           '<div class="li"><div class="ibox r">' + ICO('logout') + '</div><div class="grow"><div class="li-t c-red">تسجيل الخروج</div></div></div>' +
         '</div>' +
         '<p class="hint center mt-3">ولائي — النسخة ١.٠.٠ · كلنا كسبانين</p>' +
+      '</div></div>';
+  };
+
+
+  /* ---------- الإشعارات ---------- */
+  S.notifs = function () {
+    var un = D.NOTIFS.filter(function (n) { return n.u; }).length;
+    return statusbar() + '<div class="view pad-b" data-scroll>' + topbar('الإشعارات') +
+      '<div class="pad">' +
+        '<div class="row between mb-3"><span class="badge bg-o">' + UI.ar(un) + ' غير مقروءة</span>' +
+        '<button class="btn btn-line btn-sm" onclick="UI.toast(\'تم تعليم الكل كمقروء\')">تعليم الكل</button></div>' +
+        D.NOTIFS.map(function (n) {
+          return '<div class="ntf ' + (n.u ? 'unread' : '') + '" data-anim>' +
+            '<div class="ibox ' + n.tone + '">' + ICO(n.icon) + '</div>' +
+            '<div class="grow"><div class="nb">' + n.t + '</div><div class="ns">' + n.s + '</div></div>' +
+            '<div class="nt">' + n.a + '</div></div>';
+        }).join('') +
+      '</div></div>';
+  };
+
+  /* ---------- إيصال عملية ---------- */
+  S.receipt = function () {
+    return statusbar() + '<div class="view pad-b" data-scroll>' + topbar('تفاصيل العملية', 'activity') +
+      '<div class="pad">' +
+        '<div class="center mb-3" data-anim>' +
+        '<div class="ibox g" style="width:58px;height:58px;border-radius:19px;margin:0 auto 10px">' + ICO('checkc') + '</div>' +
+        '<b class="t-lg">تمت بنجاح</b><div class="t-sm muted w-6">كافيه بن وسط · الفرع الرئيسي</div></div>' +
+
+        '<div class="rcpt" data-anim>' +
+          '<div class="center"><div class="t-2xl w-8 num" data-n="65" data-suf=" ج">٠</div>' +
+          '<div class="t-xs muted w-7">قيمة الفاتورة</div></div>' +
+          '<div class="dash"></div>' +
+          '<div class="rl"><span class="muted">التاريخ</span><b class="num">اليوم ١٠:٤٢ ص</b></div>' +
+          '<div class="rl"><span class="muted">رقم الفاتورة</span><b class="num">INV-20841</b></div>' +
+          '<div class="rl"><span class="muted">رقم العملية</span><b class="num">#WL-8842</b></div>' +
+          '<div class="rl"><span class="muted">الكاشير</span><b>محمود سعيد</b></div>' +
+          '<div class="dash"></div>' +
+          '<div class="rl"><span class="muted">ما كسبته</span><b class="c-green">+١ ختم</b></div>' +
+          '<div class="rl"><span class="muted">رصيدك بعدها</span><b class="num">٨ من ١٠ أختام</b></div>' +
+          '<div class="rl"><span class="muted">صلاحية الرصيد</span><b class="num">٢٠٢٧/٠٢/١٤</b></div>' +
+        '</div>' +
+
+        '<div class="card card-p tint-g mt-3" data-anim><div class="row-t">' +
+        '<div class="ibox g" style="background:#fff">' + ICO('shield') + '</div><div class="grow">' +
+        '<b class="t-sm">عملية موثّقة</b><div class="t-xs muted w-6 mt-1">' +
+        'مربوطة برقم الفاتورة وقيمتها والكاشير — مسجّلة في سجل لا يُعدَّل.</div></div></div>' +
+
+        '<button class="btn btn-line btn-block mt-3" onclick="UI.toast(\'تم نسخ رقم العملية\')">' +
+        ICO('doc') + ' نسخ رقم العملية</button>' +
+      '</div></div>';
+  };
+
+  /* ---------- المستويات ---------- */
+  S.tiers = function () {
+    var T = [
+      { n:'برونزي',  need:'٠',          on:false, done:true,  perks:'نقاط عادية' },
+      { n:'فضّي',    need:'٢٠ زيارة',   on:true,  done:false, perks:'نقاط مضاعفة يوم الجمعة' },
+      { n:'ذهبي',    need:'٥٠ زيارة',   on:false, done:false, perks:'خصم دائم ٥٪ + هدية ميلاد' },
+      { n:'بلاتيني', need:'١٠٠ زيارة',  on:false, done:false, perks:'مكافآت حصرية + دعوة فعاليات' }
+    ];
+    return statusbar() + '<div class="view pad-b" data-scroll>' + topbar('مستوياتك', 'me') +
+      '<div class="pad">' +
+        '<div class="tier mb-3" data-anim style="padding:18px">' +
+        '<div class="tb" style="width:48px;height:48px;font-size:22px">' + D.TIER.icon + '</div>' +
+        '<div class="grow"><b style="font-size:16px">المستوى ' + D.TIER.name + '</b>' +
+        '<span>' + UI.ar(D.TIER.cur) + ' من ' + UI.ar(D.TIER.next) + ' زيارة</span>' +
+        '<div class="tp"><i style="width:' + Math.round(D.TIER.cur / D.TIER.next * 100) + '%"></i></div></div></div>' +
+
+        '<div class="sec-t"><h3>مزايا مستواك الحالي</h3></div>' +
+        '<div class="card card-p" data-anim>' + D.TIER.perks.map(function (pk) {
+          return '<div class="li"><div class="ibox g">' + ICO('checkc') + '</div>' +
+            '<div class="grow"><div class="li-t">' + pk + '</div></div></div>';
+        }).join('') + '</div>' +
+
+        '<div class="sec-t"><h3>كل المستويات</h3></div>' +
+        '<div class="card card-p" data-anim>' + T.map(function (t) {
+          return '<div class="li"><div class="ibox ' + (t.on ? 'v' : t.done ? 'g' : '') + '"' +
+            (t.on || t.done ? '' : ' style="background:var(--line-2);color:var(--faint)"') + '>' +
+            ICO(t.done ? 'checkc' : t.on ? 'star' : 'lock') + '</div>' +
+            '<div class="grow"><div class="li-t">' + t.n + (t.on ? ' — أنت هنا' : '') + '</div>' +
+            '<div class="li-s">' + t.need + ' · ' + t.perks + '</div></div></div>';
+        }).join('') + '</div>' +
+      '</div></div>';
+  };
+
+  /* ---------- دعوة صديق ---------- */
+  S.invite = function () {
+    return statusbar() + '<div class="view pad-b" data-scroll>' + topbar('ادعُ صديقًا', 'me') +
+      '<div class="pad center">' +
+        '<div data-anim style="width:96px;height:96px;border-radius:30px;margin:14px auto 18px;' +
+        'background:linear-gradient(140deg,#6D3BD6,#3A1078);display:grid;place-items:center;color:#fff;' +
+        'box-shadow:var(--sh-brand)">' + ICO('users', '', 46) + '</div>' +
+        '<h2 class="t-xl" data-anim>اكسب ١٠٠ نقطة</h2>' +
+        '<p class="hint" data-anim style="max-width:260px;margin:8px auto 0">' +
+        'لكل صديق ينضم بكودك ويعمل أول عملية شراء — وهو كمان بياخد ١٠٠ نقطة.</p>' +
+
+        '<div class="card card-p mt-3" data-anim>' +
+        '<div class="t-xs muted w-7">كودك الخاص</div>' +
+        '<div class="t-2xl w-8 num" style="letter-spacing:3px;margin:4px 0">MN-2291</div>' +
+        '<button class="btn btn-primary btn-block mt-2" onclick="UI.toast(\'تم نسخ الكود\')">' +
+        ICO('send') + ' مشاركة الكود</button></div>' +
+
+        '<div class="grid g2 mt-3" data-anim>' +
+        '<div class="card card-p center"><div class="t-lg w-8 num" data-n="3">٠</div>' +
+        '<div class="t-xs muted w-7">صديق انضم</div></div>' +
+        '<div class="card card-p center"><div class="t-lg w-8 num" data-n="300">٠</div>' +
+        '<div class="t-xs muted w-7">نقطة كسبتها</div></div></div>' +
       '</div></div>';
   };
 
@@ -294,7 +423,7 @@
     return '<div class="success" data-anim>' + statusbar(true) +
       '<div class="tick anim-pop">' + ICO('check', '', 48) + '</div>' +
       '<h2>تمام! 🎉</h2><p>اتسجّلت زيارتك في كافيه بن وسط</p>' +
-      '<div class="gain">+١ ختم</div>' +
+      '<div class="gain anim-pop">+١ ختم</div>' +
       '<p>باقي لك <b>ختمين</b> على القهوة المجانية</p>' +
       '<div class="recap">' +
       '<div class="r"><span>قيمة الفاتورة</span><b class="num">٦٥ ج</b></div>' +
@@ -312,6 +441,7 @@
         var map = { home:'home', stores:'stores', rewards:'rewards', me:'me' };
         if (map[name]) tab = name;
         CUS.paintTabs();
+        UI.countAll(root);
       });
       var h=(location.hash||'').replace('#','');
       router.go(S[h]?h:'home');
@@ -334,6 +464,10 @@
     },
     overlay: function (h) {
       var o = $('#overlay'); o.innerHTML = h; o.style.display = 'block';
+      UI.countAll(o);
+      if (h.indexOf('class="success"') > -1) {
+        setTimeout(function () { UI.confetti(o.firstChild, 32); }, 200);
+      }
     },
     closeOverlay: function (toast) {
       var o = $('#overlay'); if (o) { o.innerHTML = ''; o.style.display = 'none'; }

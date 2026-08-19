@@ -5,7 +5,7 @@
   function at(seg) { return here.indexOf('/' + seg + '/') > -1; }
 
   var base = at('customer') || at('merchant') || at('admin') || at('plan') ||
-             at('architecture') || at('present') ? '../' : './';
+             at('architecture') || at('present') || at('team') ? '../' : './';
 
   var ITEMS = [
     { k:'index',        l:'المعرض',    href: base + 'index.html',              ic:'grid'  },
@@ -14,7 +14,8 @@
     { k:'merchant',     l:'التاجر',    href: base + 'merchant/index.html',     ic:'store' },
     { k:'admin',        l:'الإدارة',   href: base + 'admin/index.html',        ic:'cog'   },
     { k:'plan',         l:'الخطة',     href: base + 'plan/index.html',         ic:'doc'   },
-    { k:'architecture', l:'المعمارية', href: base + 'architecture/index.html', ic:'code'  }
+    { k:'architecture', l:'المعمارية', href: base + 'architecture/index.html', ic:'code'  },
+    { k:'team',         l:'الفريق ⚠',  href: base + 'team/index.html',         ic:'users', int:true }
   ];
 
   var I = {
@@ -57,6 +58,7 @@
     '.wsw-a svg{width:16px;height:16px;opacity:.8;flex:none;}',
     '.wsw-a.on{background:rgba(109,59,214,.42);color:#fff;}',
     '.wsw-a.on::after{content:"";width:6px;height:6px;border-radius:50%;background:#4ADE80;margin-inline-start:auto;}',
+    '.wsw-a.intl{color:#FDBA74;border-top:1px solid rgba(255,255,255,.1);margin-top:4px;padding-top:10px;}',
     '.wtop{position:fixed;bottom:20px;inset-inline-end:20px;z-index:500;width:42px;height:42px;',
     '  border-radius:13px;display:grid;place-items:center;cursor:pointer;border:1px solid var(--line,#E9E4F5);',
     '  background:var(--surface,#fff);color:var(--violet-700,#4B1E9E);box-shadow:0 6px 18px rgba(20,20,43,.14);',
@@ -75,9 +77,9 @@
     '<button class="wsw-t" aria-label="تبديل الواجهة" aria-expanded="false">' + svg('menu') + '</button>' +
     '<div class="wsw-p" role="menu"><div class="hd">تنقّل سريع</div>' +
     ITEMS.map(function (it) {
-      var on = (it.k === 'index') ? (!at('customer') && !at('merchant') && !at('admin') &&
-                                     !at('plan') && !at('architecture') && !at('present')) : at(it.k);
-      return '<a class="wsw-a' + (on ? ' on' : '') + '" role="menuitem" href="' + it.href + '">' +
+      var on = (it.k === 'index') ? (!at('customer') && !at('merchant') && !at('admin') && !at('plan') &&
+                                     !at('architecture') && !at('present') && !at('team')) : at(it.k);
+      return '<a class="wsw-a' + (on ? ' on' : '') + (it.int ? ' intl' : '') + '" role="menuitem" href="' + it.href + '">' +
              svg(it.ic) + '<span>' + it.l + '</span></a>';
     }).join('') + '</div>';
   document.body.appendChild(wrap);

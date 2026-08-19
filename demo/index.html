@@ -79,6 +79,9 @@ body{background:#0B0918;color:#fff;}
 .doc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:18px;
   padding:20px;display:flex;gap:15px;align-items:flex-start;transition:var(--t);}
 .doc:hover{background:rgba(255,255,255,.09);transform:translateY(-3px);}
+.doc.intl{border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.09);
+  background-image:repeating-linear-gradient(45deg,transparent,transparent 9px,rgba(249,115,22,.05) 9px,rgba(249,115,22,.05) 18px);}
+.doc.intl:hover{background-color:rgba(249,115,22,.16);}
 .doc .ic{width:44px;height:44px;border-radius:14px;background:rgba(109,59,214,.24);color:#B9A3EE;
   display:grid;place-items:center;flex:none;}
 .doc b{font-size:15px;display:block;margin-bottom:4px;}
@@ -203,6 +206,13 @@ body{background:#0B0918;color:#fff;}
       <div><b>التحليل الشامل (PDF)</b><span>٢٤ صفحة: ٨ نقاط قوة، ١٦ مشكلة بحلولها، التكلفة الكاملة، نقطة التعادل، وتقييم الجدوى.</span></div>
     </a>
   </div>
+
+  <div class="st"><span>INTERNAL</span><b>مستندات داخلية — لا تُعرض على العميل</b><div class="ln"></div></div>
+  <a class="doc intl" href="team/index.html">
+    <div class="ic" style="background:rgba(249,115,22,.24);color:#FDBA74"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"/><path d="M2 20c0-3.6 3.1-5.8 7-5.8s7 2.2 7 5.8"/><path d="M16 5.2A3.4 3.4 0 0 1 16 11M18 14.6c2.4.7 4 2.5 4 5"/></svg></div>
+    <div><b>دليل الفريق ودورة التطوير <span style="color:#FDBA74;font-size:11px">⚠ داخلي</span></b>
+    <span>٨ أدوار بمسؤولياتها ومعايير قبولها · مصفوفة RACI · ١٢ سبرنت · سير Git وبوابات الدمج · تعريف الجاهز والمنجز · نقاط التسليم · إجراءات الطوارئ.</span></div>
+  </a>
 
   <div class="foot">
     <b>ولائي… كلنا كسبانين.</b>

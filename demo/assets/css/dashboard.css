@@ -131,3 +131,7 @@ body.dash{background:var(--canvas);min-height:100vh;}
   .g2,.g3,.g4,.g5{grid-template-columns:1fr;}
   .content{padding:16px;}
 }
+
+/* ---------- خط بياني مصغّر داخل بطاقة المؤشر ---------- */
+.kpi .spk{margin:10px -4px 2px;opacity:.9;}
+.kpi:hover .spk{opacity:1;}

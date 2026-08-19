@@ -152,5 +152,119 @@
     return s + '</svg>';
   };
 
+
+  /* ---------- عدّاد رقمي متحرك ---------- */
+  UI.count = function (el, to, opt) {
+    opt = opt || {};
+    var dur = opt.dur || 900, dec = opt.dec || 0, pre = opt.pre || '', suf = opt.suf || '';
+    var t0 = null, from = opt.from || 0;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+      var v = (from + (to - from) * e).toFixed(dec);
+      el.textContent = pre + UI.ar(Number(v).toLocaleString('en-US')) + suf;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  };
+  UI.countAll = function (root) {
+    UI.$$('[data-n]', root || document).forEach(function (el) {
+      if (el.dataset.done) return; el.dataset.done = '1';
+      UI.count(el, parseFloat(el.dataset.n), {
+        dec: +(el.dataset.dec || 0), pre: el.dataset.pre || '', suf: el.dataset.suf || '',
+        dur: +(el.dataset.dur || 900)
+      });
+    });
+  };
+
+  /* ---------- خط بياني مصغّر (Sparkline) ---------- */
+  UI.spark = function (data, opt) {
+    opt = opt || {};
+    var w = opt.w || 100, h = opt.h || 30, c = opt.color || '#4B1E9E', fill = opt.fill !== false;
+    var max = Math.max.apply(null, data), min = Math.min.apply(null, data);
+    var rng = (max - min) || 1, step = w / (data.length - 1);
+    var pts = data.map(function (v, i) {
+      return [w - i * step, h - 2 - ((v - min) / rng) * (h - 6)];   /* RTL */
+    });
+    var d = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
+    var id = 'sp' + Math.floor(Math.abs(data[0] * 977 + data.length * 31));
+    var s = '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;height:' + h + 'px;overflow:visible">';
+    if (fill) {
+      s += '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1">' +
+           '<stop offset="0" stop-color="' + c + '" stop-opacity=".3"/>' +
+           '<stop offset="1" stop-color="' + c + '" stop-opacity="0"/></linearGradient></defs>' +
+           '<path d="' + d + ' L' + pts[pts.length - 1][0] + ' ' + h + ' L' + pts[0][0] + ' ' + h + ' Z" fill="url(#' + id + ')"/>';
+    }
+    s += '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ' +
+         'pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;animation:draw .9s cubic-bezier(.4,0,.2,1) forwards"/>';
+    s += '<circle cx="' + pts[0][0] + '" cy="' + pts[0][1] + '" r="2.6" fill="' + c + '"/>';
+    return s + '</svg>';
+  };
+
+  /* ---------- احتفال (Confetti) ---------- */
+  UI.confetti = function (host, n) {
+    n = n || 26;
+    var cols = ['#F97316', '#16A34A', '#6D3BD6', '#FDBA74', '#4ADE80', '#fff'];
+    var box = document.createElement('div');
+    box.className = 'cfti';
+    var h = '';
+    for (var i = 0; i < n; i++) {
+      var x = Math.random() * 100, d = (Math.random() * .5).toFixed(2),
+          r = (Math.random() * 360) | 0, sz = 5 + Math.random() * 6,
+          c = cols[i % cols.length], sq = Math.random() > .5;
+      h += '<i style="left:' + x.toFixed(1) + '%;width:' + sz.toFixed(1) + 'px;height:' + (sz * (sq ? 1 : 1.7)).toFixed(1) +
+           'px;background:' + c + ';animation-delay:' + d + 's;transform:rotate(' + r + 'deg);' +
+           (sq ? 'border-radius:2px' : 'border-radius:50%') + '"></i>';
+    }
+    box.innerHTML = h;
+    (host || document.body).appendChild(box);
+    setTimeout(function () { box.remove(); }, 2600);
+  };
+
+  /* ---------- لوحة جانبية (Drawer) ---------- */
+  UI.drawer = function (title, body, foot) {
+    var d = UI.$('#drw');
+    if (!d) {
+      d = document.createElement('div'); d.id = 'drw'; d.className = 'drw';
+      document.body.appendChild(d);
+      d.addEventListener('click', function (e) { if (e.target === d) UI.closeDrawer(); });
+    }
+    d.innerHTML = '<aside><header><h3>' + title + '</h3>' +
+      '<button class="btn btn-line btn-sm" onclick="UI.closeDrawer()">' + ICO('x') + '</button></header>' +
+      '<div class="dbody">' + body + '</div>' +
+      (foot ? '<footer>' + foot + '</footer>' : '') + '</aside>';
+    void d.offsetWidth; d.classList.add('show');
+    UI.countAll(d);
+  };
+  UI.closeDrawer = function () { var d = UI.$('#drw'); if (d) d.classList.remove('show'); };
+
+  /* ---------- هيكل تحميل (Skeleton) ---------- */
+  UI.skel = function (rows, h) {
+    var o = '';
+    for (var i = 0; i < (rows || 3); i++) o += '<div class="sk" style="height:' + (h || 54) + 'px"></div>';
+    return '<div class="skwrap">' + o + '</div>';
+  };
+
+  /* ---------- تموّج عند الضغط (Ripple) ---------- */
+  UI.ripple = function (e) {
+    var t = e.currentTarget, r = t.getBoundingClientRect();
+    var i = document.createElement('span');
+    i.className = 'rpl';
+    var size = Math.max(r.width, r.height);
+    i.style.width = i.style.height = size + 'px';
+    i.style.left = (e.clientX - r.left - size / 2) + 'px';
+    i.style.top = (e.clientY - r.top - size / 2) + 'px';
+    t.appendChild(i);
+    setTimeout(function () { i.remove(); }, 620);
+  };
+
+  /* ---------- وقت نسبي ---------- */
+  UI.ago = function (mins) {
+    if (mins < 1) return 'الآن';
+    if (mins < 60) return 'منذ ' + UI.ar(mins) + ' دقيقة';
+    if (mins < 1440) return 'منذ ' + UI.ar(Math.floor(mins / 60)) + ' ساعة';
+    return 'منذ ' + UI.ar(Math.floor(mins / 1440)) + ' يوم';
+  };
+
   g.UI = UI;
 })(window);

@@ -34,12 +34,20 @@
   };
 
   /* ================ مكونات ================ */
+  var SPK = { 'عملاء جدد هذا الشهر':['newCust','#4B1E9E'], 'العملاء العائدون':['returning','#16A34A'],
+              'معدل تكرار الشراء':['repeat','#2563EB'], 'مكافآت مُستبدلة':['redeem','#F97316'],
+              'الالتزام القائم':['liability','#CA8A04'], 'عمليات تحتاج مراجعة':['flags','#DC2626'] };
+
   function kpi(k) {
+    var sp = SPK[k.k];
     return '<div class="kpi" data-anim><div class="row between" style="align-items:flex-start">' +
       '<div class="grow"><div class="kt">' + k.k + '</div><div class="kv num">' + k.v + '</div>' +
       '<div class="ks">' + (k.sub || '') + '</div></div>' +
       '<div class="ibox ' + k.tone + '">' + ICO(k.icon) + '</div></div>' +
-      (k.d ? '<div class="mt-1"><span class="delta ' + (k.up ? 'up' : 'dn') + '">' + (k.up ? '▲' : '▼') + ' ' + k.d + '</span></div>' : '') +
+      (sp && D.SPARK[sp[0]] ? '<div class="spk">' + UI.spark(D.SPARK[sp[0]], { color: sp[1], h: 28 }) + '</div>' : '') +
+      (k.d ? '<div class="row between mt-1"><span class="delta ' + (k.up ? 'up' : 'dn') + '">' +
+             (k.up ? '▲' : '▼') + ' ' + k.d + '</span>' +
+             '<span class="t-xs faint w-7">آخر ٧ أيام</span></div>' : '') +
       '</div>';
   }
   function sectionHd(t, right) {
@@ -78,10 +86,11 @@
           '</div></div>' +
       '</div>' +
 
-      '<div class="card mt-3" data-anim>' + sectionHd('أحدث العمليات',
+      '<div class="card mt-3" data-anim>' + sectionHd(
+        'أحدث العمليات <span class="live" style="margin-inline-start:9px"><i></i> مباشر</span>',
         '<button class="btn btn-line btn-sm" onclick="MER.go(\'pos\')">' + ICO('qr') + ' فتح وضع الكاشير</button>') +
         '<div style="overflow-x:auto"><table class="tbl"><thead><tr>' +
-        '<th>الوقت</th><th>العميل</th><th>الفرع</th><th>الكاشير</th><th>الفاتورة</th><th>الأثر</th><th>الحالة</th></tr></thead><tbody>' +
+        '<th>الوقت</th><th>العميل</th><th>الفرع</th><th>الكاشير</th><th>الفاتورة</th><th>الأثر</th><th>الحالة</th></tr></thead><tbody id="livetbl">' +
         D.TXNS.map(function (t) {
           var st = { ok:'<span class="badge bg-g">مؤكدة</span>', new:'<span class="badge bg-b">عميل جديد</span>',
                      redeem:'<span class="badge bg-v">استبدال</span>', flag:'<span class="badge bg-r">تحتاج مراجعة</span>' };
@@ -145,16 +154,19 @@
 
       '<div class="card" data-anim>' +
         '<div class="card-hd"><div class="row wrap gap-sm">' +
-          segs.map(function (s, i) { return '<span class="seg' + (i === 0 ? ' on' : '') + '" onclick="MER.seg(this)">' + s + '</span>'; }).join('') +
+          segs.map(function (sg, i) { return '<span class="seg' + (i === 0 ? ' on' : '') +
+            '" data-seg="' + sg + '" onclick="MER.seg(this)">' + sg + '</span>'; }).join('') +
         '</div>' +
         '<div class="row gap-sm"><div style="position:relative">' +
-        '<input class="input" placeholder="بحث بالاسم أو الرقم…" style="padding-inline-start:38px;width:230px">' +
+        '<input class="input" id="csearch" oninput="MER.search(this.value)" placeholder="بحث بالاسم أو الرقم…" style="padding-inline-start:38px;width:230px">' +
         '<span style="position:absolute;inset-inline-start:12px;top:10px;color:var(--faint)">' + ICO('search','',17) + '</span></div>' +
         '<button class="btn btn-line btn-sm">' + ICO('down') + ' تصدير</button></div></div>' +
         '<div style="overflow-x:auto"><table class="tbl"><thead><tr>' +
-        '<th>العميل</th><th>الشريحة</th><th>الزيارات</th><th>آخر زيارة</th><th>الرصيد</th><th>إجمالي الإنفاق</th><th></th></tr></thead><tbody>' +
+        '<th>العميل</th><th>الشريحة</th><th class="srt" onclick="MER.sort(2)">الزيارات</th><th>آخر زيارة</th>' +
+        '<th>الرصيد</th><th class="srt" onclick="MER.sort(5)">إجمالي الإنفاق</th><th></th></tr></thead><tbody id="custtbl">' +
         D.CUSTOMERS.map(function (c) {
-          return '<tr><td><div class="row"><div class="av av-sm ' + c.tone + '">' + c.n[0] + '</div>' +
+          return '<tr data-seg="' + c.seg + '" data-v="' + c.visits + '" data-s="' + c.spendN + '">' +
+            '<td><div class="row"><div class="av av-sm ' + c.tone + '">' + c.n[0] + '</div>' +
             '<div><b class="t-sm">' + c.n + '</b><div class="t-xs muted num">' + c.p + '</div></div></div></td>' +
             '<td>' + segBadge(c.seg) + '</td><td class="num w-7">' + UI.ar(c.visits) + '</td>' +
             '<td class="muted">' + c.last + '</td><td class="num w-7">' + c.bal + '</td>' +
@@ -502,7 +514,76 @@
         '<button class="btn btn-line" onclick="UI.closeModal()">إلغاء</button>' +
         '<button class="btn btn-primary" onclick="UI.closeModal();UI.toast(\'تم تسجيل العملية\')">تسجيل</button>');
     },
-    seg: function (el) { UI.$$('.seg').forEach(function (e) { e.classList.remove('on'); }); el.classList.add('on'); },
+    seg: function (el) {
+      UI.$$('.seg').forEach(function (e) { e.classList.remove('on'); });
+      el.classList.add('on');
+      var want = el.dataset.seg;
+      var n = 0;
+      UI.$$('#custtbl tr').forEach(function (tr) {
+        var ok = (want === 'الكل' || tr.dataset.seg === want);
+        tr.style.display = ok ? '' : 'none';
+        if (ok) { n++; tr.classList.add('rowin'); setTimeout(function(){tr.classList.remove('rowin');}, 620); }
+      });
+      UI.toast('عرض ' + UI.ar(n) + ' عميل');
+    },
+
+    search: function (q) {
+      q = (q || '').trim();
+      UI.$$('#custtbl tr').forEach(function (tr) {
+        tr.style.display = (!q || tr.textContent.indexOf(q) > -1) ? '' : 'none';
+      });
+    },
+
+    sort: function (col) {
+      var th = UI.$$('#custtbl').length ? UI.$$('th.srt') : [];
+      var tb = UI.$('#custtbl'); if (!tb) return;
+      var key = col === 2 ? 'v' : 's';
+      var asc = tb.dataset.dir !== 'asc' || tb.dataset.col !== String(col);
+      tb.dataset.dir = asc ? 'asc' : 'desc'; tb.dataset.col = String(col);
+      th.forEach(function (h) { h.classList.remove('asc', 'desc'); });
+      var active = th[col === 2 ? 0 : 1]; if (active) active.classList.add(asc ? 'asc' : 'desc');
+      var rows = UI.$$('#custtbl tr');
+      rows.sort(function (a, b) {
+        var x = +a.dataset[key], y = +b.dataset[key];
+        return asc ? x - y : y - x;
+      });
+      rows.forEach(function (r, i) { tb.appendChild(r); r.classList.add('rowin'); r.style.animationDelay = (i * .03) + 's'; });
+      setTimeout(function () { rows.forEach(function (r) { r.classList.remove('rowin'); r.style.animationDelay = ''; }); }, 900);
+    },
+
+    /* بث عمليات جديدة لحظيًا في لوحة المعلومات ووضع الكاشير */
+    liveFeed: function () {
+      var i = 0;
+      setInterval(function () {
+        var tb = UI.$('#livetbl'), tk = UI.$('#ticker');
+        if (!tb && !tk) return;
+        var x = D.LIVE_POOL[i % D.LIVE_POOL.length]; i++;
+        var now = new Date();
+        var t = UI.ar(('0' + ((now.getHours() % 12) || 12)).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2)) +
+                (now.getHours() < 12 ? ' ص' : ' م');
+        var rec = { t: t, c: x.c, b: x.b, cash: x.cash, amt: x.amt, pts: x.pts, st: x.st };
+
+        if (tb) {
+          var st = { ok:'<span class="badge bg-g">مؤكدة</span>', new:'<span class="badge bg-b">عميل جديد</span>',
+                     redeem:'<span class="badge bg-v">استبدال</span>', flag:'<span class="badge bg-r">تحتاج مراجعة</span>' };
+          var tr = document.createElement('tr');
+          tr.className = 'rowin';
+          tr.innerHTML = '<td class="num">' + rec.t + '</td><td class="w-7">' + rec.c + '</td>' +
+            '<td class="muted">' + rec.b + '</td><td class="muted">' + rec.cash + '</td>' +
+            '<td class="num w-7">' + rec.amt + '</td><td class="num w-8 c-green">' + rec.pts + '</td>' +
+            '<td>' + st[rec.st] + '</td>';
+          tb.insertBefore(tr, tb.firstChild);
+          while (tb.children.length > 7) tb.removeChild(tb.lastChild);
+        }
+        if (tk) {
+          var d = document.createElement('div');
+          d.innerHTML = txRow(rec);
+          var el = d.firstChild; el.classList.add('rowin');
+          tk.insertBefore(el, tk.firstChild);
+          while (tk.children.length > 8) tk.removeChild(tk.lastChild);
+        }
+      }, 6500);
+    },
     pickModel: function (el) { UI.$$('.model').forEach(function (e) { e.classList.remove('on'); }); el.classList.add('on'); UI.toast('تم اختيار النموذج'); },
     pickChan: function (el) { UI.$$('.chan').forEach(function (e) { e.classList.remove('on'); }); el.classList.add('on'); },
     resolve: function (btn, ok) {
@@ -511,18 +592,39 @@
     },
     cust: function (n) {
       var c = D.CUSTOMERS.filter(function (x) { return x.n === n; })[0];
-      UI.modal('ملف العميل',
+      UI.drawer('ملف العميل',
         '<div class="row mb-3"><div class="av av-lg ' + c.tone + '">' + c.n[0] + '</div>' +
-        '<div class="grow"><b class="t-lg">' + c.n + '</b><div class="t-sm muted num">' + c.p + '</div></div>' + segBadge(c.seg) + '</div>' +
+        '<div class="grow"><b class="t-lg">' + c.n + '</b>' +
+        '<div class="t-sm muted num">' + c.p + '</div></div>' + segBadge(c.seg) + '</div>' +
+
         '<div class="grid g3 mb-3">' +
-        '<div class="card card-p center"><div class="t-lg w-8 num">' + UI.ar(c.visits) + '</div><div class="t-xs muted w-7">زيارة</div></div>' +
-        '<div class="card card-p center"><div class="t-lg w-8 num">' + c.bal + '</div><div class="t-xs muted w-7">الرصيد</div></div>' +
-        '<div class="card card-p center"><div class="t-lg w-8 num">' + c.spend + '</div><div class="t-xs muted w-7">الإنفاق</div></div></div>' +
-        '<div class="card card-p tint-v"><b class="t-sm">ملاحظة تحليلية</b>' +
-        '<p class="t-xs muted w-6 mt-1">متوسط الفترة بين زياراته ١٢ يومًا. آخر زيارة ' + c.last + '.</p></div>',
-        '<button class="btn btn-line" onclick="UI.closeModal()">إغلاق</button>' +
-        '<button class="btn btn-primary" onclick="UI.closeModal();UI.toast(\'تمت إضافته للحملة\')">' + ICO('send') + ' أرسل عرضًا</button>');
+        '<div class="card card-p center"><div class="t-lg w-8 num" data-n="' + c.visits + '">٠</div>' +
+        '<div class="t-xs muted w-7">زيارة</div></div>' +
+        '<div class="card card-p center"><div class="t-lg w-8 num">' + c.bal + '</div>' +
+        '<div class="t-xs muted w-7">الرصيد</div></div>' +
+        '<div class="card card-p center"><div class="t-lg w-8 num" data-n="' + c.spendN + '" data-suf=" ج">٠</div>' +
+        '<div class="t-xs muted w-7">الإنفاق</div></div></div>' +
+
+        '<div class="card card-p mb-3"><div class="row between mb-2">' +
+        '<b class="t-sm">نشاطه خلال ٧ أسابيع</b><span class="t-xs faint w-7">زيارات</span></div>' +
+        UI.spark([2,3,1,4,3,5,4], { color:'#4B1E9E', h:44 }) + '</div>' +
+
+        '<b class="t-sm" style="display:block;margin-bottom:10px">الخط الزمني</b>' +
+        '<div class="tml">' + D.CUST_TL.map(function (t) {
+          return '<div class="ti ' + t.c + '"><b>' + t.t + '</b><span>' + t.s + '</span></div>';
+        }).join('') + '</div>' +
+
+        '<div class="card card-p tint-v mt-2"><b class="t-sm">ملاحظة تحليلية</b>' +
+        '<p class="t-xs muted w-6 mt-1">متوسط الفترة بين زياراته ١٢ يومًا. آخر زيارة ' + c.last + '. ' +
+        (c.seg === 'معرّض للفقدان'
+          ? 'تجاوز ضعف فترته المعتادة — مرشّح لحملة استرجاع.'
+          : 'ضمن نمطه الطبيعي.') + '</p></div>',
+
+        '<button class="btn btn-line" onclick="UI.closeDrawer()">إغلاق</button>' +
+        '<button class="btn btn-primary" onclick="UI.closeDrawer();UI.toast(\'تمت إضافته للحملة\')">' +
+        ICO('send') + ' أرسل عرضًا</button>');
     },
+
     addReward: function () {
       UI.modal('مكافأة جديدة',
         '<label class="field"><span>اسم المكافأة</span><input class="input" placeholder="مثال: قهوة مجانية"></label>' +

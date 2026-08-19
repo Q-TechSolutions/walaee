@@ -162,3 +162,49 @@ body.phone-body.bare .screen{border-radius:0;}
 .a2hs .ic{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.2);display:grid;place-items:center;flex:none;}
 .a2hs b{font-size:13.5px;display:block;}
 .a2hs span{font-size:11.5px;opacity:.85;font-weight:600;line-height:1.5;display:block;}
+
+/* ============================================================
+   إضافات تجربة الموبايل
+   ============================================================ */
+
+/* ---------- شريط المستوى ---------- */
+.tier{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;
+  background:linear-gradient(120deg,#3A1078,#6D3BD6);color:#fff;box-shadow:var(--sh-brand);}
+.tier .tb{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.2);
+  display:grid;place-items:center;font-size:18px;flex:none;}
+.tier b{font-size:13.5px;display:block;}
+.tier span{font-size:11px;opacity:.85;font-weight:600;display:block;}
+.tier .tp{height:5px;background:rgba(255,255,255,.25);border-radius:9px;margin-top:6px;overflow:hidden;}
+.tier .tp i{display:block;height:100%;background:#fff;border-radius:9px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+
+/* ---------- سلسلة الزيارات ---------- */
+.streak{display:flex;gap:5px;}
+.streak i{flex:1;height:30px;border-radius:8px;background:var(--line-2);display:grid;place-items:center;
+  font-size:9.5px;font-weight:800;color:var(--faint);font-style:normal;}
+.streak i.on{background:var(--green-100);color:var(--green-700);}
+.streak i.today{background:var(--orange-600);color:#fff;box-shadow:0 4px 10px rgba(249,115,22,.35);}
+
+/* ---------- إيصال ---------- */
+.rcpt{background:var(--surface);border-radius:18px;padding:18px;position:relative;
+  box-shadow:var(--sh-2);border:1px solid var(--line);}
+.rcpt::before,.rcpt::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;
+  background:var(--canvas);top:50%;transform:translateY(-50%);}
+.rcpt::before{inset-inline-start:-10px;} .rcpt::after{inset-inline-end:-10px;}
+.rcpt .rl{display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px;}
+.rcpt .rl b{font-weight:800;}
+.rcpt .dash{border-top:1.5px dashed var(--line);margin:12px -4px;}
+
+/* ---------- إشعار ---------- */
+.ntf{display:flex;gap:11px;padding:12px;border-radius:14px;background:var(--surface);
+  border:1px solid var(--line);margin-bottom:8px;transition:var(--t);}
+.ntf.unread{background:var(--violet-50);border-color:#DDD2F5;}
+.ntf .nb{font-size:13px;font-weight:700;line-height:1.45;}
+.ntf .ns{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:3px;}
+.ntf .nt{font-size:10.5px;color:var(--faint);font-weight:700;white-space:nowrap;}
+
+/* ---------- سحب للتحديث ---------- */
+.ptr{text-align:center;padding:8px 0 2px;font-size:11px;color:var(--faint);font-weight:700;}
+
+/* ---------- ضغط البطاقة ---------- */
+.lcard:active{transform:scale(.975);}
+.rw:active,.li:active{transform:scale(.99);}
