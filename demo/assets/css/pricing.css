@@ -57,6 +57,32 @@ h3.h3{font-size:15px;margin:26px 0 10px;color:var(--violet-800);}
 .pk .pfoot{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-2);
   font-size:11.5px;color:var(--muted);font-weight:700;text-align:center;}
 
+
+/* ---------- شريط فصل التكاليف ---------- */
+.streams{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:-14px;}
+.str{background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:16px 18px;
+  position:relative;transition:var(--t);}
+.str:hover{transform:translateY(-3px);box-shadow:var(--sh-2);}
+.str.s1{border-color:#C9B6F5;background:var(--violet-50);}
+.str.s2{border-color:#FBDCC4;background:var(--orange-50);}
+.str.s3{border-color:#BBE7CE;background:var(--green-50);}
+.str .sk2{font-size:10px;letter-spacing:1.2px;font-weight:800;margin-bottom:6px;}
+.str.s1 .sk2{color:var(--violet-700);} .str.s2 .sk2{color:#C2410C;} .str.s3 .sk2{color:var(--green-700);}
+.str b{font-size:15.5px;display:block;}
+.str .sv{font-size:21px;font-weight:800;margin:7px 0 6px;line-height:1.1;}
+.str.s1 .sv{color:var(--violet-800);} .str.s2 .sv{color:#C2410C;} .str.s3 .sv{color:var(--green-700);}
+.str span{font-size:11.5px;color:var(--muted);line-height:1.7;display:block;font-weight:600;}
+
+/* ---------- بطاقة التوصية ---------- */
+.rec2{background:var(--surface);border:2px solid var(--green-600);border-radius:var(--r-lg);
+  padding:18px;position:relative;}
+.rec2 .rtag{position:absolute;top:-11px;inset-inline-start:18px;background:var(--green-600);color:#fff;
+  font-size:10.5px;font-weight:800;padding:3px 12px;border-radius:99px;}
+.rec2 b{font-size:15px;display:block;margin:4px 0 8px;}
+.rec2 p{font-size:12.5px;color:var(--muted);line-height:1.8;margin-bottom:10px;}
+.rec2 li{font-size:12px;padding:3.5px 0;display:flex;gap:8px;color:var(--ink-2);font-weight:600;line-height:1.65;}
+.rec2 li::before{content:'✓';color:var(--green-600);font-weight:800;flex:none;}
+
 /* ---------- جداول ---------- */
 table.pt{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--surface);
   border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px;}
@@ -206,6 +232,13 @@ table.pt .hl2{background:var(--orange-50) !important;}
 
   .nt{font-size:10px;padding:9px 12px;margin:9px 0;line-height:1.7;break-inside:avoid;}
   .cols2{gap:10px;}
+  .streams{grid-template-columns:repeat(3,1fr);gap:8px;margin-top:0;break-inside:avoid;}
+  .str{padding:10px 12px;border-radius:10px;border-width:1.5px;}
+  .str b{font-size:12.5px;} .str .sv{font-size:16px;margin:5px 0 4px;}
+  .str span{font-size:9.5px;line-height:1.55;} .str .sk2{font-size:8.5px;}
+  .rec2{padding:12px;break-inside:avoid;} .rec2 b{font-size:12.5px;}
+  .rec2 p{font-size:10px;line-height:1.6;} .rec2 li{font-size:9.5px;padding:2.5px 0;}
+  .rec2 .rtag{font-size:9px;padding:2px 10px;top:-8px;}
 
   .cta{padding:20px;margin-top:16px;border-radius:14px;break-inside:avoid;}
   .cta h3{font-size:17px;} .cta p{font-size:10.5px;}
