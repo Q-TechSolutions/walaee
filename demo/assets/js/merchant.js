@@ -183,6 +183,19 @@
       '<p class="t-sm muted mt-1">اختر النموذج المناسب لنشاطك — الكافيه يفضّل الأختام، والصيدلية النقاط، وغسيل السيارات الكاش باك. ' +
       'يمكنك تشغيل أكثر من نموذج في نفس الوقت.</p></div></div></div>' +
 
+      '<div class="card mb-3" data-anim>' + sectionHd('ابدأ من قالب قطاعك',
+        '<span class="badge bg-g">يضبط كل شيء تلقائيًا</span>') + '<div class="card-p">' +
+        '<p class="hint mb-2">اختر نشاطك ويضبط النظام نموذج الولاء والقواعد والمكافآت المقترحة — ' +
+        'ثم عدّل ما تشاء. لا تبدأ من صفحة بيضاء.</p>' +
+        '<div class="grid g3">' + D.SECTORS.map(function (t, i) {
+          return '<div class="sect' + (i === 0 ? ' on' : '') + '" onclick="MER.pickSector(this,\'' + t.id + '\')">' +
+            '<div class="row"><div class="ibox ' + t.tone + '">' + ICO(t.icon) + '</div>' +
+            '<div class="grow"><b class="t-sm">' + t.n + '</b>' +
+            '<div class="t-xs muted w-7">' + t.model + '</div></div></div>' +
+            '<div class="sr">' + t.rule + '</div>' +
+            '<div class="sw">' + ICO('brain', '', 12) + ' ' + t.why + '</div></div>';
+        }).join('') + '</div></div></div>' +
+
       '<div class="grid g3 mb-3">' + D.MODELS.map(function (m, i) {
         return '<div class="model' + (i === 1 ? ' on' : '') + '" onclick="MER.pickModel(this)" data-anim>' +
           '<div class="ibox ' + m.color + '">' + ICO(m.icon) + '</div>' +
@@ -584,6 +597,13 @@
         }
       }, 6500);
     },
+    pickSector: function (el, id) {
+      UI.$$('.sect').forEach(function (e) { e.classList.remove('on'); });
+      el.classList.add('on');
+      var t = D.SECTORS.filter(function (x) { return x.id === id; })[0];
+      UI.toast('تم تطبيق قالب «' + t.n + '» — نموذج ' + t.model);
+    },
+
     pickModel: function (el) { UI.$$('.model').forEach(function (e) { e.classList.remove('on'); }); el.classList.add('on'); UI.toast('تم اختيار النموذج'); },
     pickChan: function (el) { UI.$$('.chan').forEach(function (e) { e.classList.remove('on'); }); el.classList.add('on'); },
     resolve: function (btn, ok) {

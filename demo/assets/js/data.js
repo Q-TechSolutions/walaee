@@ -208,11 +208,28 @@
     { c:'أحمد سيد',    b:'فرع المعادي',  cash:'سمر',   amt:'٨٥ ج',  pts:'+٨٥',  st:'ok'  }
   ];
 
+
+  /* ---------- قوالب جاهزة حسب القطاع (م-03) ---------- */
+  var SECTORS = [
+    { id:'cafe',   n:'كافيه ومشروبات', icon:'star',    tone:'g', model:'الأختام',
+      rule:'ختم لكل فاتورة ≥ ٥٠ ج · ١٠ أختام = مشروب مجاني', why:'تكرار يومي وفاتورة صغيرة' },
+    { id:'bakery', n:'مخبوزات وحلويات', icon:'gift',   tone:'o', model:'النقاط',
+      rule:'نقطة لكل جنيه · ١٠٠٠ نقطة = خصم ٥٠ ج',        why:'سلة متغيّرة وقيمة مختلفة كل زيارة' },
+    { id:'beauty', n:'تجميل وصالونات', icon:'heart',   tone:'v', model:'الزيارات',
+      rule:'٦ زيارات = جلسة مجانية',                       why:'خدمة محجوزة وزيارات متباعدة' },
+    { id:'auto',   n:'خدمات وغسيل سيارات', icon:'cash', tone:'b', model:'الكاش باك',
+      rule:'١٠٪ من الفاتورة رصيدًا · يُصرف على أي خدمة',   why:'فاتورة كبيرة وتكرار متوسط' },
+    { id:'pharma', n:'صيدليات', icon:'shield',        tone:'g', model:'النقاط',
+      rule:'نقطة لكل جنيه · بدون نقاط على الأدوية المقنّنة', why:'التزام تنظيمي على بعض الأصناف' },
+    { id:'resto',  n:'مطاعم', icon:'store',           tone:'o', model:'نقاط + هدايا',
+      rule:'نقطة لكل جنيه + هدية عيد ميلاد',               why:'مناسبات ومجموعات' }
+  ];
+
   g.DATA = {
     MODELS:MODELS, CARDS:CARDS, ACTIVITY:ACTIVITY, REWARDS:REWARDS, DISCOVER:DISCOVER,
     KPIS:KPIS, CUSTOMERS:CUSTOMERS, TXNS:TXNS, FLAGS:FLAGS, BRANCHES:BRANCHES,
     CAMPAIGNS:CAMPAIGNS, CHART_VISITS:CHART_VISITS, CHART_LABELS:CHART_LABELS, CHART_NEW:CHART_NEW,
-    NOTIFS:NOTIFS, TIER:TIER, STREAK:STREAK, SPARK:SPARK, CUST_TL:CUST_TL, LIVE_POOL:LIVE_POOL,
+    SECTORS:SECTORS, NOTIFS:NOTIFS, TIER:TIER, STREAK:STREAK, SPARK:SPARK, CUST_TL:CUST_TL, LIVE_POOL:LIVE_POOL,
     PLANS:PLANS, ADMIN_KPIS:ADMIN_KPIS, ADMIN_STORES:ADMIN_STORES, PLATFORM_KPIS:PLATFORM_KPIS
   };
 })(window);
