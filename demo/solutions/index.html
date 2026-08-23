@@ -71,7 +71,7 @@
     ملف المشروع
   </a>
 
-  <section class="intro">
+  <section class="intro" data-r>
     <h1>من المشكلة <em>إلى</em> الشاشة</h1>
     <p>التحليل الشامل رصد ست عشرة مشكلة في المشروع، منها اثنتان كانتا تُبطلان النموذج بالكامل.
        هذه قائمة بكل مشكلة، وحلّها المنطقي، والموضع الذي تراه فيه داخل النموذج.</p>
@@ -83,7 +83,7 @@
     </div>
   </section>
 
-  <div class="filters">
+  <div class="filters" data-r>
     <button class="fl on" data-f="all">الكل<span class="n2">١٦</span></button>
     <button class="fl" data-f="s1">حرجة جدًا<span class="n2">٢</span></button>
     <button class="fl" data-f="s2">حرجة<span class="n2">٤</span></button>
@@ -155,7 +155,7 @@ var SOL = [
 var list = document.getElementById('list');
 function render(f) {
   list.innerHTML = SOL.filter(function (x) { return f === 'all' || x[1] === f; }).map(function (x) {
-    return '<article class="item" data-s="' + x[1] + '">' +
+    return '<article class="item card3" data-tilt="6" data-s="' + x[1] + '">' +
       '<div class="ref2">' + x[0] + '<span class="sev ' + x[1] + '">' + x[2] + '</span></div>' +
       '<div><h3>' + x[3] + '</h3>' +
       '<div class="sol2"><span class="lb">الحل المُطبَّق</span><p>' + x[4] + '</p></div>' +
@@ -164,6 +164,7 @@ function render(f) {
   }).join('');
 }
 render('all');
+function fx(){ var t=document.createElement('script'); t.src='../assets/js/fx.js'; document.body.appendChild(t); }
 [].forEach.call(document.querySelectorAll('.fl'), function (b) {
   b.addEventListener('click', function () {
     [].forEach.call(document.querySelectorAll('.fl'), function (x) { x.classList.remove('on'); });
@@ -172,6 +173,7 @@ render('all');
   });
 });
 </script>
+<script src="../assets/js/fx.js"></script>
 <script src="../assets/js/switcher.js"></script>
 </body>
 </html>
