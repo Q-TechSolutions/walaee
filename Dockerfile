@@ -18,11 +18,12 @@ RUN apk add --no-cache tzdata curl \
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # الواجهات
-COPY demo/ /usr/share/nginx/html/demo/
+COPY docs/demo/ /usr/share/nginx/html/demo/
 
 # التقارير (المعرض يربط عليها بمسار نسبي ../)
 # كل ملفات PDF — نمط عام حتى لا يُنسى ملف جديد لاحقًا
-COPY *.pdf /usr/share/nginx/html/
+COPY docs/reports/*.pdf /usr/share/nginx/html/
+COPY docs/reports/*.pdf /usr/share/nginx/html/reports/
 
 # nginx:alpine يشتغل بمستخدم غير جذري داخليًا عبر master/worker
 EXPOSE 80

@@ -1,14 +1,30 @@
+# ── هذه الصورة تبني موقع العرض فقط (docs/demo + docs/reports) ──
+# استبعاد المشروع الفعلي لتسريع البناء وتصغير السياق
+backend/
+frontend/
+infra/
+.github/
+
+# ── نظام التحكم بالإصدارات والمحررات ──
 .git
 .gitignore
-node_modules
-*.log
-.DS_Store
-Thumbs.db
+.gitattributes
+.vscode/
+.idea/
+
+# ── الأسرار ──
 .env
 .env.*
 !.env.example
-DEPLOY.md
+
+# ── التوثيق النصي (الصورة تحتاج HTML و PDF فقط) ──
 *.md
-!demo/README.md
-.vscode
-.idea
+docs/planning/
+!docs/demo/README.md
+
+# ── مخرجات وأدوات ──
+node_modules/
+__pycache__/
+*.log
+.DS_Store
+Thumbs.db
