@@ -1,7 +1,7 @@
 # هيكلة مشروع ولائي
 
 فصل كامل بين **مرحلة التخطيط** (منتهية) و**المشروع الفعلي** (لم يبدأ بعد).
-كل ما في `docs/` مرجع لا يُعدَّل أثناء البناء. وكل ما في `backend/` و`frontend/` هو ما سيُبنى.
+كل ما في `docs/` مرجع لا يُعدَّل أثناء البناء. وكل ما في `project/backend/` و`project/frontend/` هو ما سيُبنى.
 
 > الهيكلة مشتقّة حرفيًا من **`docs/demo/architecture/`** القسم ٣ — لم يُغيَّر شيء في التخطيط أو المعمارية.
 
@@ -18,10 +18,16 @@ walaee/
 │   ├── planning/                 مراجع التخطيط ونقاط القرار
 │   └── DEPLOY-DEMO.md            نشر موقع العرض
 │
-├── backend/ ──────────────────── ② الخلفية  (Django + DRF)
-├── frontend/ ─────────────────── ③ الواجهات  (٣ تطبيقات ويب)
-├── infra/ ────────────────────── ④ البنية والنشر
-├── .github/workflows/ ────────── ⑤ التكامل والنشر المستمر
+├── project/ ──────────────────── ② المشروع الفعلي  (كل الشغل)
+│   ├── backend/                  الخلفية — Django + DRF
+│   ├── frontend/                 الواجهات — ٣ تطبيقات ويب
+│   ├── infra/                    البنية والنشر للإنتاج
+│   ├── .env.example              متغيرات البيئة
+│   ├── docker-compose.dev.yml    بيئة التطوير المحلية
+│   ├── Makefile                  أوامر التطوير
+│   └── README.md
+│
+├── .github/workflows/ ────────── ③ التكامل والنشر المستمر
 │
 ├── Dockerfile · nginx.conf · docker-compose.yml    نشر موقع العرض (docs/demo)
 └── README.md · PROJECT_STRUCTURE.md
@@ -84,12 +90,12 @@ docs/
 
 ---
 
-## ② `backend/` — الخلفية
+## ② `project/backend/` — الخلفية
 
 Django 5 + DRF. تقسيم بالمجال لا بالنوع — كل تطبيق يملك نماذجه وخدماته واختباراته.
 
 ```
-backend/
+project/backend/
 ├── config/                        إعدادات المشروع
 │   ├── settings/                  base · dev · prod
 │   ├── urls.py                    توجيه الجذر
@@ -118,27 +124,27 @@ backend/
 ◆ ضمن النطاق المعتمد · ○ مؤجّل للتطوير المستقبلي (مفاتيح ميزات، نفس قاعدة الكود)
 
 **قاعدة معمارية غير قابلة للكسر:** كل تعديل على الرصيد يمر عبر
-`backend/apps/ledger/services.py → apply_entry()`. لا يوجد في المشروع كله سطر آخر
+`project/backend/apps/ledger/services.py → apply_entry()`. لا يوجد في المشروع كله سطر آخر
 يكتب في جدول `Balance` مباشرة.
 
 ### قاعدة البيانات
 
 | ماذا | أين |
 |---|---|
-| تعريف الجداول | `backend/apps/*/models.py` |
-| الهجرات | `backend/apps/*/migrations/` |
+| تعريف الجداول | `project/backend/apps/*/models.py` |
+| الهجرات | `project/backend/apps/*/migrations/` |
 | مخطط ERD المرجعي | `docs/demo/architecture/` — قسم ٤ |
-| إعداد الخادم محليًا | `infra/docker/` + `docker-compose.dev.yml` |
-| سكربتات التهيئة | `infra/postgres/` |
-| النسخ الاحتياطي | `infra/scripts/` |
+| إعداد الخادم محليًا | `project/infra/docker/` + `docker-compose.dev.yml` |
+| سكربتات التهيئة | `project/infra/postgres/` |
+| النسخ الاحتياطي | `project/infra/scripts/` |
 
 ### واجهات API
 
 | ماذا | أين |
 |---|---|
-| المسارات | `backend/config/urls.py` + `backend/apps/*/urls.py` |
-| العرض والتسلسل | `backend/apps/*/views.py` · `serializers.py` |
-| منطق الأعمال | `backend/apps/*/services.py` |
+| المسارات | `project/backend/config/urls.py` + `project/backend/apps/*/urls.py` |
+| العرض والتسلسل | `project/backend/apps/*/views.py` · `serializers.py` |
+| منطق الأعمال | `project/backend/apps/*/services.py` |
 | التوثيق التلقائي | `/api/schema/` عبر drf-spectacular |
 | العقد المرجعي | `docs/demo/architecture/` — قسم ٧ |
 
@@ -146,20 +152,20 @@ backend/
 
 | ماذا | أين |
 |---|---|
-| هوية العميل والتاجر | `backend/apps/accounts/models.py` |
-| تسجيل الدخول بالهاتف و OTP | `backend/apps/accounts/services.py` |
-| توكنات JWT | `backend/config/settings/base.py` |
-| صلاحيات الأدوار الخمسة | `backend/apps/*/permissions.py` |
-| عزل بيانات العلامات | `backend/apps/tenancy/managers.py` |
+| هوية العميل والتاجر | `project/backend/apps/accounts/models.py` |
+| تسجيل الدخول بالهاتف و OTP | `project/backend/apps/accounts/services.py` |
+| توكنات JWT | `project/backend/config/settings/base.py` |
+| صلاحيات الأدوار الخمسة | `project/backend/apps/*/permissions.py` |
+| عزل بيانات العلامات | `project/backend/apps/tenancy/managers.py` |
 
 ---
 
-## ③ `frontend/` — الواجهات
+## ③ `project/frontend/` — الواجهات
 
 ثلاثة تطبيقات ويب مستقلة تشترك في مكتبة واحدة. **ويب فقط — لا يوجد تطبيق سطح مكتب ولا Electron.**
 
 ```
-frontend/
+project/frontend/
 ├── customer-pwa/          تطبيق العميل — PWA · Service Worker · قراءة QR
 ├── merchant-dashboard/    لوحة صاحب المتجر — الكاشير · العملاء · الحملات · الحوكمة
 ├── admin-panel/           لوحة إدارة المنصة — الإيراد · المتاجر · مؤشرات الصحة
@@ -171,15 +177,15 @@ frontend/
 ```
 
 **لوحة الإدارة موجودة في مكانين مختلفين ومقصودين:**
-`frontend/admin-panel/` لوحة أعمال لمالك المنصة (الإيراد والمؤشرات) ·
+`project/frontend/admin-panel/` لوحة أعمال لمالك المنصة (الإيراد والمؤشرات) ·
 Django Admin على `/django-admin/` أداة تشغيلية للفريق التقني فقط.
 
 ---
 
-## ④ `infra/` — البنية والنشر
+## ④ `project/infra/` — البنية والنشر
 
 ```
-infra/
+project/infra/
 ├── docker/        Dockerfile للخلفية والواجهات + compose الإنتاج
 ├── nginx/         الوكيل العكسي وتوجيه /api
 ├── postgres/      تهيئة قاعدة البيانات

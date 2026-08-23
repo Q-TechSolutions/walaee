@@ -38,3 +38,9 @@ npm-debug.log*
 *.log
 tmp/
 _static.html
+
+# ── المشروع الفعلي ──
+project/.env
+project/backend/staticfiles/
+project/*/node_modules/
+project/infra/openapi.yaml
