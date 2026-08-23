@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ولائي — تصفّح الواجهات</title>
+<link rel="stylesheet" href="../assets/css/theme.css?v=14">
+<link rel="stylesheet" href="../assets/css/hub.css?v=14">
+<link rel="stylesheet" href="../assets/css/preview.css?v=14">
+</head>
+<body class="hub pv">
+
+<div class="bgfx">
+  <span class="orb o1" data-px="0.5"></span>
+  <span class="orb o2" data-px="0.9"></span>
+  <span class="grid"></span>
+</div>
+
+<header class="mast"><div class="in">
+  <a class="id" href="../index.html">
+    <span class="mk"><svg viewBox="0 0 24 24"><path d="M21 3v7.5A10.5 10.5 0 0 1 10.5 21H3v-7.5A10.5 10.5 0 0 1 13.5 3z" fill="currentColor" opacity=".32"/><path d="M21 3c-2 10-8.5 16.5-18 18C5 11 11.5 4.5 21 3z" fill="currentColor"/></svg></span>
+    <span><b>walaee</b><span>تصفّح الواجهات</span></span>
+  </a>
+  <nav>
+    <a href="../index.html">ملف المشروع</a>
+    <a href="../solutions/index.html">الحلول</a>
+    <a href="../pricing/index.html">عرض السعر</a>
+  </nav>
+  <a class="cta" href="../present/index.html">العرض التقديمي</a>
+</div></header>
+
+<div class="pvwrap">
+
+  <div class="switcher">
+    <button class="sw on" data-k="customer"><span class="d"></span> تطبيق العميل <span class="n">١٢</span></button>
+    <button class="sw" data-k="merchant"><span class="d"></span> لوحة صاحب المتجر <span class="n">١١</span></button>
+    <button class="sw" data-k="admin"><span class="d"></span> لوحة إدارة المنصة <span class="n">٧</span></button>
+  </div>
+
+  <div class="stage2">
+    <aside class="slist">
+      <div class="hd3"><b id="lt">شاشات التطبيق</b><span id="lc">١٢ شاشة</span></div>
+      <div class="body2" id="list2"></div>
+    </aside>
+
+    <div>
+      <div class="frame" id="frame"></div>
+      <div class="hint2" id="hint"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/fx.js?v=14"></script>
+<script>
+var APPS = {
+  customer: {
+    title: 'شاشات التطبيق', kind: 'phone', base: '../customer/index.html', q: '?bare=1',
+    url: 'walaee.app',
+    screens: [
+      { g: 'الرحلة الكاملة' },
+      { h: 'onb',      t: 'التسجيل والأونبوردنج', s: 'ثلاث خطوات ثم كود التحقق' },
+      { h: 'scan',     t: 'المسح والكسب',          s: 'رمز المتجر ثم قيمة الفاتورة' },
+      { g: 'الشاشات الرئيسية' },
+      { h: 'home',     t: 'الرئيسية',              s: 'محفظة البطاقات والمستوى' },
+      { h: 'card1',    t: 'بطاقة أختام',           s: 'كافيه — شبكة الأختام' },
+      { h: 'card2',    t: 'بطاقة نقاط',            s: 'مخبز — حلقة التقدّم' },
+      { h: 'rewards',  t: 'المكافآت',              s: 'جاهزة وقريبة للاستبدال' },
+      { h: 'stores',   t: 'المتاجر',               s: 'اكتشاف متاجر قريبة' },
+      { h: 'activity', t: 'سجل النشاط',            s: 'كل العمليات' },
+      { h: 'receipt',  t: 'إيصال العملية',         s: 'تفاصيل موثّقة' },
+      { g: 'الحساب' },
+      { h: 'notifs',   t: 'الإشعارات',             s: 'ست تنبيهات' },
+      { h: 'tiers',    t: 'المستويات',             s: 'برونزي إلى بلاتيني' },
+      { h: 'invite',   t: 'دعوة صديق',             s: 'كود إحالة' },
+      { h: 'me',       t: 'حسابي والخصوصية',       s: 'تحميل وحذف البيانات' }
+    ]
+  },
+  merchant: {
+    title: 'شاشات لوحة التاجر', kind: 'browser', base: '../merchant/index.html',
+    url: 'app.walaee.com/merchant',
+    screens: [
+      { g: 'التشغيل اليومي' },
+      { h: 'dash',      t: 'لوحة المعلومات',   s: 'ستة مؤشرات وبث لحظي' },
+      { h: 'pos',       t: 'وضع الكاشير',      s: 'رمز متغيّر كل ٣٠ ثانية' },
+      { h: 'customers', t: 'العملاء',          s: 'شرائح وفرز وبحث' },
+      { g: 'برنامج الولاء' },
+      { h: 'program',   t: 'إعداد البرنامج',   s: 'قوالب القطاعات والنماذج الستة' },
+      { h: 'rewards',   t: 'المكافآت',         s: 'التكلفة ومعدل الاستبدال' },
+      { h: 'campaigns', t: 'الحملات',          s: 'القنوات بتكلفتها' },
+      { g: 'التحليل والحوكمة' },
+      { h: 'reports',   t: 'التقارير',         s: 'أثر البرنامج على النشاط' },
+      { h: 'fraud',     t: 'المراجعة والاحتيال', s: 'كشف الشذوذ والضوابط' },
+      { h: 'branches',  t: 'الفروع والكاشيرون', s: 'التسلسل الهرمي' },
+      { g: 'الحساب' },
+      { h: 'billing',   t: 'الاشتراك والفواتير', s: 'الباقات والاستهلاك' },
+      { h: 'settings',  t: 'الإعدادات',        s: 'الخصوصية والتكاملات' }
+    ]
+  },
+  admin: {
+    title: 'شاشات لوحة الإدارة', kind: 'browser', base: '../admin/index.html',
+    url: 'app.walaee.com/admin',
+    screens: [
+      { g: 'المنصة' },
+      { h: 'overview', t: 'نظرة عامة',            s: 'الإيراد والنمو' },
+      { h: 'kpis',     t: 'مؤشرات الصحة',         s: 'ثمانية بأهدافها' },
+      { g: 'الإدارة' },
+      { h: 'stores',   t: 'المتاجر',              s: 'إدارة واعتماد' },
+      { h: 'revenue',  t: 'الاشتراكات والإيراد',  s: 'المصادر والتوزيع' },
+      { h: 'users',    t: 'المستخدمون',           s: 'الأدوار والصلاحيات' },
+      { g: 'النظام' },
+      { h: 'ops',      t: 'التشغيل والمراقبة',    s: 'الصحة والتكلفة' },
+      { h: 'config',   t: 'إعدادات المنصة',       s: 'الامتثال ونموذج النقاط' }
+    ]
+  }
+};
+
+var cur = 'customer', curH = null;
+var frame = document.getElementById('frame');
+var list  = document.getElementById('list2');
+var hint  = document.getElementById('hint');
+var AR = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+function ar(n){ return String(n).replace(/\d/g, function(d){ return AR[+d]; }); }
+
+function device(app, hash) {
+  var src = app.base + (app.q || '') + (hash ? '#' + hash : '');
+  if (app.kind === 'phone') {
+    return '<div class="dev-phone"><span class="btn-s b1"></span><span class="btn-s b2"></span>' +
+           '<iframe id="fr" src="' + src + '" title="تطبيق العميل"></iframe></div>';
+  }
+  return '<div class="dev-browser"><div class="bar2">' +
+    '<i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i>' +
+    '<span class="url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+    '<rect x="4.5" y="10" width="15" height="10" rx="2"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg>' +
+    app.url + '</span></div>' +
+    '<iframe id="fr" src="' + src + '" title="لوحة تحكم"></iframe></div>';
+}
+
+function renderList(app) {
+  var n = 0;
+  list.innerHTML = app.screens.map(function (s) {
+    if (s.g) return '<span class="grp2">' + s.g + '</span>';
+    n++;
+    return '<div class="si' + (s.h === curH ? ' on' : '') + '" data-h="' + s.h + '">' +
+      '<span class="num2">' + ('0' + n).slice(-2) + '</span>' +
+      '<span><span class="t2">' + s.t + '</span><span class="s2">' + s.s + '</span></span></div>';
+  }).join('');
+  [].forEach.call(list.querySelectorAll('.si'), function (el) {
+    el.addEventListener('click', function () { go(cur, el.dataset.h); });
+  });
+}
+
+function go(k, h) {
+  var app = APPS[k];
+  var changedApp = (k !== cur) || !document.getElementById('fr');
+  cur = k; curH = h || app.screens.filter(function (s) { return s.h; })[0].h;
+
+  [].forEach.call(document.querySelectorAll('.sw'), function (b) {
+    b.classList.toggle('on', b.dataset.k === k);
+  });
+  document.getElementById('lt').textContent = app.title;
+  var count = app.screens.filter(function (s) { return s.h; }).length;
+  document.getElementById('lc').textContent = ar(count) + ' شاشة';
+
+  if (changedApp) frame.innerHTML = device(app, curH);
+  else {
+    var fr = document.getElementById('fr');
+    var target = app.base + (app.q || '') + '#' + curH;
+    if (app.kind === 'phone') fr.src = target;              /* التطبيق يعيد التحميل */
+    else { try { fr.contentWindow.location.hash = curH; } catch (e) { fr.src = target; } }
+  }
+  renderList(app);
+
+  hint.innerHTML = app.kind === 'phone'
+    ? 'اضغط داخل الشاشة للتفاعل — كل الأزرار تعمل · <a href="' + app.base + '" target="_blank">فتح بملء الشاشة</a>'
+    : 'تصفّح اللوحة كأنها منتج حقيقي · <a href="' + app.base + '" target="_blank">فتح بملء الشاشة</a>';
+}
+
+[].forEach.call(document.querySelectorAll('.sw'), function (b) {
+  b.addEventListener('click', function () { go(b.dataset.k); });
+});
+
+go('customer');
+</script>
+<script src="../assets/js/switcher.js?v=14"></script>
+</body>
+</html>

@@ -1,15 +1,18 @@
 /* ولائي — مبدّل الواجهات العائم + زر العودة لأعلى
    يُحقن تلقائيًا في أي صفحة تستدعيه. لا يحتاج أي إعداد. */
 (function () {
+  /* لا يظهر داخل iframe — وضع التضمين في صفحة تصفّح الواجهات */
+  if (window.self !== window.top) return;
   var here = location.pathname.replace(/\\/g, '/');
   function at(seg) { return here.indexOf('/' + seg + '/') > -1; }
 
   var base = at('customer') || at('merchant') || at('admin') || at('plan') ||
-             at('architecture') || at('present') || at('team') || at('pricing') || at('solutions') ? '../' : './';
+             at('architecture') || at('present') || at('team') || at('pricing') || at('solutions') || at('preview') ? '../' : './';
 
   var ITEMS = [
     { k:'index',        l:'المعرض',    href: base + 'index.html',              ic:'grid'  },
     { k:'present',      l:'العرض',     href: base + 'present/index.html',      ic:'play'  },
+    { k:'preview',      l:'تصفّح الواجهات', href: base + 'preview/index.html',  ic:'grid'  },
     { k:'customer',     l:'العميل',    href: base + 'customer/index.html',     ic:'phone' },
     { k:'merchant',     l:'التاجر',    href: base + 'merchant/index.html',     ic:'store' },
     { k:'admin',        l:'الإدارة',   href: base + 'admin/index.html',        ic:'cog'   },
@@ -82,7 +85,7 @@
     '<div class="wsw-p" role="menu"><div class="hd">تنقّل سريع</div>' +
     ITEMS.map(function (it) {
       var on = (it.k === 'index') ? (!at('customer') && !at('merchant') && !at('admin') && !at('plan') &&
-                                     !at('architecture') && !at('present') && !at('team') && !at('pricing') && !at('solutions')) : at(it.k);
+                                     !at('architecture') && !at('present') && !at('team') && !at('pricing') && !at('solutions') && !at('preview')) : at(it.k);
       return '<a class="wsw-a' + (on ? ' on' : '') + (it.int ? ' intl' : '') + '" role="menuitem" href="' + it.href + '">' +
              svg(it.ic) + '<span>' + it.l + '</span></a>';
     }).join('') + '</div>';

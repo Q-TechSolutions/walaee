@@ -444,7 +444,15 @@
         UI.countAll(root);
       });
       var h=(location.hash||'').replace('#','');
-      router.go(S[h]?h:'home');
+      /* شاشات خاصة تُفتح كطبقات لا كشاشات راوتر */
+      var SPECIAL = { onb:function(){ router.go('home'); CUS.onb(); },
+                      scan:function(){ router.go('home'); CUS.scan(); },
+                      card1:function(){ router.go('card',1); },
+                      card2:function(){ router.go('card',2); },
+                      card3:function(){ router.go('card',3); },
+                      card4:function(){ router.go('card',4); } };
+      if (SPECIAL[h]) SPECIAL[h]();
+      else router.go(S[h] ? h : 'home');
       CUS.paintTabs();
     },
     go: function (n, a) { CUS.closeOverlay(); router.go(n, a); if(location.hash.slice(1)!==n) location.hash=n; },
