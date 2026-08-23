@@ -5,7 +5,7 @@
   function at(seg) { return here.indexOf('/' + seg + '/') > -1; }
 
   var base = at('customer') || at('merchant') || at('admin') || at('plan') ||
-             at('architecture') || at('present') || at('team') || at('pricing') ? '../' : './';
+             at('architecture') || at('present') || at('team') || at('pricing') || at('solutions') ? '../' : './';
 
   var ITEMS = [
     { k:'index',        l:'المعرض',    href: base + 'index.html',              ic:'grid'  },
@@ -14,6 +14,7 @@
     { k:'merchant',     l:'التاجر',    href: base + 'merchant/index.html',     ic:'store' },
     { k:'admin',        l:'الإدارة',   href: base + 'admin/index.html',        ic:'cog'   },
     { k:'pricing',      l:'عرض السعر', href: base + 'pricing/index.html',      ic:'cash'  },
+    { k:'solutions',    l:'الحلول',    href: base + 'solutions/index.html',    ic:'check' },
     { k:'plan',         l:'الخطة',     href: base + 'plan/index.html',         ic:'doc'   },
     { k:'architecture', l:'المعمارية', href: base + 'architecture/index.html', ic:'code'  },
     { k:'team',         l:'الفريق ⚠',  href: base + 'team/index.html',         ic:'users', int:true }
@@ -29,6 +30,7 @@
     code:'<path d="m9 8-5 4 5 4M15 8l5 4-5 4"/>',
     cash:'<circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.6-1-1.8-1.5-3-1.5-1.7 0-3 .9-3 2s1 1.7 3 2 3 .9 3 2-1.3 2-3 2c-1.2 0-2.4-.5-3-1.5M12 6v12"/>',
     up:'<path d="M12 19V6M6.5 11.5 12 6l5.5 5.5"/>',
+    check:'<path d="m4 12.5 5 5L20 6.5"/>',
     menu:'<path d="M4 7h16M4 12h16M4 17h16"/>'
   };
   function svg(n) {
@@ -80,7 +82,7 @@
     '<div class="wsw-p" role="menu"><div class="hd">تنقّل سريع</div>' +
     ITEMS.map(function (it) {
       var on = (it.k === 'index') ? (!at('customer') && !at('merchant') && !at('admin') && !at('plan') &&
-                                     !at('architecture') && !at('present') && !at('team') && !at('pricing')) : at(it.k);
+                                     !at('architecture') && !at('present') && !at('team') && !at('pricing') && !at('solutions')) : at(it.k);
       return '<a class="wsw-a' + (on ? ' on' : '') + (it.int ? ' intl' : '') + '" role="menuitem" href="' + it.href + '">' +
              svg(it.ic) + '<span>' + it.l + '</span></a>';
     }).join('') + '</div>';

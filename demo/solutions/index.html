@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ولائي — من المشكلة إلى الشاشة</title>
+<link rel="stylesheet" href="../assets/css/theme.css">
+<link rel="stylesheet" href="../assets/css/hub.css">
+<style>
+.wrap{max-width:1000px;}
+.back2{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;
+  color:var(--ink-3);margin:26px 0 0;transition:color .16s;}
+.back2:hover{color:var(--ink-1);}
+.back2 svg{width:13px;height:13px;}
+
+.intro{padding:26px 0 34px;border-bottom:1px solid var(--rule);}
+.intro h1{font-size:clamp(27px,4.2vw,40px);font-weight:800;line-height:1.3;}
+.intro p{font-size:15px;color:var(--ink-2);margin-top:14px;max-width:620px;line-height:1.8;}
+
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding:22px 0;border-bottom:1px solid var(--rule);}
+.fl{font-size:12.5px;font-weight:700;padding:6px 14px;border-radius:2px;
+  border:1px solid var(--rule);color:var(--ink-3);cursor:pointer;transition:all .16s;background:none;}
+.fl:hover{border-color:var(--ink-3);color:var(--ink-1);}
+.fl.on{background:var(--ink-1);border-color:var(--ink-1);color:var(--paper);}
+.fl .n2{opacity:.55;margin-inline-start:5px;}
+
+.item{display:grid;grid-template-columns:64px 1fr;gap:22px;padding:26px 0;
+  border-bottom:1px solid var(--rule-2);}
+.item .ref2{font-size:13px;color:var(--ink-1);font-weight:600;padding-top:2px;}
+.item .sev{display:block;margin-top:7px;font-size:11px;font-weight:700;padding:2px 0;}
+.sev.s1{color:#B4230E;} .sev.s2{color:#B4460E;} .sev.s3{color:#8A5A08;} .sev.s4{color:var(--ink-4);}
+.item h3{font-size:17px;font-weight:700;line-height:1.55;}
+.item .sol2{margin-top:12px;padding-inline-start:16px;border-inline-start:2px solid var(--rule);}
+.item .sol2 .lb{font-size:11.5px;color:var(--accent);font-weight:700;display:block;margin-bottom:6px;}
+.item .sol2 p{font-size:13.5px;color:var(--ink-2);line-height:1.85;}
+.item .sol2 b{color:var(--ink-1);font-weight:700;}
+.item .where{margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.item .where a{font-size:12.5px;font-weight:700;color:var(--accent);
+  border-bottom:1.5px solid rgba(75,30,158,.3);padding-bottom:1px;transition:border-color .16s;}
+.item .where a:hover{border-bottom-color:var(--accent);}
+.item .where .st2{font-size:11px;font-weight:700;color:#0F7A3D;
+  border:1px solid #BBE7CE;background:#F1FAF4;padding:2px 8px;border-radius:2px;}
+
+.legend2{display:flex;gap:24px;flex-wrap:wrap;padding:18px 0 0;font-size:12px;color:var(--ink-3);font-weight:600;}
+.legend2 i{font-style:normal;font-weight:600;}
+</style>
+</head>
+<body class="hub">
+
+<header class="mast"><div class="in">
+  <div class="id"><b>walaee</b><span>ولائي — كلنا كسبانين</span></div>
+  <div class="meta"><span>١٦ مشكلة</span><span>١٦ حلًّا</span><span>الحالة <i>مكتمل</i></span></div>
+</div></header>
+
+<div class="wrap">
+  <a class="back2" href="../index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+    ملف المشروع
+  </a>
+
+  <section class="intro">
+    <h1>من المشكلة إلى الشاشة</h1>
+    <p>التحليل الشامل رصد ست عشرة مشكلة في المشروع، منها اثنتان كانتا تُبطلان النموذج بالكامل.
+       هذه قائمة بكل مشكلة، وحلّها المنطقي، والموضع الذي تراه فيه داخل النموذج.</p>
+    <div class="legend2">
+      <span><i style="color:#B4230E">حرجة جدًا</i> — تُبطل النموذج</span>
+      <span><i style="color:#B4460E">حرجة</i> — تحدد السنة الأولى</span>
+      <span><i style="color:#8A5A08">عالية</i> — خسارة مالية أو قانونية</span>
+      <span><i style="color:#A8A6B4">متوسطة</i> — تحدّ من النمو</span>
+    </div>
+  </section>
+
+  <div class="filters">
+    <button class="fl on" data-f="all">الكل<span class="n2">١٦</span></button>
+    <button class="fl" data-f="s1">حرجة جدًا<span class="n2">٢</span></button>
+    <button class="fl" data-f="s2">حرجة<span class="n2">٤</span></button>
+    <button class="fl" data-f="s3">عالية<span class="n2">٤</span></button>
+    <button class="fl" data-f="s4">متوسطة<span class="n2">٦</span></button>
+  </div>
+
+  <div id="list"></div>
+
+  <footer class="foot2">
+    <div class="l"><b>ولائي — كلنا كسبانين</b>
+      <span>المرجع الكامل في التحليل الشامل، القسم الثالث والقسم الثامن.</span></div>
+    <div class="r"><a href="../../Walaee_Analysis_Report_AR.pdf" style="color:var(--accent)">التحليل الشامل · PDF</a></div>
+  </footer>
+</div>
+
+<script>
+var SOL = [
+ ["م‑٠١","s1","حرجة جدًا","آلية إثبات الشراء غير معرّفة",
+  "رمز QR ديناميكي على شاشة الكاشير يتغيّر كل ٣٠ ثانية ويُستهلك مرة واحدة. العميل يمسحه ويُدخل قيمة الفاتورة، والتاجر يؤكّد، وكل منح مرتبط برقم الفاتورة وقيمتها. ومسار يدوي بديل عند تعذّر الكاميرا.",
+  "وضع الكاشير","../merchant/index.html#pos"],
+ ["م‑٠٢","s1","حرجة جدًا","النقاط خاصة بالمتجر أم مشتركة؟",
+  "حُسمت لصالح <b>رصيد منفصل لكل علامة تجارية</b>. جدول العضوية يربط العميل بالعلامة ويحمل رصيدًا مستقلًا. الشبكة تظهر في الهوية الموحّدة والاكتشاف فقط، بلا أي تبادل قيمة مالية بين التجّار — وهو ما يتجنّب تحوّل المنصة إلى نظام مقاصة.",
+  "إعدادات المنصة","../admin/index.html#config"],
+ ["م‑٠٣","s2","حرجة","«منصة لكل الأنشطة» = بلا تركيز",
+  "<b>قوالب جاهزة حسب القطاع</b> داخل إعداد البرنامج: كافيه، مخبوزات، تجميل، خدمات، صيدلية، مطاعم. اختيار القالب يضبط نموذج الولاء والقواعد والمكافآت المقترحة تلقائيًا، ومكتوب مع كل قالب سبب اختياره.",
+  "إعداد البرنامج","../merchant/index.html#program"],
+ ["م‑٠٤","s2","حرجة","مشكلة البيضة والدجاجة",
+  "قرار تشغيلي: <b>كثافة جغرافية</b> — ثلاثون متجرًا في نطاق كيلومترين قبل أي توسّع. ويدعمه في المنتج شاشة «متاجر قريبة منك» وعروض ترحيبية، مع ضمان أن قيمة المنتج قائمة حتى لو كان المتجر وحيدًا على المنصة.",
+  "المتاجر والاكتشاف","../customer/index.html#stores"],
+ ["م‑٠٥","s2","حرجة","Freemium بلا جدار ولا محفّز تحويل",
+  "أربع باقات بحدود كمّية صريحة: مئتا عميل، فرع واحد، نموذج ولاء واحد، تقارير ثلاثين يومًا. مع شريط استهلاك يُظهر للتاجر قربه من الحد، ورسوم تفعيل لمرة واحدة. وما له تكلفة متغيرة كالرسائل لا يكون مجانيًا أبدًا.",
+  "الاشتراك والفواتير","../merchant/index.html#billing"],
+ ["م‑٠٦","s2","حرجة","لا يوجد رقم واحد في المستند",
+  "<b>ثمانية مؤشرات صحة</b> بأهداف رقمية معلنة وحالة نجاح أو فشل لكل منها، تُقاس من اليوم الأول وتُراجع أسبوعيًا. أحدها معروض خارج الهدف بصراحة مع علاجه المقترح.",
+  "مؤشرات الصحة","../admin/index.html#kpis"],
+ ["م‑٠٧","s3","عالية","الاحتيال الداخلي من الكاشير",
+  "حساب مستقل لكل كاشير، سقوف يومية لكل عميل ولكل كاشير، ربط المنح برقم الفاتورة وقيمتها، كشف شذوذ آلي (تكرار الرقم، منح خارج ساعات العمل، فاتورة شاذة)، وسجل تدقيق غير قابل للحذف.",
+  "المراجعة والاحتيال","../merchant/index.html#fraud"],
+ ["م‑٠٨","s3","عالية","التزام النقاط غير المستبدلة",
+  "مؤشر <b>«الالتزام القائم» بالجنيه</b> ظاهر في لوحة المعلومات، وسياسة صلاحية افتراضية اثني عشر شهرًا مع تنبيه مجاني قبل الانتهاء بثلاثين يومًا، وعكس تلقائي للنقاط عند إرجاع الفاتورة.",
+  "لوحة المعلومات","../merchant/index.html#dash"],
+ ["م‑٠٩","s3","عالية","حماية البيانات والامتثال",
+  "التاجر «متحكّم» والمنصة «معالِج» بعقد معالجة بيانات. موافقة صريحة مسجّلة بالتاريخ عند التسجيل، وتحميل نسخة من البيانات وحذف الحساب ذاتيًا من التطبيق، وتشفير عند النقل والتخزين، وسياسة احتفاظ أربعة وعشرين شهرًا.",
+  "حسابي والخصوصية","../customer/index.html#me"],
+ ["م‑١٠","s3","عالية","تكلفة الرسائل تلتهم الهامش",
+  "ترتيب القنوات بالتكلفة تلقائيًا: إشعار مجاني، ثم واتساب، ثم رسالة نصية. مع عرض <b>التكلفة المتوقعة قبل الإرسال</b>، ورصيد رسائل يُشحن ويُخصم لحظيًا، والتعاقد مع مزوّد محلي بدل الدولي.",
+  "الحملات","../merchant/index.html#campaigns"],
+ ["م‑١١","s4","متوسطة","نموذج البيانات لا يستوعب السلاسل",
+  "تسلسل هرمي كامل من اليوم صفر: <b>مؤسسة ← علامة ← فرع ← نقطة بيع ← كاشير</b>، بصلاحيات على كل مستوى وتقارير قابلة للتجميع والتفصيل. يفتح شريحة السلاسل ويمنع ترحيل بيانات مؤلمًا لاحقًا.",
+  "الفروع والكاشيرون","../merchant/index.html#branches"],
+ ["م‑١٢","s4","متوسطة","«محرك ذكاء اصطناعي» بلا مضمون",
+  "<b>أُسقط الادعاء من النطاق المبدئي.</b> بدلًا منه تقارير وصفية بقواعد حسابية بسيطة تعمل من اليوم الأول: تحديد العملاء المعرّضين للفقدان بقاعدة تجاوز ضعف متوسط فترة الزيارة، واقتراح قيمة المكافأة من متوسط الفاتورة. والذكاء الاصطناعي الحقيقي تطوير مستقبلي بعد تراكم البيانات.",
+  "العملاء والمكافآت","../merchant/index.html#customers"],
+ ["م‑١٣","s4","متوسطة","قيود إشعارات PWA على iOS",
+  "بانر تثبيت على الشاشة الرئيسية مقابل خمسين نقطة ترحيبية، وواتساب كقناة بديلة معتمدة، وعرض حالة الرصيد على شاشة الكاشير، وقياس نسبة تفعيل الإشعارات كمؤشر رئيسي.",
+  "الرئيسية","../customer/index.html#home"],
+ ["م‑١٤","s4","متوسطة","لا تحليل منافسة ولا تمايز مُثبت",
+  "جدول مقارنة تنافسية على ستة محاور مقابل خمسة منافسين، مع اعتراف صريح بأن أخطرهم هو الولاء المدمج المجاني في أنظمة نقاط البيع. وتحديد الخندقين غير القابلين للتقليد: <b>تعدد نماذج الولاء في نظام واحد</b>، و<b>هوية عميل موحّدة عبر متاجر مختلفة</b>.",
+  "المنافسة والتمايز","../plan/index.html"],
+ ["م‑١٥","s4","متوسطة","لا خارطة طريق ولا فريق ولا مؤشرات",
+  "ثلاث وثائق مكتملة: خطة التطوير بست مراحل ومعايير قبول، ودليل الفريق بثمانية أدوار ومصفوفة RACI، ومؤشرات الصحة الثمانية بأهدافها. ولكل مرحلة معيار لا يُتجاوز إلا بتحققه.",
+  "خطة التطوير","../plan/index.html"],
+ ["م‑١٦","s4","متوسطة","عيوب في ملف البريف نفسه",
+  "توحيد الاسم على <b>walaee</b> في كل الواجهات والمستندات، وميتاداتا مضبوطة في كل ملف PDF، وطبقة نص قابلة للبحث، وفهرس وأقسام مرقّمة، وتقليل الحجم.",
+  "كل الشاشات","../index.html"]
+];
+
+var list = document.getElementById('list');
+function render(f) {
+  list.innerHTML = SOL.filter(function (x) { return f === 'all' || x[1] === f; }).map(function (x) {
+    return '<article class="item" data-s="' + x[1] + '">' +
+      '<div class="ref2">' + x[0] + '<span class="sev ' + x[1] + '">' + x[2] + '</span></div>' +
+      '<div><h3>' + x[3] + '</h3>' +
+      '<div class="sol2"><span class="lb">الحل المُطبَّق</span><p>' + x[4] + '</p></div>' +
+      '<div class="where"><a href="' + x[6] + '">' + x[5] + '</a>' +
+      '<span class="st2">مُنفَّذ</span></div></div></article>';
+  }).join('');
+}
+render('all');
+[].forEach.call(document.querySelectorAll('.fl'), function (b) {
+  b.addEventListener('click', function () {
+    [].forEach.call(document.querySelectorAll('.fl'), function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    render(b.dataset.f);
+  });
+});
+</script>
+<script src="../assets/js/switcher.js"></script>
+</body>
+</html>
