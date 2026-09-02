@@ -31,6 +31,7 @@ REMOVE = [
     f'{REPORTS}/Walaee_Analysis_Report_AR.html',
     f'{REPORTS}/Walaee_Executive_Brief_Book_Mobile.pdf',
     'docs/planning', 'docs/DEPLOY-DEMO.md', 'docs/README.md',
+    f'{DEMO}/README.md',
     'project', 'PROJECT_STRUCTURE.md', '.github',
     'scripts',
 ]
@@ -56,12 +57,7 @@ p = f'{DEMO}/index.html'
 s = io.open(p, encoding='utf-8', newline='').read()
 
 # بطاقات المستندات المحذوفة
-for href, label in [('plan/index.html', 'خطة التطوير'),
-                    ('architecture/index.html', 'المخطط المعماري'),
-                    ('../reports/Walaee_Analysis_Report_AR.pdf', 'التحليل الشامل'),
-                    ('solutions/index.html', 'تتبّع الحلول — بطاقة')]:
-    s = cut_block(s, '<a class="card3 doc', '</a>', label) if False else s
-# إزالة دقيقة بالـregex: كل <a class="card3 doc ..." href="X" ...> ... </a>
+# إزالة كل بطاقة مستند تشير إلى محتوى محذوف
 for href in ['plan/index.html', 'architecture/index.html',
              '../reports/Walaee_Analysis_Report_AR.pdf', 'solutions/index.html']:
     pat = re.compile(
@@ -71,9 +67,9 @@ for href in ['plan/index.html', 'architecture/index.html',
     print(f'  بطاقة {href}: حُذفت' if n else f'  ⚠ بطاقة {href}: غير موجودة')
 
 # قسم «تتبّع الحلول» بالكامل
-s = cut_block(s, '<!-- ══ 3 · الحلول ══ -->', '</section>', 'قسم الحلول')
+s = cut_block(s, '<!-- ═════ 03 · الحلول ═════ -->', '</section>', 'قسم الحلول')
 # قسم «مستند داخلي» بالكامل
-s = cut_block(s, '<!-- ══ 4 · داخلي ══ -->', '</section>', 'قسم داخلي')
+s = cut_block(s, '<!-- ═════ 04 · داخلي ═════ -->', '</section>', 'قسم داخلي')
 
 # رابط التنقّل للحلول
 s = re.sub(r'\s*<a href="#s3">[^<]*</a>', '', s)
