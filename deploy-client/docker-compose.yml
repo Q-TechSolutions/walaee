@@ -26,4 +26,4 @@ services:
       - "traefik.http.services.walaee-client.loadbalancer.server.port=80"
     deploy:
       resources:
-        limits: { cpus: "0.50", memory: 128M }
+        limits: { cpus: "1.0", memory: 256M }

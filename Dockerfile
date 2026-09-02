@@ -15,6 +15,9 @@ RUN apk add --no-cache tzdata curl \
  && echo "Africa/Cairo" > /etc/timezone \
  && rm -rf /usr/share/nginx/html/*
 
+# عدد عمّال متناسب مع حد المعالج — auto كان يشغّل 20 عاملًا على نصف نواة
+RUN sed -i 's/^worker_processes.*/worker_processes 2;/' /etc/nginx/nginx.conf
+
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # الواجهات
