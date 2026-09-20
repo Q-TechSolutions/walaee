@@ -1,6 +1,6 @@
 import { NavLink, Navigate, Route, Routes, useLocation } from "react-router-dom";
 
-import { isAuthenticated } from "@walaee/shared";
+import { hardRedirect, isAuthenticated } from "@walaee/shared";
 
 import { activeRole, atLeast, endSession, readSession } from "./lib/session";
 import type { Role } from "./lib/session";
@@ -108,7 +108,7 @@ export function App() {
             className="link"
             onClick={() => {
               endSession();
-              window.location.replace("/login");
+              hardRedirect("/login");
             }}
           >
             تسجيل الخروج

@@ -8,6 +8,11 @@ DEBUG = False
 # ── رؤوس وضوابط الأمان ──────────────────────────────
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# الفحص الصحي يأتي من داخل الحاوية على http بلا أي رأس وكيل.
+# بدون هذا الاستثناء يردّ بـ301 فيبدو ناجحًا لـcurl وهو لم يلمس
+# قاعدة البيانات أصلًا — فحص أخضر كاذب أسوأ من غياب الفحص.
+SECURE_REDIRECT_EXEMPT = [r"^healthz$"]
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True

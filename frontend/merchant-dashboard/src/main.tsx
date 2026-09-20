@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
-import { configureApi } from "@walaee/shared";
+import { configureApi, hardRedirect, isAt } from "@walaee/shared";
 
 import "@walaee/shared/tokens.css";
 import "@walaee/shared/base.css";
@@ -15,15 +15,16 @@ import { endSession } from "./lib/session";
 configureApi({
   onUnauthenticated: () => {
     endSession();
-    if (window.location.pathname !== "/login") {
-      window.location.replace("/login");
+    if (!isAt("/login")) {
+      hardRedirect("/login");
     }
   },
 });
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
+    {/* BASE_URL يأتي من Vite ويطابق `base` في إعداده */}
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <App />
     </BrowserRouter>
   </StrictMode>,

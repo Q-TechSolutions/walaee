@@ -41,7 +41,12 @@ RUN pip install --no-index --find-links=/wheels -r requirements/prod.txt \
 
 COPY backend/ /app/
 COPY infra/scripts/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh && chown -R walaee:walaee /app
+
+# المجلدان يُنشآن هنا لا في وقت التشغيل: Docker ينسخ ملكية مسار
+# الصورة إلى الحجم المسمّى عند أول إنشاء. لو لم يوجدا في الصورة
+# أنشأهما بملكية root، فيعجز المستخدم غير الجذري عن الكتابة
+# فيهما — ويفشل collectstatic بعد أن تكون الهجرات طُبّقت بالفعل.
+RUN mkdir -p /app/staticfiles /app/media     && chmod +x /entrypoint.sh     && chown -R walaee:walaee /app
 
 USER walaee
 

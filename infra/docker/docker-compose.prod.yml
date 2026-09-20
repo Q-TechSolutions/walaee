@@ -3,7 +3,13 @@
 #  المرجع: docs/architecture/deployment.md
 #
 #  التشغيل من جذر المستودع:
-#      docker compose -f infra/docker/docker-compose.prod.yml up -d
+#      make prod-build && make prod-up
+#  أو مباشرة:
+#      docker compose --env-file .env -f infra/docker/docker-compose.prod.yml up -d
+#
+#  ‏--env-file إلزامي: Compose يقرأ متغيرات التداخل ${...} من ملف
+#  .env المجاور لملف compose لا من جذر المستودع. بدونه يفشل
+#  التشغيل برسالة عن متغيّر ناقص وملف .env موجود فعلًا.
 # ══════════════════════════════════════════════════════════
 name: walaee
 
@@ -15,24 +21,28 @@ x-api-base: &api-base
   env_file: [../../.env]
   restart: unless-stopped
   depends_on:
-    postgres: {condition: service_healthy}
-    redis: {condition: service_started}
+    postgres: { condition: service_healthy }
+    redis: { condition: service_started }
 
 services:
-  nginx:
-    image: nginx:1.27-alpine
+  # ── الحافة: الواجهات الثلاث + تمرير /api ──
+  web:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.web
+    image: walaee-web:latest
     restart: unless-stopped
-    depends_on: [api]
+    depends_on:
+      api: { condition: service_started }
     volumes:
-      - ../nginx/walaee.conf:/etc/nginx/conf.d/default.conf:ro
-      - ../nginx/proxy_headers.conf:/etc/nginx/proxy_headers.conf:ro
       - static:/var/www/static:ro
       - media:/var/www/media:ro
     ports:
-      - "8080:80"
+      # المنفذ الوحيد المكشوف. Dokploy يوجّه النطاق إليه عبر Traefik.
+      - "${WEB_PORT:-8080}:80"
     deploy:
       resources:
-        limits: {cpus: "0.25", memory: 128M}
+        limits: { cpus: "0.5", memory: 192M }
 
   api:
     <<: *api-base
@@ -44,40 +54,58 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 40s
     deploy:
       resources:
-        limits: {cpus: "1.0", memory: 1G}
+        limits: { cpus: "1.0", memory: 1G }
 
   # عامل معزول للطابور الحسّاس: حملة رسائل ضخمة يجب ألا توقف
   # تدوير رموز الكاشير — docs/architecture/async-tasks.md
   worker-realtime:
     <<: *api-base
     command: celery -A config worker -Q realtime -c 4 --max-tasks-per-child 200
+    # العامل لا يشغّل خادم ويب، وفحص الصورة الافتراضي (curl على
+    # المنفذ ٨٠٠٠) يفشل دائمًا فيبدو العامل معطّلًا وهو يعمل.
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping -d celery@$$HOSTNAME"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
     deploy:
       resources:
-        limits: {cpus: "0.5", memory: 512M}
+        limits: { cpus: "0.5", memory: 512M }
 
   worker-default:
     <<: *api-base
     command: >
       celery -A config worker
       -Q messaging,webhooks,analytics,billing,maintenance -c 2
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping -d celery@$$HOSTNAME"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
     deploy:
       resources:
-        limits: {cpus: "0.5", memory: 512M}
+        limits: { cpus: "0.5", memory: 512M }
 
   beat:
     <<: *api-base
     command: >
       celery -A config beat
       --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    # المجدول لا يستقبل نداءات inspect ولا يفتح منفذًا، فلا فحص
+    # صحي ذا معنى له. خروجه يُعالَج بـrestart لا بفحص كاذب.
+    healthcheck:
+      disable: true
     # نسخة واحدة فقط — إلزامي. نسختان تعنيان تنفيذًا مزدوجًا لكل
-    # مهمة مجدولة، أي منح نقاط مرتين وإرسال رسائل مرتين.
+    # مهمة مجدولة: منح نقاط مرتين وإرسال رسائل مرتين وخصم رصيد مرتين.
     deploy:
       replicas: 1
       resources:
-        limits: {cpus: "0.1", memory: 256M}
+        limits: { cpus: "0.25", memory: 256M }
 
   postgres:
     image: postgres:16-alpine
@@ -85,7 +113,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-walaee}
       POSTGRES_USER: ${POSTGRES_USER:-walaee}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?مطلوب}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?مطلوب في .env}
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ../postgres/01-extensions.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro
@@ -96,7 +124,7 @@ services:
       retries: 5
     deploy:
       resources:
-        limits: {cpus: "1.0", memory: 2G}
+        limits: { cpus: "1.0", memory: 2G }
 
   redis:
     image: redis:7-alpine
@@ -104,7 +132,9 @@ services:
     # noeviction مقصود: Redis هنا ليس كاشًا فقط. يحمل رموز نقاط
     # البيع وطوابير Celery، وطرد مفتاح منها يعني مسحًا فاشلًا عند
     # الكاشير أو مهمة ضائعة. الامتلاء يجب أن يُصرَخ به لا أن يُبتلَع.
-    command: redis-server --appendonly yes --maxmemory 200mb --maxmemory-policy noeviction
+    command: >
+      redis-server --appendonly yes
+      --maxmemory 200mb --maxmemory-policy noeviction
     volumes:
       - redisdata:/data
     healthcheck:
@@ -114,7 +144,7 @@ services:
       retries: 5
     deploy:
       resources:
-        limits: {cpus: "0.25", memory: 256M}
+        limits: { cpus: "0.25", memory: 256M }
 
 volumes:
   pgdata:

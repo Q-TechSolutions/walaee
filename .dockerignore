@@ -1,0 +1,42 @@
+# ما لا يدخل سياق البناء إطلاقًا.
+# السياق الكبير يبطئ كل بناء ويسرّب أسرارًا بلا قصد.
+
+.git
+.github
+.venv
+venv
+node_modules
+*/node_modules
+frontend/*/node_modules
+frontend/*/dist
+frontend/*/dev-dist
+
+# أسرار ومخرجات محلية
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+__pycache__
+*.py[cod]
+.pytest_cache
+.ruff_cache
+.coverage
+coverage.xml
+htmlcov
+*.tsbuildinfo
+
+backend/staticfiles
+backend/media
+
+# التوثيق لا يدخل الصورة
+docs
+*.md
+!backend/apps/*/README.md
+
+# مستندات عمل محلية
+*.docx
+*.doc
+*.pptx
+*.xlsx

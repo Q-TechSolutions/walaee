@@ -15,6 +15,7 @@ import {
   Modal,
   clearTokens,
   fmt,
+  hardRedirect,
   useAction,
   useApi,
 } from "@walaee/shared";
@@ -62,7 +63,7 @@ export function Profile() {
 
   function signOut() {
     clearTokens();
-    window.location.replace("/login");
+    hardRedirect("/login");
   }
 
   return (
@@ -230,7 +231,7 @@ function DeleteAccountModal({
               const result = await confirmDelete.run(code);
               if (result) {
                 clearTokens();
-                window.location.replace("/login");
+                hardRedirect("/login");
               }
             }}
           >

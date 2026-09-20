@@ -3,7 +3,9 @@
 .DEFAULT_GOAL := help
 
 COMPOSE     := docker compose
-PROD        := docker compose -f infra/docker/docker-compose.prod.yml
+# ‏--env-file إلزامي: Compose يقرأ متغيرات التداخل من الملف
+# المجاور لملف compose لا من جذر المستودع
+PROD        := docker compose --env-file .env -f infra/docker/docker-compose.prod.yml
 PY          := .venv/Scripts/python.exe
 MANAGE      := cd backend && ../$(PY) manage.py
 
