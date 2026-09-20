@@ -7,6 +7,7 @@ export {
   clearTokens,
   isAuthenticated,
   decodeAccess,
+  namespacedKey,
 } from "./api/tokens";
 export * from "./api/types";
 

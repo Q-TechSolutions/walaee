@@ -13,6 +13,8 @@ import { App } from "./App";
 import { endSession } from "./lib/session";
 
 configureApi({
+  // يفصل تخزين التوكن عن التطبيقين الآخرين على نفس الأصل
+  appId: "merchant",
   onUnauthenticated: () => {
     endSession();
     if (!isAt("/login")) {

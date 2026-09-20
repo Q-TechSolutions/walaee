@@ -18,6 +18,8 @@ import { App } from "./App";
  * يعني أن زر الرجوع يعيد المستخدم إليها فيرى بيانات لا يملكها.
  */
 configureApi({
+  // يفصل تخزين التوكن عن التطبيقين الآخرين على نفس الأصل
+  appId: "customer",
   onUnauthenticated: () => {
     if (!isAt("/login")) {
       hardRedirect("/login");

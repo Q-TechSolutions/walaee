@@ -11,6 +11,8 @@ import "./styles.css";
 import { App } from "./App";
 
 configureApi({
+  // يفصل تخزين التوكن عن التطبيقين الآخرين على نفس الأصل
+  appId: "admin",
   onUnauthenticated: () => {
     clearTokens();
     window.location.reload();

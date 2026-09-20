@@ -6,10 +6,19 @@
  * المستخدم فعله — إظهار زر يُرفض دائمًا تجربة سيئة لا ثغرة.
  */
 
-import { clearTokens, writeTokens } from "@walaee/shared";
+import { clearTokens, namespacedKey, writeTokens } from "@walaee/shared";
 import type { StaffRole, StaffSession } from "@walaee/shared";
 
-const KEY = "walaee.session";
+/**
+ * مفتاح الجلسة — يُحسَب عند الاستخدام لا عند تحميل الوحدة.
+ *
+ * وحدات ES تُنفَّذ كلها قبل جسم `main.tsx`، فثابتٌ يُحسَب هنا يقرأ
+ * اسم التطبيق قبل أن يضبطه `configureApi` — فيُكتب تحت اسم خاطئ
+ * وتضيع الجلسة عند أول إعادة تحميل. عطل يظهر بعد الدخول لا عنده.
+ */
+function key(): string {
+  return namespacedKey("session");
+}
 
 export type Role = StaffRole["role"];
 
@@ -32,7 +41,7 @@ export function saveSession(payload: StaffSession): Session {
 
   cached = session;
   try {
-    localStorage.setItem(KEY, JSON.stringify(session));
+    localStorage.setItem(key(), JSON.stringify(session));
   } catch {
     /* الجلسة تعيش في الذاكرة */
   }
@@ -42,7 +51,7 @@ export function saveSession(payload: StaffSession): Session {
 export function readSession(): Session | null {
   if (cached) return cached;
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(key());
     if (!raw) return null;
     cached = JSON.parse(raw) as Session;
     return cached;
@@ -55,7 +64,7 @@ export function endSession(): void {
   cached = null;
   clearTokens();
   try {
-    localStorage.removeItem(KEY);
+    localStorage.removeItem(key());
   } catch {
     /* لا شيء */
   }

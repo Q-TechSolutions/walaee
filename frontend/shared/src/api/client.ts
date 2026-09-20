@@ -7,7 +7,7 @@
  * ظهر مستخدم عالق في شاشة بيضاء لأن نداءً واحدًا نسي التعامل مع 401.
  */
 
-import { readTokens, writeTokens, clearTokens } from "./tokens";
+import { readTokens, writeTokens, clearTokens, setTokenNamespace } from "./tokens";
 import type { ApiError, Tokens } from "./types";
 
 const DEFAULT_BASE = "/api/v1";
@@ -47,6 +47,14 @@ interface RequestOptions {
 
 export interface ClientConfig {
   baseUrl?: string;
+  /**
+   * اسم التطبيق — يفصل تخزين التوكن عن التطبيقات الأخرى.
+   *
+   * إلزامي حين تُخدَم أكثر من واجهة من أصل واحد: `localStorage`
+   * مشترك بين كل ما هو على أصل واحد، ومفتاح واحد يجعل الدخول في
+   * تطبيق يبدو دخولًا في الثلاثة.
+   */
+  appId?: string;
   /** يُستدعى حين تنتهي الجلسة نهائيًا ولا يمكن تجديدها */
   onUnauthenticated?: () => void;
 }
@@ -55,6 +63,7 @@ let config: ClientConfig = {};
 
 export function configureApi(next: ClientConfig): void {
   config = { ...config, ...next };
+  if (next.appId) setTokenNamespace(next.appId);
 }
 
 function baseUrl(): string {
