@@ -18,29 +18,38 @@ Desktop.ini
 *.pem
 *.key
 
-# ── بايثون (للمرحلة القادمة) ─────────────────
+# ── بايثون ───────────────────────────────────
 __pycache__/
 *.py[cod]
 .venv/
 venv/
 *.egg-info/
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
 .coverage
+coverage.xml
 htmlcov/
 
-# ── جافاسكريبت (للمرحلة القادمة) ─────────────
+# ── جافاسكريبت ───────────────────────────────
 node_modules/
 dist/
 .vite/
 npm-debug.log*
 
+# ── مخرجات البناء ────────────────────────────
+backend/staticfiles/
+backend/media/*
+!backend/media/.gitkeep
+infra/openapi.yaml
+
 # ── مخرجات مؤقتة ─────────────────────────────
 *.log
 tmp/
-_static.html
 
-# ── المشروع الفعلي ──
-project/.env
-project/backend/staticfiles/
-project/*/node_modules/
-project/infra/openapi.yaml
+# ── مستندات عمل محلية لا تُرفع ────────────────
+# مسوّدات ومراجع شخصية — مكانها مستودع العرض لا مستودع المنتج
+*.docx
+*.doc
+*.pptx
+*.xlsx

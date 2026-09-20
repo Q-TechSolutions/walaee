@@ -1,0 +1,21 @@
+# قياس التغطية على منطق الأعمال فقط.
+# الهجرات مولَّدة آليًا، وملفات admin و apps تعريفات لا منطق —
+# إدراجها يخفّف الرقم بلا أن يزيد ثقة أحد في صحة الرصيد.
+[run]
+branch = True
+omit =
+    */migrations/*
+    */tests/*
+    */apps.py
+    */admin.py
+    */__init__.py
+    config/*
+    manage.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    if TYPE_CHECKING:
+    @abstractmethod
+show_missing = True

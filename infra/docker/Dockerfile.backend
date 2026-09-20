@@ -1,0 +1,60 @@
+# ══════════════════════════════════════════════════════════
+#  ولائي — صورة الخلفية (api · worker · beat من نفس الصورة)
+#  المرجع: docs/architecture/deployment.md
+# ══════════════════════════════════════════════════════════
+
+# ── مرحلة البناء: العجلات تُبنى هنا فلا تدخل أدوات البناء الإنتاج ──
+FROM python:3.12-slim AS builder
+
+ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /wheels
+COPY backend/requirements/ ./requirements/
+RUN pip wheel --wheel-dir /wheels -r requirements/prod.txt
+
+
+# ── مرحلة التشغيل ──
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    DJANGO_SETTINGS_MODULE=config.settings.prod
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpq5 curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# مستخدم غير جذري — حاوية تعمل بـ root تعني أن أي ثغرة تصبح ثغرة مضيف
+RUN groupadd -r walaee && useradd -r -g walaee -d /app walaee
+
+WORKDIR /app
+
+COPY --from=builder /wheels /wheels
+COPY backend/requirements/ ./requirements/
+RUN pip install --no-index --find-links=/wheels -r requirements/prod.txt \
+    && rm -rf /wheels
+
+COPY backend/ /app/
+COPY infra/scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh && chown -R walaee:walaee /app
+
+USER walaee
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD curl -fsS http://localhost:8000/healthz || exit 1
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["gunicorn", "config.asgi:application", \
+     "-k", "uvicorn.workers.UvicornWorker", \
+     "--bind", "0.0.0.0:8000", \
+     "--workers", "4", \
+     "--max-requests", "1000", \
+     "--max-requests-jitter", "100", \
+     "--access-logfile", "-"]

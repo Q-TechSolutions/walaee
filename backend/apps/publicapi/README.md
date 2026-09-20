@@ -1,4 +1,6 @@
-> ⚠️ مجلد هيكلي — لم يبدأ التنفيذ بعد. المرجع: `docs/architecture/`
+> ○ **مؤجّل.** خارج النطاق المبدئي (`docs/planning/scope.md`). المجلد موجود ليُستقبَل بلا إعادة بناء. يُفعَّل بـ `FEATURE_PUBLIC_API=1`.
+>
+> المرجع: `docs/architecture/`
 
 # `apps/publicapi` — الواجهات البرمجية العامة و Webhooks
 

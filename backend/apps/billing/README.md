@@ -1,4 +1,6 @@
-> ⚠️ مجلد هيكلي — لم يبدأ التنفيذ بعد. المرجع: `docs/architecture/`
+> ⬜ **المرحلة الثانية.** مفاتيح الميزات تُقرأ حاليًا من متغيرات البيئة لا من `Subscription` — راجع `config/settings/base.py`.
+>
+> المرجع: `docs/architecture/`
 
 # `apps/billing` — الاشتراكات والفوترة
 

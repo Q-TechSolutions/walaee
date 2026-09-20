@@ -1,47 +1,145 @@
-# ولائي — أوامر التطوير الشائعة
+# ولائي — أوامر التطوير
+# التشغيل من جذر المستودع.  `make help` يعرض كل شيء.
 .DEFAULT_GOAL := help
-COMPOSE := docker compose -f docker-compose.dev.yml
+
+COMPOSE     := docker compose
+PROD        := docker compose -f infra/docker/docker-compose.prod.yml
+PY          := .venv/Scripts/python.exe
+MANAGE      := cd backend && ../$(PY) manage.py
+
+# على لينكس و macOS المسار مختلف
+ifeq ($(OS),)
+PY := .venv/bin/python
+endif
 
 help:            ## عرض كل الأوامر
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+		| awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
-up:              ## تشغيل خدمات التطوير (قاعدة البيانات و Redis)
+# ══════════════ البيئة ══════════════
+
+venv:            ## إنشاء البيئة الافتراضية
+	python -m venv .venv
+
+install:         ## تثبيت اعتماديات التطوير
+	$(PY) -m pip install --upgrade pip
+	$(PY) -m pip install -r backend/requirements/dev.txt
+
+env:             ## إنشاء .env من القالب
+	@test -f .env || cp .env.example .env
+	@echo "✓ .env جاهز — راجع القيم قبل التشغيل"
+
+# ══════════════ الخدمات المحلية ══════════════
+
+up:              ## تشغيل PostgreSQL و Redis
 	$(COMPOSE) up -d
 
 down:            ## إيقاف الخدمات
 	$(COMPOSE) down
 
-logs:            ## متابعة السجلات
+logs:            ## متابعة سجلات الخدمات
 	$(COMPOSE) logs -f --tail=100
 
 ps:              ## حالة الخدمات
 	$(COMPOSE) ps
 
+# ══════════════ Django ══════════════
+
+run:             ## تشغيل خادم التطوير على 8000
+	$(MANAGE) runserver 127.0.0.1:8000
+
 migrate:         ## تطبيق الهجرات
-	cd backend && python manage.py migrate
+	$(MANAGE) migrate
 
 makemigrations:  ## توليد الهجرات
-	cd backend && python manage.py makemigrations
+	$(MANAGE) makemigrations
 
-seed:            ## بيانات بذرة للتطوير
-	cd backend && python manage.py seed_demo
+superuser:       ## إنشاء مستخدم خارق
+	$(MANAGE) createsuperuser
+
+seed:            ## بيانات تجريبية للتطوير
+	$(MANAGE) seed_demo
+
+reseed:          ## مسح البيانات التجريبية وإعادة إنشائها
+	$(MANAGE) seed_demo --reset
+
+shell:           ## صدفة Django
+	$(MANAGE) shell
+
+schema:          ## توليد مخطط OpenAPI إلى infra/openapi.yaml
+	$(MANAGE) spectacular --file ../infra/openapi.yaml
+
+# ══════════════ Celery ══════════════
+
+worker:          ## عامل الطابور الحسّاس
+	cd backend && ../$(PY) -m celery -A config worker -Q realtime -c 4 -l info
+
+worker-default:  ## عامل الطوابير الباقية
+	cd backend && ../$(PY) -m celery -A config worker \
+		-Q messaging,webhooks,analytics,billing,maintenance -c 2 -l info
+
+beat:            ## مجدول المهام — نسخة واحدة فقط
+	cd backend && ../$(PY) -m celery -A config beat \
+		--scheduler django_celery_beat.schedulers:DatabaseScheduler -l info
+
+# ══════════════ الجودة ══════════════
 
 test:            ## كل الاختبارات مع التغطية
-	cd backend && pytest --cov=apps --cov-report=term-missing
+	cd backend && ../$(PY) -m pytest --cov=apps --cov-report=term-missing
 
-test-ledger:     ## اختبارات محرك القيود — التغطية 100% إلزامية
-	cd backend && pytest apps/ledger --cov=apps.ledger --cov-fail-under=100
+test-fast:       ## الاختبارات بلا تغطية ولا تزامن
+	cd backend && ../$(PY) -m pytest -q -m "not concurrency" --no-cov
+
+test-ledger:     ## محرك القيود — التغطية ١٠٠٪ إلزامية
+	cd backend && ../$(PY) -m pytest apps/ledger \
+		--cov=apps.ledger --cov-report=term-missing --cov-fail-under=100
 
 lint:            ## فحص التنسيق والأنماط
-	cd backend && ruff check . && black --check .
+	$(PY) -m ruff check backend
+	$(PY) -m black --check backend
 
 fmt:             ## تنسيق تلقائي
-	cd backend && ruff check --fix . && black .
+	$(PY) -m ruff check --fix backend
+	$(PY) -m black backend
 
-schema:          ## توليد مخطط OpenAPI
-	cd backend && python manage.py spectacular --file ../infra/openapi.yaml
+check:           ## فحص Django + هجرات غير مولَّدة
+	$(MANAGE) check --deploy --fail-level WARNING || true
+	$(MANAGE) makemigrations --check --dry-run
 
-reset-db:        ## حذف قاعدة البيانات وإعادة إنشائها (يمسح كل البيانات)
-	$(COMPOSE) down -v && $(COMPOSE) up -d postgres redis
+verify:          ## كل فحوص ما قبل الدمج
+	$(MAKE) lint
+	$(MAKE) test-ledger
+	$(MAKE) test
 
-.PHONY: help up down logs ps migrate makemigrations seed test test-ledger lint fmt schema reset-db
+# ══════════════ قاعدة البيانات ══════════════
+
+reset-db:        ## حذف قاعدة البيانات وإعادة إنشائها (يمسح كل شيء)
+	$(COMPOSE) down -v
+	$(COMPOSE) up -d
+	@echo "انتظر قليلًا ثم: make migrate seed"
+
+psql:            ## صدفة psql
+	$(COMPOSE) exec postgres psql -U walaee -d walaee
+
+harden-db:       ## تطبيق حارس append-only (للإنتاج لا للتطوير)
+	$(COMPOSE) exec -T postgres psql -U walaee -d walaee \
+		< infra/postgres/02-append-only.sql
+
+# ══════════════ الإنتاج ══════════════
+
+prod-build:      ## بناء صور الإنتاج
+	$(PROD) build
+
+prod-up:         ## تشغيل تركيبة الإنتاج
+	$(PROD) up -d
+
+prod-down:       ## إيقاف تركيبة الإنتاج
+	$(PROD) down
+
+prod-logs:       ## سجلات الإنتاج
+	$(PROD) logs -f --tail=100
+
+.PHONY: help venv install env up down logs ps run migrate makemigrations \
+        superuser seed reseed shell schema worker worker-default beat \
+        test test-fast test-ledger lint fmt check verify reset-db psql \
+        harden-db prod-build prod-up prod-down prod-logs
