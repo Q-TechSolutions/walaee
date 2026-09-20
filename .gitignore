@@ -44,3 +44,11 @@ project/.env
 project/backend/staticfiles/
 project/*/node_modules/
 project/infra/openapi.yaml
+
+# ── مستندات عمل محلية لا تُرفع ────────────────
+# مسوّدات شخصية. وُجد سابقًا أن `git add -A` في سكربت توليد فرع
+# العميل يكنسها إلى فرع مخصّص للنشر — التجاهل هنا يمنع تكرارها.
+*.docx
+*.doc
+*.pptx
+*.xlsx

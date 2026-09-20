@@ -35,6 +35,17 @@ cp -f deploy-client/.dockerignore     .dockerignore
 cp -f deploy-client/README.md         README.md
 rm -rf deploy-client
 
+# حارس: `git add -A` يكنس أي ملف غير متتبَّع إلى فرع مخصّص للنشر.
+# حدث هذا فعلًا مع مستند محلي، فصار الحارس إلزاميًا.
+STRAY="$(git ls-files --others --exclude-standard)"
+if [ -n "$STRAY" ]; then
+  echo "✗ ملفات غير متتبَّعة ستُكنس إلى فرع العميل:"
+  echo "$STRAY" | sed 's/^/    /'
+  echo "  أضفها إلى .gitignore أو احذفها، ثم أعد المحاولة."
+  git checkout -q "$ORIGINAL"
+  exit 1
+fi
+
 git add -A
 git commit -q -m "Build client-facing demo (auto-generated from $SRC)
 
