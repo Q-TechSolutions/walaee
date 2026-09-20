@@ -1,46 +1,71 @@
-# ============================================================
-#  walaee — نشر نموذج العرض على Dokploy
-#  Dokploy > Create > Compose > اربط المستودع واختر هذا الملف
-# ============================================================
+# ══════════════════════════════════════════════════════════
+#  بيئة التطوير المحلية للمشروع الفعلي
+#  ملاحظة: docker-compose.yml في جذر المستودع يخص موقع العرض فقط
+#  التشغيل:  cd project && docker compose -f docker-compose.dev.yml up -d
+# ══════════════════════════════════════════════════════════
+name: walaee-dev
+
 services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: walaee-demo:latest
-    container_name: walaee-demo
+  postgres:
+    image: postgres:16-alpine
+    container_name: walaee-postgres
     restart: unless-stopped
-
-    # Dokploy يوجّه الترافيك عبر Traefik تلقائيًا للمنفذ الداخلي 80.
-    # لو بتشغّله محليًا أو محتاج منفذ مكشوف، فعّل السطرين التاليين:
-    # ports:
-    #   - "3000:80"
-    expose:
-      - "80"
-
     environment:
-      TZ: Africa/Cairo
-
+      POSTGRES_DB: ${POSTGRES_DB:-walaee}
+      POSTGRES_USER: ${POSTGRES_USER:-walaee}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-walaee}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/postgres:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5433:5432"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1/healthz"]
-      interval: 30s
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-walaee}"]
+      interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 5s
+      retries: 5
 
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
+  redis:
+    image: redis:7-alpine
+    container_name: walaee-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
-    labels:
-      - "dokploy.app=walaee-demo"
-      - "traefik.enable=true"
-      - "traefik.http.services.walaee-demo.loadbalancer.server.port=80"
+  # ══════════════════════════════════════════════════════
+  #  الخدمات التالية تُفعَّل بعد إنشاء ملفات المشروع
+  #  في مرحلة البناء — المرجع: docs/demo/architecture قسم ١٠
+  # ══════════════════════════════════════════════════════
+  # api:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: ../infra/docker/Dockerfile.backend
+  #   command: python manage.py runserver 0.0.0.0:8000
+  #   env_file: [.env]
+  #   volumes: ["./backend:/app"]
+  #   ports: ["8000:8000"]
+  #   depends_on:
+  #     postgres: {condition: service_healthy}
+  #     redis: {condition: service_healthy}
+  #
+  # worker-realtime:                  # عامل معزول للطابور الحسّاس
+  #   command: celery -A config worker -Q realtime -c 4
+  #
+  # worker-default:
+  #   command: celery -A config worker -Q messaging,webhooks,analytics,billing,maintenance -c 2
+  #
+  # beat:
+  #   command: celery -A config beat --scheduler django_celery_beat.schedulers:DatabaseScheduler
+  #   deploy: {replicas: 1}           # نسخة واحدة فقط — إلزامي
 
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 256M
+volumes:
+  pgdata:
+  redisdata:
