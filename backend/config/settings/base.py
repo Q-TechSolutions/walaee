@@ -241,6 +241,9 @@ DEMO_LOGIN_CODE = env_str("DEMO_LOGIN_CODE", "")
 # كلمة مرور موظفي التجربة. ضبطها يجعل شاشات الدخول تعرضهم للدخول
 # بضغطة، وتركها فارغة يخفيهم تمامًا.
 DEMO_STAFF_PASSWORD = env_str("DEMO_STAFF_PASSWORD", "")
+# مسارات التطبيقات حين تُخدَم على نطاقات منفصلة، بصيغة
+# customer=https://app.example,merchant=https://merchant.example
+DEMO_APP_URLS = env_list("DEMO_APP_URLS", [])
 
 SMS_PROVIDER = env_str("SMS_PROVIDER", "console")
 SMS_API_KEY = env_str("SMS_API_KEY", "")

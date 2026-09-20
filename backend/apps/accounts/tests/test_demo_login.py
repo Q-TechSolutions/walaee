@@ -205,3 +205,83 @@ class TestFullDemoFlow:
 
         with pytest.raises(OtpNotFound):
             login_customer(phone=DEMO_PHONE, code=CODE)
+
+
+class TestThrottleExemption:
+    """
+    أرقام التجربة معفاة من حد OTP. الإعفاء يجب أن يبقى محصورًا
+    فيها — وإلا صار بابًا لإغراق أي رقم حقيقي برسائل.
+    """
+
+    @demo_settings
+    def test_demo_phone_never_throttled(self, api):
+        # أضعاف الحد المسموح (٣ / ١٥ دقيقة)
+        codes = [
+            api.post(
+                reverse("accounts:otp-request"), {"phone": DEMO_PHONE}, format="json"
+            ).status_code
+            for _ in range(8)
+        ]
+
+        assert codes == [200] * 8
+
+    @demo_settings
+    def test_real_phone_still_throttled(self, api):
+        """الضمان: الإعفاء لا يتسرّب إلى رقم خارج القائمة."""
+        for _ in range(3):
+            api.post(reverse("accounts:otp-request"), {"phone": REAL_PHONE}, format="json")
+
+        blocked = api.post(reverse("accounts:otp-request"), {"phone": REAL_PHONE}, format="json")
+
+        assert blocked.status_code == 429
+
+    @override_settings(DEMO_LOGIN_PHONES=[], DEMO_LOGIN_CODE="")
+    def test_feature_off_throttles_everyone(self, api):
+        for _ in range(3):
+            api.post(reverse("accounts:otp-request"), {"phone": DEMO_PHONE}, format="json")
+
+        blocked = api.post(reverse("accounts:otp-request"), {"phone": DEMO_PHONE}, format="json")
+
+        assert blocked.status_code == 429
+
+    @demo_settings
+    def test_throttle_error_says_what_happened(self, api):
+        """
+        ٤٢٩ كان يُسمّى «validation_error»، فيرى المستخدم «البيانات
+        غير صالحة» ويصحّح مدخلاته مرارًا بلا أن يفهم أن عليه
+        الانتظار فحسب.
+        """
+        for _ in range(3):
+            api.post(reverse("accounts:otp-request"), {"phone": REAL_PHONE}, format="json")
+
+        blocked = api.post(reverse("accounts:otp-request"), {"phone": REAL_PHONE}, format="json")
+
+        assert blocked.status_code == 429
+        assert blocked.json()["error"]["code"] == "rate_limited"
+        assert "انتظر" in blocked.json()["error"]["message"]
+
+
+class TestErrorCodesFollowStatus:
+    def test_unauthenticated(self, api):
+        response = api.get(reverse("me:cards"))
+
+        assert response.status_code == 401
+        assert response.json()["error"]["code"] == "unauthenticated"
+
+    def test_forbidden(self, customer):
+        from apps.accounts.services import issue_tokens_for_customer
+
+        client = APIClient()
+        tokens = issue_tokens_for_customer(customer)
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+
+        response = client.get(reverse("ledger:dashboard"))
+
+        assert response.status_code == 403
+        assert response.json()["error"]["code"] == "forbidden"
+
+    def test_validation_error_kept_for_bad_input(self, api):
+        response = api.post(reverse("accounts:otp-request"), {"phone": ""}, format="json")
+
+        assert response.status_code == 400
+        assert response.json()["error"]["code"] == "validation_error"

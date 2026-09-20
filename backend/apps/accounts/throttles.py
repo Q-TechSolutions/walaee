@@ -44,6 +44,16 @@ class OtpPhoneThrottle(WindowThrottle):
         phone = (request.data or {}).get("phone")
         if not phone:
             return None
+
+        # أرقام التجربة معفاة: كودها ثابت ومعلَن أصلًا، فالحد لا
+        # يحمي شيئًا ولا يوجد ما يُرسَل ليُغرَق به أحد. ما يفعله
+        # فقط هو إيقاف من يعرض المنتج بعد ثلاث محاولات.
+        # الإعفاء محصور فيها — كل رقم آخر يبقى محدودًا.
+        from . import demo
+
+        if demo.is_demo_phone(phone):
+            return None
+
         return self.cache_format % {"scope": self.scope, "ident": phone}
 
 
@@ -55,6 +65,14 @@ class OtpIpThrottle(WindowThrottle):
     duration = 15 * 60
 
     def get_cache_key(self, request, view):
+        # عرض المنتج يعني عدة حسابات تجربة من نفس الجهاز والشبكة،
+        # فحدّ العنوان يوقفه بلا أن يحمي شيئًا
+        from . import demo
+
+        phone = (request.data or {}).get("phone")
+        if phone and demo.is_demo_phone(phone):
+            return None
+
         return self.cache_format % {
             "scope": self.scope,
             "ident": self.get_ident(request),

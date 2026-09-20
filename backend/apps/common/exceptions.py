@@ -71,11 +71,36 @@ def walaee_exception_handler(exc, context):
     if response is not None and isinstance(response.data, dict):
         # توحيد شكل أخطاء DRF مع شكل أخطاء المجال
         if "error" not in response.data:
+            code, message = _describe(response.status_code)
             response.data = {
                 "error": {
-                    "code": "validation_error",
-                    "message": "البيانات المُرسَلة غير صالحة.",
+                    "code": code,
+                    "message": message,
                     "details": response.data,
                 }
             }
     return response
+
+
+# رمز ورسالة لكل حالة. تسمية كل خطأ «validation_error» تجعل تجاوز
+# حد المعدل يظهر للمستخدم كـ«البيانات غير صالحة» — فيصحّح مدخلاته
+# مرارًا ولا يفهم أن عليه الانتظار فحسب.
+_STATUS_ERRORS = {
+    status.HTTP_400_BAD_REQUEST: ("validation_error", "البيانات المُرسَلة غير صالحة."),
+    status.HTTP_401_UNAUTHORIZED: ("unauthenticated", "سجّل دخولك للمتابعة."),
+    status.HTTP_403_FORBIDDEN: ("forbidden", "لا تملك صلاحية هذا الإجراء."),
+    status.HTTP_404_NOT_FOUND: ("not_found", "غير موجود."),
+    status.HTTP_405_METHOD_NOT_ALLOWED: ("method_not_allowed", "إجراء غير مدعوم."),
+    status.HTTP_429_TOO_MANY_REQUESTS: (
+        "rate_limited",
+        "محاولات كثيرة خلال وقت قصير. انتظر قليلًا ثم أعد المحاولة.",
+    ),
+}
+
+
+def _describe(status_code: int) -> tuple[str, str]:
+    if status_code in _STATUS_ERRORS:
+        return _STATUS_ERRORS[status_code]
+    if status_code >= 500:
+        return ("server_error", "خطأ في الخادم. حاول مجددًا بعد قليل.")
+    return ("request_error", "تعذّر إتمام الطلب.")

@@ -39,9 +39,38 @@ CUSTOMER_NAMES = {
     "+201333333333": "نورهان سعيد",
 }
 
+# مسار كل تطبيق كما يخدمه nginx في الإنتاج. تُعاد إلى الواجهة
+# لتستطيع شاشة الدخول أن تدلّ على مكان الحسابات التي لا تخصّها —
+# بدلها يبقى المستخدم يجرّب حسابًا في التطبيق الخطأ.
+# تُضبَط بـDEMO_APP_URLS حين تُخدَم التطبيقات على نطاقات منفصلة.
+DEFAULT_APP_URLS = {
+    "customer": "/",
+    "merchant": "/merchant/",
+    "admin": "/admin/",
+}
+
 
 def staff_password() -> str:
     return str(getattr(settings, "DEMO_STAFF_PASSWORD", "") or "")
+
+
+def app_urls() -> dict:
+    """
+    مسار كل تطبيق.
+
+    الإعداد بصيغة `customer=/,merchant=/merchant/,admin=/admin/`.
+    أي مفتاح غير مذكور يأخذ الافتراضي، فلا يختفي رابط بسبب إعداد
+    ناقص.
+    """
+    urls = dict(DEFAULT_APP_URLS)
+
+    for entry in getattr(settings, "DEMO_APP_URLS", []) or []:
+        key, _, value = str(entry).partition("=")
+        key, value = key.strip(), value.strip()
+        if key in urls and value:
+            urls[key] = value
+
+    return urls
 
 
 def is_enabled() -> bool:
@@ -97,6 +126,7 @@ class DemoAccountsView(APIView):
                 "enabled": True,
                 "staff": staff,
                 "customers": customers,
+                "apps": app_urls(),
                 "notice": "حسابات عرض — لا تُستخدم على نشر حقيقي.",
             }
         )
