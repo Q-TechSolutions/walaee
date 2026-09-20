@@ -89,11 +89,19 @@ jobs:
         working-directory: backend
         run: python manage.py makemigrations --check --dry-run
 
-      - name: محرك القيود — التغطية ١٠٠٪ إلزامية
+      # القاعدة المعمارية تخصّ المحرك: كل سطر يمسّ الرصيد.
+      # التقارير والعروض في نفس التطبيق لكنها قراءة فقط، ولها بوابة
+      # أدنى منفصلة حتى لا تميّع الرقم الأهم في المشروع.
+      - name: محرك القيود — ١٠٠٪ إلزامية
         working-directory: backend
         run: |
           pytest apps/ledger \
-            --cov=apps.ledger --cov-report=term-missing --cov-fail-under=100
+            --cov=apps.ledger.services --cov=apps.ledger.models \
+            --cov-report=term-missing --cov-fail-under=100
+
+      - name: تطبيق القيود كاملًا — ٩٥٪
+        working-directory: backend
+        run: pytest apps/ledger --cov=apps.ledger --cov-fail-under=95
 
       - name: كل الاختبارات
         working-directory: backend

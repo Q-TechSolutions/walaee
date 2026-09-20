@@ -171,6 +171,19 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": "/api/v1",
+    # عدة نماذج تسمّي حقلها `status`، والتسمية التلقائية تولّد
+    # أسماء مثل Status6e4Enum في العميل المولَّد — لا تُقرأ ولا تُصان.
+    "ENUM_NAME_OVERRIDES": {
+        "TransactionStatusEnum": "apps.ledger.models.Transaction.STATUS_CHOICES",
+        "RedemptionStatusEnum": "apps.ledger.models.Redemption.STATUS_CHOICES",
+        "CampaignStatusEnum": "apps.campaigns.models.Campaign.STATUS_CHOICES",
+        "MessageJobStatusEnum": "apps.campaigns.models.MessageJob.STATUS_CHOICES",
+        "SubscriptionStatusEnum": "apps.billing.models.Subscription.STATUS_CHOICES",
+        "InvoiceStatusEnum": "apps.billing.models.Invoice.STATUS_CHOICES",
+        "FraudSignalStatusEnum": "apps.fraud.models.FraudSignal.STATUS_CHOICES",
+        "MembershipStatusEnum": "apps.loyalty.models.Membership.STATUS_CHOICES",
+        "OrganizationStatusEnum": "apps.tenancy.models.Organization.STATUS_CHOICES",
+    },
 }
 
 # ═══════════════════════ Redis و Celery ═══════════════════════

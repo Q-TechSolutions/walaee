@@ -69,6 +69,7 @@ class Command(BaseCommand):
         # العمليات خارج المعاملة: كل واحدة تفتح معاملتها الخاصة داخل
         # محرك القيود، ولفّها بمعاملة أكبر يخفي أي خلل في القفل
         self._create_transactions(branches[0], staff["cashier"], customers, programs)
+        self._create_subscription(org)
 
         self._report(brand, staff, customers)
 
@@ -239,6 +240,30 @@ class Command(BaseCommand):
             )
             services.confirm_transaction(txn.id, staff_user=cashier)
 
+    # ── الاشتراك ورصيد الرسائل ─────────────────────────────
+
+    def _create_subscription(self, org):
+        """
+        باقة نمو برصيد رسائل — وإلا بدت كل شاشات الحملات معطّلة
+        والمطوّر لا يعرف أن السبب حدّ الباقة لا عطل في الكود.
+        """
+        from apps.billing.models import MessageCredit, Plan, Subscription
+        from apps.billing.services import apply_credit, get_subscription
+
+        subscription = get_subscription(org)
+        if subscription.plan != Plan.GROWTH:
+            subscription.plan = Plan.GROWTH
+            subscription.status = Subscription.STATUS_ACTIVE
+            subscription.save(update_fields=["plan", "status"])
+
+        if not MessageCredit.objects.filter(organization=org).exists():
+            apply_credit(
+                organization=org,
+                delta=3_000,
+                reason=MessageCredit.REASON_MONTHLY,
+                note="رصيد بذرة للتطوير",
+            )
+
     # ── التقرير ────────────────────────────────────────────
 
     def _report(self, brand, staff, customers):
@@ -256,6 +281,12 @@ class Command(BaseCommand):
         out.write(f"  العملاء      {len(customers)}")
         out.write(f"  العمليات     {Transaction.objects.count()}")
         out.write(f"  القيود       {LedgerEntry.objects.count()}")
+
+        from apps.billing.services import get_subscription, wallet_balance
+
+        subscription = get_subscription(brand.organization)
+        out.write(f"  الباقة       {subscription.get_plan_display()}")
+        out.write(f"  رصيد رسائل   {wallet_balance(brand.organization)}")
         out.write("")
         out.write("  حسابات الدخول — كلمة المرور: " + DEMO_PASSWORD)
         out.write("    مدير المنصة   +201000000000")
@@ -277,6 +308,15 @@ class Command(BaseCommand):
         الترتيب يتبع اتجاه المفاتيح الخارجية عكسيًا، و LedgerEntry
         يُحذف بـ queryset لأن الحذف على مستوى السجل ممنوع بالتصميم.
         """
+        from apps.billing.models import Invoice, MessageCredit, MessageWallet, Subscription
+        from apps.campaigns.models import Campaign, MessageJob
+
+        MessageJob.objects.all().delete()
+        Campaign.objects.all().delete()
+        Invoice.objects.all().delete()
+        MessageCredit.objects.all().delete()
+        MessageWallet.objects.all().delete()
+        Subscription.objects.all().delete()
         Redemption.objects.all().delete()
         LedgerEntry.objects.all().delete()
         Transaction.objects.all().delete()

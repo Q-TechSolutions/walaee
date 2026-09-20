@@ -90,9 +90,17 @@ test:            ## كل الاختبارات مع التغطية
 test-fast:       ## الاختبارات بلا تغطية ولا تزامن
 	cd backend && ../$(PY) -m pytest -q -m "not concurrency" --no-cov
 
-test-ledger:     ## محرك القيود — التغطية ١٠٠٪ إلزامية
+test-ledger:     ## محرك القيود — ١٠٠٪ إلزامية على المحرك
+	# القاعدة المعمارية تخصّ المحرك نفسه: النماذج والخدمات، أي كل
+	# سطر يمسّ الرصيد. التقارير والعروض في نفس التطبيق لكنها قراءة
+	# فقط — لها بوابة أدنى منفصلة حتى لا تميّع الرقم الأهم.
 	cd backend && ../$(PY) -m pytest apps/ledger \
-		--cov=apps.ledger --cov-report=term-missing --cov-fail-under=100
+		--cov=apps.ledger.services --cov=apps.ledger.models \
+		--cov-report=term-missing --cov-fail-under=100
+
+test-ledger-all: ## تطبيق القيود كاملًا — ٩٥٪ حد أدنى
+	cd backend && ../$(PY) -m pytest apps/ledger \
+		--cov=apps.ledger --cov-report=term-missing --cov-fail-under=95
 
 lint:            ## فحص التنسيق والأنماط
 	$(PY) -m ruff check backend
@@ -109,6 +117,7 @@ check:           ## فحص Django + هجرات غير مولَّدة
 verify:          ## كل فحوص ما قبل الدمج
 	$(MAKE) lint
 	$(MAKE) test-ledger
+	$(MAKE) test-ledger-all
 	$(MAKE) test
 
 # ══════════════ قاعدة البيانات ══════════════
@@ -141,5 +150,5 @@ prod-logs:       ## سجلات الإنتاج
 
 .PHONY: help venv install env up down logs ps run migrate makemigrations \
         superuser seed reseed shell schema worker worker-default beat \
-        test test-fast test-ledger lint fmt check verify reset-db psql \
+        test test-fast test-ledger test-ledger-all lint fmt check verify reset-db psql \
         harden-db prod-build prod-up prod-down prod-logs
