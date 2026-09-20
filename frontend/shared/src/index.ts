@@ -27,6 +27,8 @@ export {
   Spinner,
   Stat,
 } from "./ui/components";
+export { DemoAccountsPanel, useDemoAccounts } from "./ui/DemoAccounts";
+export type { DemoCustomer, DemoStaff } from "./ui/DemoAccounts";
 export {
   useAction,
   useApi,

@@ -17,12 +17,20 @@ export class WalaeeApiError extends Error {
   readonly status: number;
   readonly details?: unknown;
 
-  constructor(status: number, payload: ApiError | null, fallback: string) {
+  constructor(
+    status: number,
+    payload: ApiError | null,
+    fallback: string,
+    cause?: unknown,
+  ) {
     super(payload?.error?.message ?? fallback);
     this.name = "WalaeeApiError";
     this.status = status;
-    this.code = payload?.error?.code ?? "unknown_error";
+    // ‏0 يعني «لم يصل الطلب أصلًا»: تمييزه عن أخطاء الخادم يسمح
+    // للواجهة بعرض سبب مختلف تمامًا
+    this.code = payload?.error?.code ?? (status === 0 ? "network_error" : "unknown_error");
     this.details = payload?.error?.details;
+    if (cause !== undefined) this.cause = cause;
   }
 }
 
@@ -144,7 +152,21 @@ export async function request<T>(
   };
 
   const tokens = anonymous ? null : readTokens();
-  let response = await send(tokens?.access);
+
+  let response: Response;
+  try {
+    response = await send(tokens?.access);
+  } catch (cause) {
+    // fetch يرمي TypeError على كل فشل شبكة برسالة "Failed to fetch"
+    // لا تقول شيئًا للمستخدم ولا للمطوّر. الأسباب الفعلية محدودة
+    // ومعروفة، فتُذكَر بدل الرسالة الصمّاء.
+    throw new WalaeeApiError(
+      0,
+      null,
+      "تعذّر الوصول إلى الخادم. تأكد من اتصالك، ومن أن الخادم يعمل على نفس العنوان.",
+      cause,
+    );
+  }
 
   // 401 مرة واحدة يعني توكنًا منتهيًا — يُجرَّب التجديد ثم يُعاد
   // الطلب مرة واحدة فقط. تكرار المحاولة يحوّل انتهاء الجلسة إلى
@@ -186,6 +208,8 @@ export const api = {
     request<T>(path, { method: "PUT", body }),
   del: <T>(path: string) => request<T>(path, { method: "DELETE" }),
   anonymous: {
+    get: <T>(path: string, query?: RequestOptions["query"]) =>
+      request<T>(path, { method: "GET", query, anonymous: true }),
     post: <T>(path: string, body?: unknown) =>
       request<T>(path, { method: "POST", body, anonymous: true }),
   },

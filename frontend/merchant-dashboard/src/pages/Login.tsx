@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Button, ErrorBox, Field, useAction } from "@walaee/shared";
+import {
+  Button,
+  DemoAccountsPanel,
+  ErrorBox,
+  Field,
+  useAction,
+} from "@walaee/shared";
 
 import { actions } from "../lib/queries";
 import { saveSession } from "../lib/session";
@@ -15,22 +21,25 @@ export function Login() {
 
   const login = useAction(actions.login);
 
+  /** دخول مباشر بحساب تجربة — بلا كتابة. */
+  async function signIn(phoneValue: string, passwordValue: string) {
+    const session = await login.run(phoneValue.trim(), passwordValue);
+    if (session) {
+      saveSession(session);
+      // الكاشير يبدأ من شاشته: هي الشاشة الوحيدة التي يستخدمها
+      navigate(session.roles[0]?.role === "cashier" ? "/cashier" : "/", {
+        replace: true,
+      });
+    }
+  }
+
   return (
     <div className="auth">
       <form
         className="auth-card"
         onSubmit={async (event) => {
           event.preventDefault();
-          const session = await login.run(phone.trim(), password);
-          if (session) {
-            saveSession(session);
-            // الكاشير يبدأ من شاشته مباشرة: هي الشاشة الوحيدة
-            // التي يستخدمها، وإجباره على المرور باللوحة إهدار وقت
-            navigate(
-              session.roles[0]?.role === "cashier" ? "/cashier" : "/",
-              { replace: true },
-            );
-          }
+          await signIn(phone, password);
         }}
       >
         <div className="auth-brand">
@@ -70,6 +79,15 @@ export function Login() {
         <Button type="submit" size="lg" block loading={login.loading}>
           دخول
         </Button>
+
+        <DemoAccountsPanel
+          app="merchant"
+          onPick={({ phone: p, secret }) => {
+            setPhone(p);
+            setPassword(secret);
+            void signIn(p, secret);
+          }}
+        />
       </form>
     </div>
   );

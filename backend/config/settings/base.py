@@ -238,6 +238,9 @@ OTP_LENGTH = env_int("OTP_LENGTH", 6)
 # في هذه الأرقام وحدها — راجع apps/accounts/demo.py
 DEMO_LOGIN_PHONES = env_list("DEMO_LOGIN_PHONES", [])
 DEMO_LOGIN_CODE = env_str("DEMO_LOGIN_CODE", "")
+# كلمة مرور موظفي التجربة. ضبطها يجعل شاشات الدخول تعرضهم للدخول
+# بضغطة، وتركها فارغة يخفيهم تمامًا.
+DEMO_STAFF_PASSWORD = env_str("DEMO_STAFF_PASSWORD", "")
 
 SMS_PROVIDER = env_str("SMS_PROVIDER", "console")
 SMS_API_KEY = env_str("SMS_API_KEY", "")

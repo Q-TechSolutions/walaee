@@ -11,6 +11,7 @@ import { useState } from "react";
 import {
   Badge,
   Button,
+  DemoAccountsPanel,
   Empty,
   ErrorBox,
   Field,
@@ -96,17 +97,21 @@ function Login({ onDone }: { onDone: () => void }) {
   const [password, setPassword] = useState("");
   const login = useAction(actions.login);
 
+  async function signIn(phoneValue: string, passwordValue: string) {
+    const session = await login.run(phoneValue.trim(), passwordValue);
+    if (session) {
+      writeTokens({ access: session.access, refresh: session.refresh });
+      onDone();
+    }
+  }
+
   return (
     <div className="auth">
       <form
         className="auth-card"
         onSubmit={async (event) => {
           event.preventDefault();
-          const session = await login.run(phone.trim(), password);
-          if (session) {
-            writeTokens({ access: session.access, refresh: session.refresh });
-            onDone();
-          }
+          await signIn(phone, password);
         }}
       >
         <div className="auth-brand">
@@ -144,6 +149,15 @@ function Login({ onDone }: { onDone: () => void }) {
         <Button type="submit" size="lg" block loading={login.loading}>
           دخول
         </Button>
+
+        <DemoAccountsPanel
+          app="admin"
+          onPick={({ phone: p, secret }) => {
+            setPhone(p);
+            setPassword(secret);
+            void signIn(p, secret);
+          }}
+        />
       </form>
     </div>
   );

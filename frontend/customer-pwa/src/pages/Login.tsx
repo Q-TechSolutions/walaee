@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   Button,
+  DemoAccountsPanel,
   ErrorBox,
   api,
   useAction,
@@ -67,6 +68,18 @@ export function Login() {
   useEffect(() => {
     if (step === "code") codeInput.current?.focus();
   }, [step]);
+
+  /** دخول بضغطة من منتقي حسابات التجربة. */
+  async function pickDemo(account: { phone: string; secret: string }) {
+    setPhone(account.phone);
+    const result = await requestOtp.run(account.phone);
+    if (result?.code) {
+      setCode(result.code);
+      setDemoNotice(result.notice ?? "حساب تجربة — الكود مُدخَل تلقائيًا.");
+      setStep("code");
+      restartCountdown();
+    }
+  }
 
   async function submitPhone(event: React.FormEvent) {
     event.preventDefault();
@@ -150,6 +163,8 @@ export function Login() {
             بالمتابعة أنت توافق على تلقّي رسائل من المتاجر التي تنضم إليها.
             يمكنك إلغاء الموافقة في أي وقت من صفحة حسابك.
           </p>
+
+          <DemoAccountsPanel app="customer" onPick={pickDemo} />
         </form>
       ) : (
         <form className="login-card" onSubmit={submitCode}>

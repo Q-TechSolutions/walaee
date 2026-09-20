@@ -44,6 +44,14 @@ case "$1" in
     # سجل. أول ما يُكتشف رصيد لم ينتهِ بعد سنة من موعده.
     echo "▸ تثبيت جدول المهام الدورية …"
     python manage.py install_schedule
+
+    # حسابات التجربة تُنشأ تلقائيًا حين يكون النشر تجريبيًا.
+    # مطالبة من يجرّب المنتج بتشغيل أمر يدوي قبل أن يستطيع الدخول
+    # هي عقبة بلا سبب — ولن يفعلها أحد.
+    if [ -n "${DEMO_STAFF_PASSWORD:-}" ] || [ -n "${DEMO_LOGIN_PHONES:-}" ]; then
+        echo "▸ تهيئة حسابات التجربة …"
+        python manage.py demo_accounts --with-data             --password "${DEMO_STAFF_PASSWORD:-Walaee@2026}" ||             echo "  (تُخطّيت — راجع السجل)"
+    fi
     ;;
 esac
 

@@ -158,11 +158,15 @@ class Command(BaseCommand):
 
         organization = brand.organization
         subscription = get_subscription(organization)
+        expected_mrr = PLAN_LIMITS[Plan.GROWTH]["monthly_price"]
 
-        if subscription.plan != Plan.GROWTH:
+        # الشرط على الإيراد أيضًا لا على الباقة وحدها: اشتراك رُقّي
+        # سابقًا بلا ضبط mrr يبقى صفرًا إلى الأبد، فتعرض لوحة المنصة
+        # «MRR صفر» على مؤسسة مشتركة فعلًا — رقم خاطئ يقود قرارًا خاطئًا.
+        if subscription.plan != Plan.GROWTH or subscription.mrr != expected_mrr:
             subscription.plan = Plan.GROWTH
             subscription.status = Subscription.STATUS_ACTIVE
-            subscription.mrr = PLAN_LIMITS[Plan.GROWTH]["monthly_price"]
+            subscription.mrr = expected_mrr
             subscription.save(update_fields=["plan", "status", "mrr"])
 
         if not MessageCredit.objects.filter(organization=organization).exists():

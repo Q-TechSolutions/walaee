@@ -175,3 +175,74 @@
 .w-8 {
   font-weight: 800;
 }
+
+
+/* ══════════════ منتقي حسابات التجربة ══════════════
+   يظهر على النشر التجريبي وحده. مظهره مميّز عمدًا عن بقية
+   الشاشة: هو ليس جزءًا من المنتج بل أداة عرض مؤقتة. */
+
+.wl-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 14px;
+  border-radius: var(--r);
+  background: var(--violet-50);
+  border: 1px dashed var(--violet-300);
+}
+
+.wl-demo-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--violet-700);
+}
+
+.wl-demo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wl-demo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  text-align: start;
+  transition: border-color var(--t), transform var(--t);
+  /* هدف لمس كامل: يُستخدم على الجوال بإبهام مستعجل */
+  min-height: 44px;
+}
+
+.wl-demo-item:hover {
+  border-color: var(--violet-600);
+}
+
+.wl-demo-item:active {
+  transform: translateY(1px);
+}
+
+.wl-demo-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.wl-demo-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.wl-demo-note {
+  font-size: 11.5px;
+  color: var(--violet-700);
+  opacity: 0.8;
+}
