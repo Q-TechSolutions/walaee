@@ -7,7 +7,7 @@
   function at(seg) { return here.indexOf('/' + seg + '/') > -1; }
 
   var base = at('customer') || at('merchant') || at('admin') || at('plan') ||
-             at('architecture') || at('present') || at('team') || at('pricing') || at('solutions') || at('preview') ? '../' : './';
+             at('architecture') || at('present') || at('pricing') || at('preview') ? '../' : './';
 
   var ITEMS = [
     { k:'index',        l:'المعرض',    href: base + 'index.html',              ic:'grid'  },
@@ -16,11 +16,7 @@
     { k:'customer',     l:'العميل',    href: base + 'customer/index.html',     ic:'phone' },
     { k:'merchant',     l:'التاجر',    href: base + 'merchant/index.html',     ic:'store' },
     { k:'admin',        l:'الإدارة',   href: base + 'admin/index.html',        ic:'cog'   },
-    { k:'pricing',      l:'عرض السعر', href: base + 'pricing/index.html',      ic:'cash'  },
-    { k:'solutions',    l:'الحلول',    href: base + 'solutions/index.html',    ic:'check' },
-    { k:'plan',         l:'الخطة',     href: base + 'plan/index.html',         ic:'doc'   },
-    { k:'architecture', l:'المعمارية', href: base + 'architecture/index.html', ic:'code'  },
-    { k:'team',         l:'الفريق ⚠',  href: base + 'team/index.html',         ic:'users', int:true }
+    { k:'pricing',      l:'عرض السعر', href: base + 'pricing/index.html',      ic:'cash'  }
   ];
 
   var I = {
@@ -85,7 +81,7 @@
     '<div class="wsw-p" role="menu"><div class="hd">تنقّل سريع</div>' +
     ITEMS.map(function (it) {
       var on = (it.k === 'index') ? (!at('customer') && !at('merchant') && !at('admin') && !at('plan') &&
-                                     !at('architecture') && !at('present') && !at('team') && !at('pricing') && !at('solutions') && !at('preview')) : at(it.k);
+                                     !at('present') && !at('pricing') && !at('preview')) : at(it.k);
       return '<a class="wsw-a' + (on ? ' on' : '') + (it.int ? ' intl' : '') + '" role="menuitem" href="' + it.href + '">' +
              svg(it.ic) + '<span>' + it.l + '</span></a>';
     }).join('') + '</div>';

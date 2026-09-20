@@ -1,92 +1,71 @@
 <div align="center">
 
-# walaee-demo · العرض والتخطيط
+# walaee · ولائي
 
 **كلنا كسبانين**
 
-النموذج التفاعلي · العرض التقديمي · التقارير · عرض السعر
+منصة إدارة برامج الولاء
 
 </div>
 
 ---
 
-> 📦 **هذا مستودع العرض فقط.**
-> الكود الفعلي للمنصة في مستودع منفصل:
-> **[github.com/mohamedN2018/walaee](https://github.com/mohamedN2018/walaee)**
-
----
-
-## الفروع
-
-| الفرع | المحتوى | يُخدَم على |
-|---|---|---|
-| `main` | كل شيء — العرض والتخطيط والتقارير الداخلية | `/demo/` |
-| `client` | نسخة العميل المقصوصة — مولَّدة آليًا من `main` | `/` |
-
-**فرع `client` لا يُعدَّل يدويًا.** عدّل `main` ثم أعد التوليد:
-
-```bash
-bash scripts/make-client-branch.sh
-git push -f origin client
-```
+> ⚠️ **هذا الفرع مولَّد آليًا — لا تعدّله يدويًا.**
+> أي تعديل هنا يُمحى عند إعادة التوليد. عدّل فرع `main` ثم شغّل
+> `bash scripts/make-client-branch.sh`.
 
 ---
 
 ## المحتوى
 
-```
-docs/
-├── demo/                    النموذج التفاعلي — ٣٠ شاشة
-│   ├── index.html             الفهرس
-│   ├── present/               العرض التقديمي — ١٨ شريحة
-│   ├── preview/               تصفّح الواجهات داخل إطارات أجهزة
-│   ├── customer/              تطبيق العميل — ١٢ شاشة
-│   ├── merchant/              لوحة صاحب المتجر — ١١ شاشة
-│   ├── admin/                 لوحة إدارة المنصة — ٧ شاشات
-│   ├── architecture/          المخطط المعماري ونموذج البيانات
-│   ├── plan/                  خطة التنفيذ — ٦ مراحل
-│   ├── solutions/             من المشكلة إلى الشاشة — ١٦ حلًّا
-│   ├── pricing/               عرض السعر والباقات
-│   ├── team/                  دليل الفريق (داخلي)
-│   └── assets/                نظام التصميم
-│
-├── reports/                 التقارير PDF ومصادرها
-└── planning/                القرارات والنطاق المعتمد
-```
+نسخة العرض المخصّصة للعميل. تُخدَم على **الجذر `/`**.
 
----
+| المسار | المحتوى |
+|---|---|
+| `/` | الصفحة الرئيسية |
+| `/present/` | **العرض التقديمي** — ١٨ شريحة |
+| `/preview/` | تصفّح الواجهات داخل إطارات أجهزة |
+| `/customer/` | تطبيق العميل — PWA |
+| `/merchant/` | لوحة صاحب المتجر |
+| `/admin/` | لوحة إدارة المنصة |
+| `/pricing/` | عرض السعر والباقات |
+| `/reports/Walaee_Pricing_Proposal_AR.pdf` | عرض السعر — PDF |
+| `/healthz` | فحص صحي |
 
-## التشغيل محليًا
+## غير موجود في هذا الفرع إطلاقًا
 
-```bash
-docker build -t walaee-demo .
-docker run -d -p 8090:80 walaee-demo
-# http://localhost:8090/demo/
-```
+هذه الملفات **محذوفة من الفرع ومن الصورة** — ليست مخفية ولا غير مرتبطة فقط:
 
-بدون Docker — أي خادم ثابت:
+- خطة التطوير
+- المخطط البرمجي والمعماري
+- دليل الفريق ودورة التطوير
+- تتبّع الحلول
+- التحليل الشامل (PDF)
+- الوثيقة الأصلية (PDF)
+- قرارات التخطيط والنطاق
+- هيكلة المشروع وكود المصدر
 
-```bash
-python -m http.server 8090 --directory docs
-# http://localhost:8090/demo/
-```
+بالإضافة إلى ذلك يحجب `nginx` أي مسار يحاول الوصول إليها ويعيد `404`،
+ويضيف `X-Robots-Tag: noindex, nofollow` على كل الصفحات فلا تظهر في محركات البحث.
 
 ---
 
 ## النشر على Dokploy
 
-| | `main` | `client` |
-|---|---|---|
-| النطاق | `walaee.deplois.net` | `walae.deplois.net` |
-| Path | `/` (يحوّل إلى `/demo/`) | `/` |
-| Build | Dockerfile في الجذر | Dockerfile في الجذر |
+1. **Create → Compose**
+2. المستودع: `mohamedN2018/walaee` · **الفرع: `client`**
+3. **Compose Path:** `docker-compose.yml`
+4. **Domains:**
+   - Host: نطاقك المستقل
+   - **Path: `/`**
+   - Service: `web` · Container Port: `80`
+   - فعّل HTTPS
+5. **Deploy**
 
-التفاصيل في [`docs/DEPLOY-DEMO.md`](docs/DEPLOY-DEMO.md).
+## تشغيل محلي
 
----
-
-<div align="center">
-
-**ولائي… كلنا كسبانين.**
-
-</div>
+```bash
+docker build -t walaee-client .
+docker run -d -p 8095:80 walaee-client
+# http://localhost:8095/
+```

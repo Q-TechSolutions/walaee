@@ -1,15 +1,13 @@
-# ============================================================
-#  walaee — نموذج العرض التفاعلي (Static Demo)
-#  صورة nginx خفيفة تخدم معرض الواجهات + العرض التقديمي + التقارير
-#  جاهزة للنشر على Dokploy / Coolify / أي مضيف يدعم Docker
-# ============================================================
+# ══════════════════════════════════════════════════════════════
+#  ولائي — نسخة العميل
+#  تُخدَم على الجذر /  ولا تحتوي إلا ما يُعرض على العميل.
+#  المحتوى المحذوف غير موجود في الصورة أصلًا — لا مجرد غير مرتبط.
+# ══════════════════════════════════════════════════════════════
 FROM nginx:1.27-alpine
 
-LABEL org.opencontainers.image.title="walaee-demo" \
-      org.opencontainers.image.description="ولائي — معرض الواجهات والعرض التقديمي" \
-      org.opencontainers.image.vendor="walaee"
+LABEL org.opencontainers.image.title="walaee-client" \
+      org.opencontainers.image.description="ولائي — العرض التقديمي والواجهات وعرض السعر"
 
-# منطقة زمنية وأدوات الفحص الصحي
 RUN apk add --no-cache tzdata curl \
  && cp /usr/share/zoneinfo/Africa/Cairo /etc/localtime \
  && echo "Africa/Cairo" > /etc/timezone \
@@ -20,15 +18,19 @@ RUN sed -i 's/^worker_processes.*/worker_processes 2;/' /etc/nginx/nginx.conf
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# الواجهات
-COPY docs/demo/ /usr/share/nginx/html/demo/
+# الواجهات على الجذر مباشرة
+COPY docs/demo/index.html    /usr/share/nginx/html/
+COPY docs/demo/assets/       /usr/share/nginx/html/assets/
+COPY docs/demo/present/      /usr/share/nginx/html/present/
+COPY docs/demo/preview/      /usr/share/nginx/html/preview/
+COPY docs/demo/customer/     /usr/share/nginx/html/customer/
+COPY docs/demo/merchant/     /usr/share/nginx/html/merchant/
+COPY docs/demo/admin/        /usr/share/nginx/html/admin/
+COPY docs/demo/pricing/      /usr/share/nginx/html/pricing/
 
-# التقارير (المعرض يربط عليها بمسار نسبي ../)
-# كل ملفات PDF — نمط عام حتى لا يُنسى ملف جديد لاحقًا
-COPY docs/reports/*.pdf /usr/share/nginx/html/
-COPY docs/reports/*.pdf /usr/share/nginx/html/reports/
+# المستند الوحيد المسموح
+COPY docs/reports/Walaee_Pricing_Proposal_AR.pdf /usr/share/nginx/html/reports/
 
-# nginx:alpine يشتغل بمستخدم غير جذري داخليًا عبر master/worker
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \

@@ -1,46 +1,29 @@
-# ============================================================
-#  walaee — نشر نموذج العرض على Dokploy
-#  Dokploy > Create > Compose > اربط المستودع واختر هذا الملف
-# ============================================================
+# ولائي — نسخة العميل · تُنشر على نطاق مستقل بمسار /
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile
-    image: walaee-demo:latest
-    container_name: walaee-demo
+    image: walaee-client:latest
+    container_name: walaee-client
     restart: unless-stopped
-
-    # Dokploy يوجّه الترافيك عبر Traefik تلقائيًا للمنفذ الداخلي 80.
-    # لو بتشغّله محليًا أو محتاج منفذ مكشوف، فعّل السطرين التاليين:
-    # ports:
-    #   - "3000:80"
     expose:
       - "80"
-
     environment:
       TZ: Africa/Cairo
-
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 5s
-
     logging:
       driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-
+      options: { max-size: "10m", max-file: "3" }
     labels:
-      - "dokploy.app=walaee-demo"
+      - "dokploy.app=walaee-client"
       - "traefik.enable=true"
-      - "traefik.http.services.walaee-demo.loadbalancer.server.port=80"
-
+      - "traefik.http.services.walaee-client.loadbalancer.server.port=80"
     deploy:
       resources:
-        limits:
-          cpus: "1.0"
-          memory: 256M
+        limits: { cpus: "1.0", memory: 256M }
