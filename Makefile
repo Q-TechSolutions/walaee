@@ -150,6 +150,18 @@ reset-db:        ## حذف قاعدة البيانات وإعادة إنشائه
 psql:            ## صدفة psql
 	$(COMPOSE) exec postgres psql -U walaee -d walaee
 
+verify-ledger:   ## تدقيق سلامة كل الأرصدة مقابل قيودها
+	$(MANAGE) verify_ledger
+
+schedule:        ## تثبيت جدول المهام الدورية
+	$(MANAGE) install_schedule
+
+backup:          ## نسخة احتياطية من قاعدة الإنتاج
+	bash infra/scripts/backup.sh
+
+restore:         ## استرجاع نسخة — restore FILE=backups/x.sql.gz
+	bash infra/scripts/restore.sh $(FILE)
+
 harden-db:       ## تطبيق حارس append-only (للإنتاج لا للتطوير)
 	$(COMPOSE) exec -T postgres psql -U walaee -d walaee \
 		< infra/postgres/02-append-only.sql
@@ -172,4 +184,4 @@ prod-logs:       ## سجلات الإنتاج
         web-install web-customer web-merchant web-admin web-build \
         superuser seed reseed shell schema worker worker-default beat \
         test test-fast test-ledger test-ledger-all lint fmt check verify reset-db psql \
-        harden-db prod-build prod-up prod-down prod-logs
+        harden-db verify-ledger schedule backup restore \n        prod-build prod-up prod-down prod-logs

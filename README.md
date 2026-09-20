@@ -12,9 +12,39 @@
 
 ---
 
-> 🛠 **هذا مستودع المنتج — الكود الفعلي.**
-> العرض التقديمي والنموذج التفاعلي والتقارير في مستودع منفصل:
-> **[github.com/mohamedN2018/walaee-demo](https://github.com/mohamedN2018/walaee-demo)**
+> 🛠 **أنت على فرع `main` — الإنتاج.**
+> العرض التقديمي والنموذج التفاعلي على فرعَي `demo` و `client`،
+> ولا يتقاطعان مع هذا الفرع في أي ملف.
+
+---
+
+## الفروع — ثلاثة منفصلة تمامًا
+
+| الفرع | ماذا يحوي | يُنشَر على |
+|---|---|---|
+| **`main`** | 🛠 **الإنتاج** — backend · frontend · infra | نطاق المنصة |
+| **`demo`** | 📘 العرض الكامل — النموذج التفاعلي والتقارير والتحليل | نطاق داخلي |
+| **`client`** | 👁 العرض المصغّر — ما يراه العميل فقط | نطاق العميل |
+
+**لا يوجد أي تداخل:** فرع الإنتاج لا يحوي ملف عرض واحد، وفرعا العرض
+لا يحويان سطر كود منتج. تحقّق بنفسك:
+
+```bash
+git ls-tree --name-only main     # backend frontend infra …
+git ls-tree --name-only demo     # docs Dockerfile nginx.conf …
+git ls-tree --name-only client   # docs Dockerfile nginx.conf
+```
+
+`client` **مولَّد آليًا** من `demo` ولا يُعدَّل يدويًا:
+
+```bash
+git checkout demo
+bash scripts/make-client-branch.sh
+git push -f origin client
+```
+
+السكربت يحذف الخطة والمعمارية والفريق والحلول والتحليل الشامل، ثم
+**يفشل** إن بقيت أي إشارة إليها.
 
 ---
 

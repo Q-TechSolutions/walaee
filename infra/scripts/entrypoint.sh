@@ -38,6 +38,12 @@ case "$1" in
     python manage.py migrate --noinput
     echo "▸ تجميع الملفات الثابتة …"
     python manage.py collectstatic --noinput --clear
+
+    # المجدول يقرأ جدوله من قاعدة البيانات، وقاعدة جديدة تبدأ
+    # فارغة — فيعمل beat بلا أن ينفّذ شيئًا ولا يظهر ذلك في أي
+    # سجل. أول ما يُكتشف رصيد لم ينتهِ بعد سنة من موعده.
+    echo "▸ تثبيت جدول المهام الدورية …"
+    python manage.py install_schedule
     ;;
 esac
 
