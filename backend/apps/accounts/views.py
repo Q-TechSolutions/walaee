@@ -16,9 +16,11 @@ from .serializers import (
     CustomerSerializer,
     OtpRequestSerializer,
     OtpVerifySerializer,
+    StaffLoginSerializer,
     TokenPairSerializer,
+    TokenRefreshSerializer,
 )
-from .throttles import OtpIpThrottle, OtpPhoneThrottle
+from .throttles import OtpIpThrottle, OtpPhoneThrottle, StaffLoginThrottle
 
 
 def _client_ip(request) -> str | None:
@@ -78,5 +80,56 @@ class OtpVerifyView(APIView):
                 "is_new": created,
                 "customer": CustomerSerializer(customer).data,
             },
+            status=status.HTTP_200_OK,
+        )
+
+
+class StaffLoginView(APIView):
+    """
+    دخول الموظفين بالهاتف وكلمة المرور.
+
+    منفصل عن دخول العملاء: الموظف يدخل من جهاز ثابت في المتجر عدة
+    مرات يوميًا، وإرسال رسالة في كل مرة تكلفة بلا فائدة. العميل
+    يدخل من هاتفه ولا كلمة مرور له أصلًا.
+    """
+
+    permission_classes = [AllowAny]
+    throttle_classes = [StaffLoginThrottle]
+
+    @extend_schema(
+        request=StaffLoginSerializer,
+        responses={200: TokenPairSerializer},
+        summary="دخول موظف",
+    )
+    def post(self, request):
+        serializer = StaffLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        result = services.login_staff(phone=data["phone"], password=data["password"])
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class TokenRefreshView(APIView):
+    """
+    تجديد توكن الوصول.
+
+    يعمل لهويتَي الموظف والعميل: يقرأ `scope` من توكن التحديث
+    ويعيد بناء الوصول بنفس الادّعاءات.
+    """
+
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        request=TokenRefreshSerializer,
+        responses={200: TokenPairSerializer},
+        summary="تجديد توكن الوصول",
+    )
+    def post(self, request):
+        serializer = TokenRefreshSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(
+            services.refresh_tokens(serializer.validated_data["refresh"]),
             status=status.HTTP_200_OK,
         )

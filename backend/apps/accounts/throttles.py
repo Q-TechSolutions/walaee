@@ -59,3 +59,22 @@ class OtpIpThrottle(WindowThrottle):
             "scope": self.scope,
             "ident": self.get_ident(request),
         }
+
+
+class StaffLoginThrottle(WindowThrottle):
+    """
+    ١٠ محاولات دخول لكل رقم خلال ١٥ دقيقة.
+
+    أوسع من OTP لأن الموظف يخطئ في كلمة مروره بشكل طبيعي، وأضيق
+    بكثير من اللانهاية لأن حساب الكاشير يفتح باب تأكيد العمليات.
+    """
+
+    scope = "staff_login"
+    num_requests = 10
+    duration = 15 * 60
+
+    def get_cache_key(self, request, view):
+        phone = (request.data or {}).get("phone")
+        if not phone:
+            return None
+        return self.cache_format % {"scope": self.scope, "ident": phone}

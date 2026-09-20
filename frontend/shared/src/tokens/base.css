@@ -1,0 +1,323 @@
+/* ══════════════════════════════════════════════════════════
+   الأساس المشترك: إعادة الضبط والمكوّنات الأوّلية.
+
+   قاعدة عربية غير قابلة للكسر: **لا `letter-spacing` على نص عربي.**
+   الحروف العربية متصلة، وأي تباعد يفكّ الاتصال فتظهر الكلمة
+   مقطّعة. التباعد السالب مسموح على العناوين اللاتينية فقط.
+   ══════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink);
+  background: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  line-height: 1.4;
+  font-weight: 800;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* حركة أقل لمن طلبها — شرط وصول لا تحسين */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ══════════════ الأرقام ══════════════
+   الأرقام تُعرض لاتينية بـ direction:ltr حتى داخل نص عربي.
+   بدونها ينعكس ترتيب خانات المبلغ في بعض المتصفحات فيقرأ
+   الكاشير ١٢٣ على أنها ٣٢١ — خطأ صامت في شاشة مالية. */
+.num {
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  display: inline-block;
+  unicode-bidi: isolate;
+}
+
+/* ══════════════ مكوّنات أوّلية ══════════════ */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-1);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.between {
+  justify-content: space-between;
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.faint {
+  color: var(--faint);
+}
+
+/* ── الأزرار ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: var(--r);
+  font-weight: 700;
+  font-size: 14px;
+  transition: var(--t);
+  transition-property: background, border-color, transform, opacity;
+  /* الحد الأدنى لهدف اللمس — شاشة الكاشير تُستخدم بإبهام مستعجل */
+  min-height: 44px;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--violet-700);
+  color: #fff;
+  box-shadow: var(--sh-brand);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--violet-800);
+}
+
+.btn-ghost {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--violet-300);
+}
+
+.btn-danger {
+  background: var(--red-600);
+  color: #fff;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-lg {
+  padding: 15px 24px;
+  font-size: 16px;
+  min-height: 52px;
+}
+
+/* ── الحقول ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field > label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  transition: border-color var(--t);
+  min-height: 46px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--violet-600);
+  box-shadow: 0 0 0 3px var(--violet-100);
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--red-600);
+}
+
+/* ── الشارات ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-violet {
+  background: var(--violet-100);
+  color: var(--violet-700);
+}
+.badge-green {
+  background: var(--green-100);
+  color: var(--green-700);
+}
+.badge-orange {
+  background: var(--orange-100);
+  color: var(--orange-600);
+}
+.badge-red {
+  background: var(--red-100);
+  color: var(--red-600);
+}
+.badge-amber {
+  background: var(--amber-100);
+  color: var(--amber-600);
+}
+.badge-blue {
+  background: var(--blue-100);
+  color: var(--blue-600);
+}
+.badge-muted {
+  background: var(--line-2);
+  color: var(--muted);
+}
+
+/* ── الحالات ── */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: var(--sp-5) var(--sp-3);
+  text-align: center;
+  color: var(--muted);
+}
+
+.empty-icon {
+  font-size: 34px;
+  opacity: 0.5;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--line-2) 25%,
+    var(--line) 37%,
+    var(--line-2) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+  border-radius: var(--r-sm);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* ── إمكانية الوصول ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--violet-600);
+  outline-offset: 2px;
+}

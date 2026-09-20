@@ -82,6 +82,23 @@ beat:            ## مجدول المهام — نسخة واحدة فقط
 	cd backend && ../$(PY) -m celery -A config beat \
 		--scheduler django_celery_beat.schedulers:DatabaseScheduler -l info
 
+# ══════════════ الواجهات ══════════════
+
+web-install:     ## تثبيت اعتماديات الواجهات
+	cd frontend && npm install
+
+web-customer:    ## تطبيق العميل — 5173
+	cd frontend && npm run dev:customer
+
+web-merchant:    ## لوحة المتجر — 5174
+	cd frontend && npm run dev:merchant
+
+web-admin:       ## لوحة إدارة المنصة — 5175
+	cd frontend && npm run dev:admin
+
+web-build:       ## بناء التطبيقات الثلاثة للإنتاج
+	cd frontend && npm run build
+
 # ══════════════ الجودة ══════════════
 
 test:            ## كل الاختبارات مع التغطية
@@ -116,6 +133,7 @@ check:           ## فحص Django + هجرات غير مولَّدة
 
 verify:          ## كل فحوص ما قبل الدمج
 	$(MAKE) lint
+	$(MAKE) web-build
 	$(MAKE) test-ledger
 	$(MAKE) test-ledger-all
 	$(MAKE) test
@@ -149,6 +167,7 @@ prod-logs:       ## سجلات الإنتاج
 	$(PROD) logs -f --tail=100
 
 .PHONY: help venv install env up down logs ps run migrate makemigrations \
+        web-install web-customer web-merchant web-admin web-build \
         superuser seed reseed shell schema worker worker-default beat \
         test test-fast test-ledger test-ledger-all lint fmt check verify reset-db psql \
         harden-db prod-build prod-up prod-down prod-logs

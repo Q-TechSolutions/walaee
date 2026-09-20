@@ -21,6 +21,15 @@ class OtpVerifySerializer(serializers.Serializer):
     consent_version = serializers.CharField(max_length=20, required=False, allow_blank=True)
 
 
+class StaffLoginSerializer(serializers.Serializer):
+    phone = PhoneField(max_length=20)
+    password = serializers.CharField(max_length=128, trim_whitespace=False)
+
+
+class TokenRefreshSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+
+
 class TokenPairSerializer(serializers.Serializer):
     access = serializers.CharField()
     refresh = serializers.CharField()

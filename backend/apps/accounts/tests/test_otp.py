@@ -1,6 +1,7 @@
 """دورة OTP كاملة: طلب · تحقق · دخول."""
 
 import pytest
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 
@@ -166,3 +167,112 @@ class TestAnonymize:
         assert customer.consent_at is None
         assert customer.phone.startswith("deleted-")
         assert customer.is_deleted
+
+
+class TestStaffLogin:
+    """
+    دخول الموظفين منفصل عن دخول العملاء: الكاشير يدخل من جهاز ثابت
+    عشرات المرات يوميًا، وإرسال رسالة في كل مرة تكلفة بلا فائدة.
+    """
+
+    @pytest.fixture
+    def cashier_account(self, db):
+        from tests import factories
+
+        staff = factories.StaffUserFactory()
+        staff.user.set_password("secret-pass-9")
+        staff.user.save(update_fields=["password"])
+        return staff
+
+    def test_valid_credentials_return_tokens_and_roles(self, cashier_account):
+        from apps.accounts.services import login_staff
+
+        result = login_staff(phone=cashier_account.user.phone, password="secret-pass-9")
+
+        assert "access" in result and "refresh" in result
+        assert result["user"]["phone"] == cashier_account.user.phone
+        assert result["roles"][0]["role"] == "cashier"
+        assert result["roles"][0]["brand_name"]
+
+    def test_wrong_password_rejected(self, cashier_account):
+        from apps.accounts.services import InvalidCredentials, login_staff
+
+        with pytest.raises(InvalidCredentials):
+            login_staff(phone=cashier_account.user.phone, password="nope")
+
+    def test_unknown_phone_gives_same_error(self):
+        """التمييز بين رقم مجهول وكلمة مرور خاطئة يسمح بتعداد الحسابات."""
+        from apps.accounts.services import InvalidCredentials, login_staff
+
+        with pytest.raises(InvalidCredentials):
+            login_staff(phone="01099999999", password="whatever")
+
+    def test_inactive_user_rejected(self, cashier_account):
+        from apps.accounts.services import InvalidCredentials, login_staff
+
+        cashier_account.user.is_active = False
+        cashier_account.user.save(update_fields=["is_active"])
+
+        with pytest.raises(InvalidCredentials):
+            login_staff(phone=cashier_account.user.phone, password="secret-pass-9")
+
+    def test_user_without_role_rejected(self):
+        from apps.accounts.services import NoStaffRole, login_staff
+
+        User = get_user_model()
+        user = User.objects.create_user(phone="01088776655", password="secret-pass-9")
+
+        with pytest.raises(NoStaffRole):
+            login_staff(phone=user.phone, password="secret-pass-9")
+
+    def test_platform_admin_without_role_allowed(self):
+        """مدير المنصة لا يملك دورًا في أي متجر — وهذا طبيعي."""
+        from apps.accounts.services import login_staff
+
+        User = get_user_model()
+        user = User.objects.create_user(
+            phone="01077665544", password="secret-pass-9", is_platform_admin=True
+        )
+
+        result = login_staff(phone=user.phone, password="secret-pass-9")
+
+        assert result["roles"] == []
+        assert result["user"]["is_platform_admin"] is True
+
+
+class TestTokenRefresh:
+    def test_staff_refresh_keeps_scope(self, db):
+        from rest_framework_simplejwt.tokens import AccessToken
+
+        from apps.accounts.services import issue_tokens_for_user, refresh_tokens
+        from tests import factories
+
+        staff = factories.StaffUserFactory()
+        tokens = issue_tokens_for_user(staff.user)
+
+        refreshed = refresh_tokens(tokens["refresh"])
+
+        assert AccessToken(refreshed["access"])["scope"] == "staff"
+
+    def test_customer_refresh_keeps_scope(self, customer):
+        """
+        بلا حفظ scope يفقد توكن العميل تمييزه فتفشل مصادقته بعد أول
+        تجديد — عطل يظهر بعد ١٥ دقيقة من الاستخدام لا فورًا.
+        """
+        from rest_framework_simplejwt.tokens import AccessToken
+
+        from apps.accounts.services import issue_tokens_for_customer, refresh_tokens
+
+        tokens = issue_tokens_for_customer(customer)
+
+        refreshed = refresh_tokens(tokens["refresh"])
+        access = AccessToken(refreshed["access"])
+
+        assert access["scope"] == "customer"
+        assert access["user_id"] == str(customer.id)
+
+    def test_garbage_token_rejected(self, db):
+        from apps.accounts.services import InvalidRefreshToken, refresh_tokens
+
+        with pytest.raises(InvalidRefreshToken):
+            refresh_tokens("not-a-token")

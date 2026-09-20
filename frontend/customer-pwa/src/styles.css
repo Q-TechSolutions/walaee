@@ -1,0 +1,656 @@
+/* ══════════════════════════════════════════════════════════
+   تطبيق العميل — أنماط خاصة بالجوال.
+
+   الهاتف هو الجهاز الوحيد المستهدف هنا: لا يوجد مستخدم يفتح
+   محفظة ولاء على شاشة مكتب. التصميم يبدأ من ٣٢٠ بكسل ويتوسّع
+   بحد أقصى إلى ٥٢٠ في المنتصف.
+   ══════════════════════════════════════════════════════════ */
+
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas);
+}
+
+.app-main {
+  flex: 1;
+  /* حجز مساحة الشريط السفلي + المنطقة الآمنة، وإلا غطّى الشريط
+     آخر عنصر في القائمة ولم يصل إليه المستخدم أبدًا */
+  padding-bottom: calc(var(--tabbar-h) + var(--safe-b) + 12px);
+}
+
+.page {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 18px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.page > h1 {
+  font-size: 22px;
+}
+
+.mb {
+  margin-bottom: 0;
+}
+
+.stack.gap {
+  gap: 12px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section > h2 {
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.link {
+  color: var(--violet-700);
+  font-weight: 700;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.center {
+  text-align: center;
+  align-self: center;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.back-link {
+  align-self: flex-start;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ══════════════ الدخول ══════════════ */
+
+.login {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: 24px 18px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.login-brand {
+  text-align: center;
+}
+
+.login-mark {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 12px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: var(--violet-700);
+  color: #fff;
+  font-size: 30px;
+  box-shadow: var(--sh-brand);
+}
+
+.login-brand h1 {
+  font-size: 30px;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-2);
+}
+
+.login-card h2 {
+  font-size: 19px;
+}
+
+.code-input {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  padding: 14px;
+}
+
+/* التباعد هنا آمن: الحقل يقبل أرقامًا ولاتينية فقط، ولا حرف
+   عربي واحد يمر به فلا يوجد اتصال يُكسَر. */
+
+.amount-input {
+  font-size: 26px;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ══════════════ الرئيسية ══════════════ */
+
+.home-hd {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-hd h1 {
+  font-size: 26px;
+}
+
+.home-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: var(--r);
+  background: var(--violet-100);
+  color: var(--violet-700);
+  line-height: 1.2;
+}
+
+.home-chip .num {
+  font-size: 19px;
+}
+
+.alert-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--r);
+  background: var(--orange-50);
+  border: 1px solid var(--orange-100);
+  color: var(--orange-600);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+/* ══════════════ البطاقات ══════════════ */
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.loyalty-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border-radius: var(--r-xl);
+  color: #fff;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    var(--brand, var(--violet-700)),
+    color-mix(in srgb, var(--brand, var(--violet-700)) 70%, #000)
+  );
+  box-shadow: var(--sh-2);
+  transition: transform var(--t);
+}
+
+.loyalty-card:active {
+  transform: scale(0.985);
+}
+
+/* لمعة قطرية خفيفة تعطي إحساس البطاقة البلاستيكية */
+.loyalty-card::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -40px;
+  top: -60px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.loyalty-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  position: relative;
+}
+
+.loyalty-card-name {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.loyalty-card-tier {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.loyalty-card-balance {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  position: relative;
+}
+
+.loyalty-card-balance .num {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.loyalty-card-unit {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.loyalty-card-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.8;
+  position: relative;
+}
+
+.loyalty-card-expiry {
+  position: relative;
+  align-self: flex-start;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ══════════════ تفاصيل البطاقة ══════════════ */
+
+.detail-hero {
+  padding: 22px 18px;
+  border-radius: var(--r-xl);
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    var(--brand, var(--violet-700)),
+    color-mix(in srgb, var(--brand, var(--violet-700)) 70%, #000)
+  );
+  box-shadow: var(--sh-2);
+}
+
+.detail-hero h1 {
+  font-size: 24px;
+  margin-bottom: 14px;
+}
+
+.detail-balances {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.detail-balance {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.detail-balance .num {
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.detail-program {
+  opacity: 0.75;
+}
+
+.detail-meta {
+  margin-top: 14px;
+  opacity: 0.8;
+}
+
+/* ══════════════ المكافآت ══════════════ */
+
+.reward-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.reward-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  min-width: 96px;
+}
+
+.reward-bar {
+  width: 92px;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--line);
+  overflow: hidden;
+}
+
+.reward-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-full);
+  background: var(--violet-600);
+  transition: width 0.4s ease-out;
+}
+
+.code-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--r-lg);
+  background: var(--green-50);
+  border: 1px solid var(--green-100);
+}
+
+.code-card-code {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.code-card-code .num {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--green-700);
+}
+
+.redeem-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.redeem-code {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 5px;
+  color: var(--violet-700);
+  padding: 12px 20px;
+  border-radius: var(--r);
+  background: var(--violet-50);
+  border: 2px dashed var(--violet-300);
+}
+
+/* ══════════════ النشاط ══════════════ */
+
+.activity {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity > li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 4px;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.activity > li:last-child {
+  border-bottom: none;
+}
+
+.activity-delta {
+  min-width: 58px;
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.activity-delta.plus {
+  color: var(--green-600);
+}
+
+.activity-delta.minus {
+  color: var(--red-600);
+}
+
+/* ══════════════ المسح ══════════════ */
+
+.qr {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#qr-reader {
+  width: 100%;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.qr-idle {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.qr-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+}
+
+.qr-placeholder > span {
+  font-size: 54px;
+  color: var(--violet-300);
+}
+
+.manual-code {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line-2);
+}
+
+.scan-brand {
+  padding: 18px;
+  border-radius: var(--r-lg);
+  color: #fff;
+  background: var(--brand, var(--violet-700));
+}
+
+.scan-brand h2 {
+  font-size: 21px;
+}
+
+.scan-balance {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 14px;
+}
+
+.waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: var(--sp-4) 10px;
+}
+
+.waiting h2 {
+  font-size: 20px;
+}
+
+.waiting-pulse {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--violet-100);
+  position: relative;
+}
+
+.waiting-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--violet-600);
+  animation: wait-ring 1.6s ease-out infinite;
+}
+
+@keyframes wait-ring {
+  0% {
+    transform: scale(0.7);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+/* ══════════════ المتاجر ══════════════ */
+
+.store-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.store-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brand, var(--violet-600));
+  flex: none;
+}
+
+/* ══════════════ الحساب ══════════════ */
+
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.profile-avatar {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--violet-100);
+  color: var(--violet-700);
+  font-size: 22px;
+  font-weight: 800;
+  flex: none;
+}
+
+.privacy-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+/* ══════════════ الشريط السفلي ══════════════ */
+
+.tabbar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  height: calc(var(--tabbar-h) + var(--safe-b));
+  padding-bottom: var(--safe-b);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--faint);
+  font-size: 10.5px;
+  font-weight: 700;
+  transition: color var(--t);
+}
+
+.tab-icon {
+  font-size: 19px;
+  line-height: 1;
+}
+
+.tab-active {
+  color: var(--violet-700);
+}
+
+/* زر المسح مرفوع: الإجراء الوحيد الذي يُستخدم والعميل واقف عند
+   الصندوق، ويجب أن يُصاب بالإبهام بلا نظر */
+.tab-primary {
+  position: relative;
+}
+
+.tab-primary .tab-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-top: -22px;
+  border-radius: 16px;
+  background: var(--violet-700);
+  color: #fff;
+  font-size: 21px;
+  box-shadow: var(--sh-brand);
+}
+
+.tab-primary.tab-active .tab-icon {
+  background: var(--violet-800);
+}

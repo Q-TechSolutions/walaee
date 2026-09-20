@@ -21,6 +21,7 @@ urlpatterns = [
     path(f"{API}auth/", include("apps.accounts.urls")),
     # تطبيق العميل وشاشة الكاشير
     path(f"{API}", include("apps.pos.urls")),
+    path(f"{API}", include("apps.accounts.me_urls")),
     # لوحة التاجر — موزّعة على تطبيقات المجال لا مجمّعة في تطبيق واحد
     path(f"{API}", include("apps.ledger.urls")),
     path(f"{API}", include("apps.tenancy.urls")),
@@ -28,6 +29,8 @@ urlpatterns = [
     path(f"{API}", include("apps.fraud.urls")),
     path(f"{API}", include("apps.campaigns.urls")),
     path(f"{API}", include("apps.billing.urls")),
+    # لوحة إدارة المنصة — أعمال لا بيانات عملاء
+    path(f"{API}platform/", include("apps.billing.admin_urls")),
     path(f"{API}schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         f"{API}docs/",

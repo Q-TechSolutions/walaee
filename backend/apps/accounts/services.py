@@ -175,3 +175,108 @@ def issue_tokens_for_customer(customer: Customer) -> dict:
     refresh["phone"] = customer.phone
 
     return {"access": str(refresh.access_token), "refresh": str(refresh)}
+
+
+# ═══════════════════════ دخول الموظفين ═══════════════════════
+
+
+class InvalidCredentials(DomainError):
+    code = "invalid_credentials"
+    message = "رقم الهاتف أو كلمة المرور غير صحيحة."
+    http_status = status.HTTP_401_UNAUTHORIZED
+
+
+class NoStaffRole(DomainError):
+    code = "no_staff_role"
+    message = "هذا الحساب غير مرتبط بأي متجر."
+    http_status = status.HTTP_403_FORBIDDEN
+
+
+def login_staff(*, phone: str, password: str) -> dict:
+    """
+    يتحقق من بيانات الموظف ويُصدر توكنات.
+
+    الرسالة واحدة سواء كان الرقم غير موجود أو كلمة المرور خاطئة:
+    التمييز بينهما يسمح بتعداد الحسابات.
+    """
+    from django.contrib.auth import authenticate
+
+    from apps.tenancy.models import StaffUser
+
+    phone = normalize_phone(phone)
+    user = authenticate(username=phone, password=password)
+
+    if user is None or not user.is_active:
+        raise InvalidCredentials()
+
+    roles = list(
+        StaffUser.objects.filter(user=user, is_active=True).select_related("branch__brand")
+    )
+
+    # فريق المنصة قد لا يملك دورًا في أي متجر — وهذا طبيعي.
+    # `is_superuser` يُحتسب منهم: من يملك لوحة Django يملك كل شيء
+    # أصلًا، ومنعه من لوحة الأعمال تعقيد بلا مكسب أمني.
+    if not roles and not (user.is_platform_admin or user.is_superuser):
+        raise NoStaffRole()
+
+    tokens = issue_tokens_for_user(user)
+
+    return {
+        **tokens,
+        "user": {
+            "id": str(user.id),
+            "phone": user.phone,
+            "full_name": user.full_name,
+            "is_platform_admin": user.is_platform_admin or user.is_superuser,
+        },
+        "roles": [
+            {
+                "id": str(role.id),
+                "role": role.role,
+                "role_label": role.get_role_display(),
+                "branch_id": str(role.branch_id),
+                "branch_name": role.branch.name,
+                "brand_id": str(role.branch.brand_id),
+                "brand_name": role.branch.brand.name,
+            }
+            for role in roles
+        ],
+    }
+
+
+def issue_tokens_for_user(user) -> dict:
+    """توكنات موظف — المصادقة الافتراضية تحلّها من جدول المستخدمين."""
+    from rest_framework_simplejwt.tokens import RefreshToken
+
+    refresh = RefreshToken.for_user(user)
+    refresh["scope"] = "staff"
+    return {"access": str(refresh.access_token), "refresh": str(refresh)}
+
+
+def refresh_tokens(refresh_token: str) -> dict:
+    """
+    يجدّد الوصول من توكن تحديث صالح.
+
+    يحافظ على `scope`: بدونه يفقد توكن العميل تمييزه فتفشل مصادقته
+    بعد أول تجديد — وهو عطل يظهر بعد ١٥ دقيقة من الاستخدام لا فورًا.
+    """
+    from rest_framework_simplejwt.exceptions import TokenError
+    from rest_framework_simplejwt.tokens import RefreshToken
+
+    try:
+        token = RefreshToken(refresh_token)
+    except TokenError as exc:
+        raise InvalidRefreshToken() from exc
+
+    access = token.access_token
+    for claim in ("scope", "phone"):
+        if claim in token:
+            access[claim] = token[claim]
+
+    return {"access": str(access), "refresh": str(token)}
+
+
+class InvalidRefreshToken(DomainError):
+    code = "invalid_refresh"
+    message = "انتهت الجلسة. سجّل الدخول من جديد."
+    http_status = status.HTTP_401_UNAUTHORIZED

@@ -192,23 +192,54 @@ class Command(BaseCommand):
             )
             staff[key] = record
 
-        if not User.objects.filter(is_superuser=True).exists():
-            User.objects.create_superuser(
+        admin = User.objects.filter(phone__endswith="1000000000").first()
+        if admin is None:
+            admin = User.objects.create_superuser(
                 phone="01000000000", password=DEMO_PASSWORD, full_name="مدير المنصة"
             )
+        # بلا هذه السمة تُرفض لوحة إدارة المنصة رغم أن الحساب خارق
+        if not admin.is_platform_admin:
+            admin.is_platform_admin = True
+            admin.save(update_fields=["is_platform_admin"])
 
         return staff
 
     # ── العملاء ────────────────────────────────────────────
 
     def _create_customers(self):
+        """
+        عملاء بموافقة مسجّلة، وبعضهم بإشعارات مفعّلة.
+
+        بلا موافقة لا يدخل العميل أي شريحة حملة — فتبدو كل شاشات
+        الحملات فارغة والمطوّر يظن أن فيها عطلًا. واختلاف قناة
+        الوصول بينهم يجعل تقدير التكلفة يعرض رقمًا حقيقيًا.
+        """
+        from django.utils import timezone
+
         customers = []
-        for phone, name in [
-            ("01111111111", "سارة عبد الله"),
-            ("01222222222", "محمود حسن"),
-            ("01333333333", "نورهان سعيد"),
+        for phone, name, has_push in [
+            ("01111111111", "سارة عبد الله", True),
+            ("01222222222", "محمود حسن", False),
+            ("01333333333", "نورهان سعيد", True),
+            ("01444444444", "عمر الشناوي", False),
         ]:
-            customer, _ = Customer.objects.get_or_create(phone=phone, defaults={"full_name": name})
+            customer, created = Customer.objects.get_or_create(
+                phone=phone, defaults={"full_name": name}
+            )
+            if created or not customer.has_consent:
+                customer.consent_at = timezone.now()
+                customer.consent_version = "v1"
+                customer.push_subscription = (
+                    {"endpoint": f"https://push.example/{phone}"} if has_push else None
+                )
+                customer.save(
+                    update_fields=[
+                        "consent_at",
+                        "consent_version",
+                        "push_subscription",
+                        "updated_at",
+                    ]
+                )
             customers.append(customer)
         return customers
 
@@ -247,14 +278,17 @@ class Command(BaseCommand):
         باقة نمو برصيد رسائل — وإلا بدت كل شاشات الحملات معطّلة
         والمطوّر لا يعرف أن السبب حدّ الباقة لا عطل في الكود.
         """
-        from apps.billing.models import MessageCredit, Plan, Subscription
+        from apps.billing.models import PLAN_LIMITS, MessageCredit, Plan, Subscription
         from apps.billing.services import apply_credit, get_subscription
 
         subscription = get_subscription(org)
         if subscription.plan != Plan.GROWTH:
             subscription.plan = Plan.GROWTH
             subscription.status = Subscription.STATUS_ACTIVE
-            subscription.save(update_fields=["plan", "status"])
+            # الإيراد يُشتق من الباقة: تركه صفرًا يجعل لوحة المنصة
+            # تعرض MRR صفرًا على مؤسسة مشتركة فعلًا
+            subscription.mrr = PLAN_LIMITS[Plan.GROWTH]["monthly_price"]
+            subscription.save(update_fields=["plan", "status", "mrr"])
 
         if not MessageCredit.objects.filter(organization=org).exists():
             apply_credit(
