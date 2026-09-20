@@ -16,6 +16,7 @@ from rest_framework import status
 
 from apps.common.exceptions import DomainError
 
+from . import demo
 from .models import Customer, OtpCode
 from .validators import normalize_phone
 
@@ -60,7 +61,10 @@ def request_otp(
         consumed_at=timezone.now()
     )
 
-    code = _generate_code()
+    # أرقام التجربة وحدها تأخذ كودًا ثابتًا. أي رقم آخر يمر بالمسار
+    # الكامل بلا تغيير — راجع apps/accounts/demo.py
+    code = demo.fixed_code_for(phone) or _generate_code()
+
     otp = OtpCode.objects.create(
         phone=phone,
         code_hash=make_password(code),

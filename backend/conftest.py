@@ -3,8 +3,23 @@
 from decimal import Decimal
 
 import pytest
+from django.core.cache import cache
 
 from tests import factories
+
+
+@pytest.fixture(autouse=True)
+def clear_rate_limits():
+    """
+    الكاش يحمل عدّادات تحديد المعدل ورموز نقاط البيع.
+
+    بلا تنظيفه بين الاختبارات يرث كل اختبار عدّادات سابقه، فيفشل
+    اختبار سليم بـ429 لأن اختبارًا آخر استهلك الحد قبله — وهو فشل
+    يعتمد على ترتيب التشغيل فيبدو عشوائيًا ويصعب تفسيره.
+    """
+    cache.clear()
+    yield
+    cache.clear()
 
 
 @pytest.fixture

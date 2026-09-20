@@ -199,6 +199,11 @@ CACHES = {
 
 CELERY_BROKER_URL = env_str("CELERY_BROKER_URL", "redis://127.0.0.1:6380/1")
 CELERY_RESULT_BACKEND = env_str("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6380/2")
+# إعادة محاولة الاتصال بالوسيط عند الإقلاع: العامل قد يبدأ قبل
+# Redis في تركيبة Docker، وبدون هذا يموت فورًا بدل أن ينتظر.
+# الافتراضي يتغيّر في Celery 6 فيُضبَط صراحةً.
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
 CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_REJECT_ON_WORKER_LOST = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
@@ -226,6 +231,13 @@ OTP_LENGTH = env_int("OTP_LENGTH", 6)
 # ═══════════════════════ القنوات ═══════════════════════
 # لا يُستورَد أي SDK لمزوّد هنا. القرارات ٧ و ٨ في
 # docs/planning/decisions.md لم تُحسم بعد، فالتكامل خلف واجهة مجرّدة.
+
+# ── حسابات التجربة ──
+# أرقام محدّدة بالاسم تقبل كودًا ثابتًا، لأن مزوّد الرسائل لم
+# يُتعاقَد عليه بعد فلا أحد يستطيع تجربة تطبيق العميل. الأثر محصور
+# في هذه الأرقام وحدها — راجع apps/accounts/demo.py
+DEMO_LOGIN_PHONES = env_list("DEMO_LOGIN_PHONES", [])
+DEMO_LOGIN_CODE = env_str("DEMO_LOGIN_CODE", "")
 
 SMS_PROVIDER = env_str("SMS_PROVIDER", "console")
 SMS_API_KEY = env_str("SMS_API_KEY", "")

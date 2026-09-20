@@ -21,6 +21,15 @@ import type { Customer } from "@walaee/shared";
 const CONSENT_VERSION = "v1";
 const RESEND_SECONDS = 60;
 
+interface OtpRequestResponse {
+  sent: boolean;
+  expires_in: number;
+  /** يصل لحسابات التجربة وحدها — الكود ثابت ومعلَن لها */
+  demo?: boolean;
+  code?: string;
+  notice?: string;
+}
+
 interface VerifyResponse {
   access: string;
   refresh: string;
@@ -37,12 +46,13 @@ export function Login() {
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [remaining, restartCountdown] = useCountdown(RESEND_SECONDS);
+  const [demoNotice, setDemoNotice] = useState<string | null>(null);
 
   const codeInput = useRef<HTMLInputElement>(null);
 
-  const requestOtp = useAction(async (value: string) => {
-    await api.anonymous.post("/auth/otp/request", { phone: value });
-  });
+  const requestOtp = useAction(async (value: string) =>
+    api.anonymous.post<OtpRequestResponse>("/auth/otp/request", { phone: value }),
+  );
 
   const verifyOtp = useAction(async (value: string, otp: string) => {
     return api.anonymous.post<VerifyResponse>("/auth/otp/verify", {
@@ -64,7 +74,15 @@ export function Login() {
     if (trimmed.length < 8) return;
 
     const result = await requestOtp.run(trimmed);
-    if (result !== null) {
+    if (result) {
+      // حساب تجربة: الكود ثابت ولا يصل برسالة، فيُملأ تلقائيًا
+      // بدل أن ينتظر المستخدم رسالة لن تأتي
+      if (result.demo && result.code) {
+        setCode(result.code);
+        setDemoNotice(result.notice ?? "حساب تجربة — الكود مُدخَل تلقائيًا.");
+      } else {
+        setDemoNotice(null);
+      }
       setStep("code");
       restartCountdown();
     }
@@ -84,7 +102,10 @@ export function Login() {
   async function resend() {
     setCode("");
     const result = await requestOtp.run(phone.trim());
-    if (result !== null) restartCountdown();
+    if (result) {
+      if (result.demo && result.code) setCode(result.code);
+      restartCountdown();
+    }
   }
 
   return (
@@ -161,6 +182,12 @@ export function Login() {
               required
             />
           </div>
+
+          {demoNotice && (
+            <p className="demo-notice">
+              <span aria-hidden="true">◈</span> {demoNotice}
+            </p>
+          )}
 
           {verifyOtp.error != null && <ErrorBox error={verifyOtp.error} />}
 

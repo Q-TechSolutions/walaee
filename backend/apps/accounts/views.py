@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from . import services
+from . import demo, services
 from .serializers import (
     CustomerSerializer,
     OtpRequestSerializer,
@@ -44,13 +44,22 @@ class OtpRequestView(APIView):
         serializer = OtpRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        services.request_otp(phone=serializer.validated_data["phone"], ip=_client_ip(request))
+        phone = serializer.validated_data["phone"]
+        services.request_otp(phone=phone, ip=_client_ip(request))
 
         # لا يُكشف أبدًا ما إذا كان الرقم مسجّلًا — تعداد الحسابات ثغرة خصوصية
         payload = {
             "sent": True,
             "expires_in": settings.OTP_TTL_SECONDS,
         }
+
+        # الكود يُعاد لأرقام التجربة وحدها، وهو ثابت ومعروف لها أصلًا.
+        # لا رقم خارج القائمة يصل إلى هذا الفرع — راجع accounts/demo.py
+        if demo.is_demo_phone(phone):
+            payload["demo"] = True
+            payload["code"] = demo.demo_code()
+            payload["notice"] = "حساب تجربة — الكود ثابت ولا يُرسَل برسالة."
+
         return Response(payload, status=status.HTTP_200_OK)
 
 
