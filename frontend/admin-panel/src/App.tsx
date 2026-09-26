@@ -32,11 +32,23 @@ import {
   writeTokens,
 } from "@walaee/shared";
 
+import { Config } from "./pages/Config";
+import { Health } from "./pages/Health";
+import { Ops } from "./pages/Ops";
+import { Users } from "./pages/Users";
+
 import { actions, queries } from "./lib/queries";
 import type { MerchantRow, UnpaidInvoice } from "./lib/queries";
 import type { IconName } from "@walaee/shared";
 
-type Tab = "overview" | "merchants" | "invoices";
+type Tab =
+  | "overview"
+  | "health"
+  | "merchants"
+  | "invoices"
+  | "users"
+  | "ops"
+  | "config";
 
 interface NavItem {
   key: Tab;
@@ -69,6 +81,13 @@ const NAV: NavGroup[] = [
         crumb: "أداء المنصة بالكامل",
         icon: "chart",
       },
+      {
+        key: "health",
+        label: "مؤشرات الصحة",
+        title: "مؤشرات الصحة",
+        crumb: "كل مؤشر مقابل هدفه",
+        icon: "target",
+      },
     ],
   },
   {
@@ -87,6 +106,32 @@ const NAV: NavGroup[] = [
         title: "الاشتراكات والفواتير",
         crumb: "ما لم يُسدَّد بعد",
         icon: "receipt",
+      },
+      {
+        key: "users",
+        label: "المستخدمون",
+        title: "المستخدمون والصلاحيات",
+        crumb: "من يملك صلاحية على ماذا",
+        icon: "users",
+      },
+    ],
+  },
+  {
+    title: "التشغيل",
+    items: [
+      {
+        key: "ops",
+        label: "التشغيل والمراقبة",
+        title: "التشغيل والمراقبة",
+        crumb: "الخدمات والمهام الدورية وسلامة الأرصدة",
+        icon: "bolt",
+      },
+      {
+        key: "config",
+        label: "إعدادات المنصة",
+        title: "إعدادات المنصة",
+        crumb: "الامتثال ونموذج النقاط والباقات",
+        icon: "settings",
       },
     ],
   },
@@ -167,8 +212,12 @@ export function App() {
 
         <main className="content">
           {tab === "overview" && <Overview />}
+          {tab === "health" && <Health />}
           {tab === "merchants" && <Merchants />}
           {tab === "invoices" && <Invoices />}
+          {tab === "users" && <Users />}
+          {tab === "ops" && <Ops />}
+          {tab === "config" && <Config />}
         </main>
       </div>
     </div>

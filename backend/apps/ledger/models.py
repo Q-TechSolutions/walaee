@@ -143,6 +143,11 @@ class LedgerEntry(AppendOnlyModel):
     )
     balance_after = models.DecimalField("الرصيد بعده", max_digits=12, decimal_places=2)
     actor_label = models.CharField("الفاعل", max_length=120, blank=True)
+    # سبب مكتوب بيد من فعلها. إلزامي على المنح اليدوي وحده: قيد
+    # المنح العادي سببه فاتورته، أما قيد بلا فاتورة فلا يفسّره شيء
+    # بعد شهر إلا ما كُتب وقته — ويقرؤه العميل في سجله كما يقرؤه
+    # المدقّق في سجل التدقيق.
+    note = models.CharField("السبب المكتوب", max_length=200, blank=True)
 
     class Meta:
         verbose_name = "قيد"

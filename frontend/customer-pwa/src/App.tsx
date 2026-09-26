@@ -7,7 +7,9 @@ import { Activity } from "./pages/Activity";
 import { CardDetail } from "./pages/CardDetail";
 import { Cards } from "./pages/Cards";
 import { Login } from "./pages/Login";
+import { Notifications } from "./pages/Notifications";
 import { Profile } from "./pages/Profile";
+import { Receipt } from "./pages/Receipt";
 import { Rewards } from "./pages/Rewards";
 import { Scan } from "./pages/Scan";
 import { Stores } from "./pages/Stores";
@@ -75,6 +77,22 @@ export function App() {
             element={
               <Guard>
                 <Activity />
+              </Guard>
+            }
+          />
+          <Route
+            path="/activity/:id"
+            element={
+              <Guard>
+                <Receipt />
+              </Guard>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <Guard>
+                <Notifications />
               </Guard>
             }
           />

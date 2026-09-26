@@ -72,6 +72,7 @@ def apply_entry(
     transaction_obj=None,
     reverses: LedgerEntry | None = None,
     actor=None,
+    note: str = "",
 ) -> LedgerEntry:
     """
     يكتب قيدًا ويحدّث لقطة الرصيد — ذرّيًا ومقاومًا للتزامن.
@@ -128,6 +129,7 @@ def apply_entry(
         reverses=reverses,
         balance_after=new_amount,
         actor_label=str(actor) if actor else "",
+        note=note,
     )
 
     # ── ٥) تحديث اللقطة على مستوى قاعدة البيانات ──
@@ -150,6 +152,7 @@ def apply_entry(
             "delta": str(delta),
             "balance_after": str(new_amount),
             "program": str(program.id),
+            "note": note,
         },
     )
 

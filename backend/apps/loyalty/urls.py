@@ -13,4 +13,5 @@ urlpatterns = [
     path(
         "merchant/customers/<uuid:pk>", views.MerchantCustomerDetailView.as_view(), name="customer"
     ),
+    path("merchant/grant", views.ManualGrantView.as_view(), name="grant"),
 ]

@@ -48,6 +48,51 @@ export interface Shift {
   branch_name: string;
 }
 
+/* ══════════════ التوصيات الإحصائية ══════════════ */
+
+/**
+ * توصية بلا بيانات كافية تعود بـ`enough_data: false` ولا تحمل
+ * رقمًا. الشاشة تعرض العتبة بدل أن تخترع اقتراحًا.
+ */
+export interface RewardValueSuggestion {
+  enough_data: boolean;
+  sample: number;
+  needed: number;
+  window_days: number;
+  average_invoice: string;
+  target_visits?: number;
+  confidence?: "low" | "medium" | "high";
+  programs: {
+    program_id: string;
+    program_name: string;
+    program_type: string;
+    unit_label: string;
+    cost_amount: string;
+    cost_low: string;
+    cost_high: string;
+    reward_worth: string;
+  }[];
+}
+
+export interface SendTimeSuggestion {
+  enough_data: boolean;
+  sample: number;
+  needed: number;
+  window_days: number;
+  confidence?: "low" | "medium" | "high";
+  best_day?: number;
+  best_day_name?: string;
+  best_hour?: number;
+  peak_hour?: number;
+  days: { weekday: number; name: string; visits: number }[];
+  hours: { hour: number; visits: number }[];
+}
+
+export interface Insights {
+  reward_value: RewardValueSuggestion;
+  send_time: SendTimeSuggestion;
+}
+
 export const queries = {
   // ── الكاشير ──
   terminalCode: (signal?: AbortSignal) =>
@@ -68,6 +113,8 @@ export const queries = {
     api.get<Dashboard["liability"]>("/merchant/liability", undefined, signal),
   segments: (signal?: AbortSignal) =>
     api.get<Record<string, number>>("/merchant/segments", undefined, signal),
+  insights: (signal?: AbortSignal) =>
+    api.get<Insights>("/merchant/insights", undefined, signal),
   report: (kind: string, signal?: AbortSignal) =>
     api.get<{ kind: string; rows: Record<string, string | number>[] }>(
       `/merchant/reports/${kind}`,
@@ -123,6 +170,21 @@ export const queries = {
 };
 
 export const actions = {
+  /** منح أو خصم يدوي — المسار الوحيد الذي يكتب في رصيد بلا فاتورة */
+  grant: (input: {
+    membership_id: string;
+    program_id: string;
+    amount: string;
+    note: string;
+  }) =>
+    api.post<{
+      entry_id: string;
+      delta: string;
+      balance_after: string;
+      unit_label: string;
+      note: string;
+    }>("/merchant/grant", input),
+
   updateBrand: (input: { name?: string; category?: string }) =>
     api.patch<Brand>("/merchant/brand", input),
 

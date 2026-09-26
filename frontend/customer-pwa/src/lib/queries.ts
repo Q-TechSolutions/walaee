@@ -134,6 +134,46 @@ export interface MyRedemption {
   used_at: string | null;
 }
 
+/** إشعار وصل العميل فعلًا — أو تنبيه تولّده المنصة. */
+export interface Notification {
+  id: string;
+  kind: "campaign" | "expiry";
+  title: string;
+  body: string;
+  brand_name: string;
+  channel: string;
+  channel_label: string;
+  created_at: string;
+  read: boolean;
+}
+
+/** إيصال عملية واحدة. */
+export interface Receipt {
+  id: string;
+  invoice_no: string;
+  invoice_amount: string;
+  status: string;
+  status_label: string;
+  created_at: string;
+  confirmed_at: string | null;
+  brand_name: string;
+  brand_id: string;
+  primary_color: string;
+  branch_name: string;
+  cashier_name: string;
+  entries: {
+    id: string;
+    delta: string;
+    reason: string;
+    reason_label: string;
+    program: string;
+    unit_label: string;
+    balance_after: string;
+  }[];
+  /** لماذا لم تمنح هذه الفاتورة شيئًا — فارغ حين منحت */
+  nothing_earned_reason: string | null;
+}
+
 export const queries = {
   me: (signal?: AbortSignal) => api.get<Customer>("/me", undefined, signal),
 
@@ -160,6 +200,16 @@ export const queries = {
 
   nearby: (lat: number, lng: number, signal?: AbortSignal) =>
     api.get<NearbyStore[]>("/stores/nearby", { lat, lng }, signal),
+
+  notifications: (signal?: AbortSignal) =>
+    api.get<{ results: Notification[]; unread: number }>(
+      "/me/notifications",
+      undefined,
+      signal,
+    ),
+
+  receipt: (id: string, signal?: AbortSignal) =>
+    api.get<Receipt>(`/me/transactions/${id}`, undefined, signal),
 };
 
 export const actions = {

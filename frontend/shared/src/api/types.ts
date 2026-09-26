@@ -181,6 +181,10 @@ export interface ActivityLine {
   program: string;
   balance_after: string;
   created_at: string;
+  /** العملية التي أنتجت القيد — null للترحيب والتسوية وانتهاء الصلاحية */
+  transaction?: string | null;
+  /** السبب المكتوب — يظهر على المنح اليدوي وحده */
+  note?: string;
 }
 
 export interface MembershipDetail extends Membership {

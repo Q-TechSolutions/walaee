@@ -29,6 +29,7 @@ import {
 } from "@walaee/shared";
 import type { Program, Reward } from "@walaee/shared";
 
+import { RewardValueCard } from "../components/Suggestions";
 import { actions, queries } from "../lib/queries";
 
 /** النطاق الصحي لمعدل الاستبدال — راجع البطاقة التحليلية أسفل الشاشة. */
@@ -38,6 +39,7 @@ export function Rewards() {
   const rewards = useApi((signal) => queries.rewards(signal), []);
   const programs = useApi((signal) => queries.programs(signal), []);
   const board = useApi((signal) => queries.dashboard(30, signal), []);
+  const insights = useApi((signal) => queries.insights(signal), []);
   const [creating, setCreating] = useState(false);
 
   const rows = rewards.data ?? [];
@@ -45,6 +47,14 @@ export function Rewards() {
 
   return (
     <div className="stack gap-lg">
+      {/* التسعير قبل القائمة: التاجر يفتح هذه الشاشة ليضيف
+          مكافأة، والسؤال الأول هو «بكام؟» */}
+      <RewardValueCard
+        data={insights.data?.reward_value}
+        loading={insights.loading}
+        rewards={rewards.data ?? []}
+      />
+
       <section className="card">
         <div className="card-hd">
           <h3>{t("مكافآت متجرك")}</h3>
@@ -93,16 +103,10 @@ export function Rewards() {
         )}
       </section>
 
-      <div className="grid g2">
-        <RedemptionHealth
-          granted={board.data?.redemptions ?? 0}
-          redeemed={redeemed}
-        />
-        <RewardValue
-          average={board.data?.revenue.average_invoice ?? "0"}
-          rewards={rows}
-        />
-      </div>
+      <RedemptionHealth
+        granted={board.data?.redemptions ?? 0}
+        redeemed={redeemed}
+      />
 
       <NewRewardModal
         open={creating}
@@ -248,65 +252,6 @@ function RedemptionHealth({
  * الفاتورة. الهامش الحقيقي يعرفه التاجر وحده، فالحساب يُعرض
  * كإشارة لا كحكم — ومكتوب صراحةً أنه تقدير.
  */
-function RewardValue({
-  average,
-  rewards,
-}: {
-  average: string;
-  rewards: Reward[];
-}) {
-  const avg = Number(average);
-
-  if (!avg || rewards.length === 0) {
-    return (
-      <div className="card card-p tint-v">
-        <div className="row-t">
-          <span className="ibox v" style={{ background: "#fff" }}>
-            <Icon name="coins" size={20} />
-          </span>
-          <div className="grow">
-            <b>{t("قيمة المكافأة")}</b>
-            <p className="t-sm muted mt-1">
-              {t("تظهر المقارنة بعد أول فواتير مسجّلة على البرنامج.")}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const low = avg * 0.2;
-  const high = avg * 0.28;
-  const over = rewards.filter((r) => Number(r.merchant_cost ?? 0) > high);
-
-  return (
-    <div className="card card-p tint-v">
-      <div className="row-t">
-        <span className="ibox v" style={{ background: "#fff" }}>
-          <Icon name="coins" size={20} />
-        </span>
-        <div className="grow">
-          <b>{t("قيمة المكافأة المقترحة")}</b>
-          <p className="t-sm muted mt-1">
-            {t("متوسط فاتورتك")} <span className="num">{fmt.money(avg)}</span> {t("، فالقيمة المعقولة للمكافأة بين")}{" "}
-            <span className="num">{fmt.money(low)}</span> {t("و")}{" "}
-            <span className="num">{fmt.money(high)}</span> {t("— تقدير يعتمد على هامش نموذجي، والهامش الحقيقي تعرفه أنت.")}
-          </p>
-          {over.length > 0 && (
-            <p className="t-sm mt-1 c-orange w-7">
-              {over.length === 1
-                ? t("«{title}» أعلى من الحد الموصى به.", { title: over[0]!.title })
-                : t("{n} مكافآت أعلى من الحد الموصى به.", {
-                    n: fmt.number(over.length),
-                  })}
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function NewRewardModal({
   open,
   programs,

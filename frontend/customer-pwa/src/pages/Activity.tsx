@@ -39,7 +39,11 @@ export function Activity() {
             {activity.data.results.map((line) => {
               const delta = Number(line.delta);
               return (
-                <div key={line.id} className="li">
+                <Link
+                  key={line.id}
+                  to={line.transaction ? `/activity/${line.transaction}` : "#"}
+                  className="li"
+                >
                   <span
                     className={`ibox ${delta > 0 ? "g" : "o"}`}
                     aria-hidden="true"
@@ -60,7 +64,8 @@ export function Activity() {
                     {delta > 0 ? "+" : ""}
                     {fmt.number(line.delta)}
                   </span>
-                </div>
+                  {line.transaction && <Icon name="chevronLeft" size={16} />}
+                </Link>
               );
             })}
           </div>

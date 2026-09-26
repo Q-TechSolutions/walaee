@@ -666,3 +666,62 @@ a.tier:active,
 a.tier {
   transition: var(--t);
 }
+
+/* ══════════════ دعوة التثبيت على iOS ══════════════ */
+
+/**
+ * مسار ثانٍ لأن iOS لا يملك زرًّا يُضغط.
+ *
+ * `beforeinstallprompt` لا يُطلَق على Safari إطلاقًا، فالدعوة هناك
+ * إرشاد لا إجراء: خطوتان بالاسم والأيقونة. الشكل عمودي لأن
+ * الخطوات تُقرأ لا تُلمَح.
+ */
+.a2hs-ios {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.a2hs-ios .row {
+  gap: 12px;
+}
+
+.a2hs-x {
+  color: rgba(255, 255, 255, 0.7);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  flex: none;
+  transition: var(--t);
+}
+
+.a2hs-x:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.a2hs-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 11px 13px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.14);
+  list-style: none;
+}
+
+.a2hs-steps li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--t-sm);
+  font-weight: 600;
+}
+
+.a2hs-steps svg {
+  flex: none;
+  opacity: 0.85;
+}

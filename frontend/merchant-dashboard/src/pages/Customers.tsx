@@ -7,18 +7,20 @@ import {
   Button,
   Empty,
   ErrorBox,
+  Field,
   Icon,
   Loading,
   Modal,
   fmt,
   t,
+  useAction,
   useApi,
   useDebounced,
 } from "@walaee/shared";
 
-import type { IconName } from "@walaee/shared";
+import type { IconName, Program } from "@walaee/shared";
 
-import { queries } from "../lib/queries";
+import { actions, queries } from "../lib/queries";
 
 const SEGMENTS = [
   { key: "", label: "الكل" },
@@ -169,6 +171,126 @@ export function Customers() {
   );
 }
 
+/* ══════════════ منح أو خصم يدوي ══════════════ */
+
+/**
+ * الطريق الوحيد الذي يكتب في رصيد عميل بلا فاتورة.
+ *
+ * وجوده ليس ترفًا: نموذج **الهدايا** — أحد النماذج الستة — لا
+ * يمنح بالفاتورة أصلًا، فبلا هذه الشاشة يخرج التاجر الذي يختاره
+ * ببرنامج لا يمنح شيئًا أبدًا. ويخدم ما هو أعمّ: تعويض عن عطل،
+ * أو تصحيح خطأ كاشير، أو هدية مناسبة.
+ *
+ * السبب إلزامي هنا كما هو إلزامي في الخادم، ويُقال للتاجر لماذا:
+ * يظهر للعميل في سجله وللمدقّق في سجل التدقيق. حقلٌ يُطلب بلا
+ * تفسير يُملأ بـ«تصحيح» ولا يفسّر شيئًا بعد شهر.
+ */
+function GrantPanel({
+  programs,
+  membershipId,
+  onDone,
+}: {
+  programs: Program[];
+  membershipId: string;
+  onDone: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [programId, setProgramId] = useState(programs[0]?.id ?? "");
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
+
+  const grant = useAction(actions.grant);
+  const unit = programs.find((p) => p.id === programId)?.unit_label ?? "";
+
+  // برنامج الهدايا بلا رصيد قبل أول منح، فالقائمة تُبنى على
+  // البرامج لا على الأرصدة — وإلا اختفى النموذج الذي وُجدت
+  // هذه الشاشة من أجله
+  if (programs.length === 0) return null;
+
+  if (!open) {
+    return (
+      <Button variant="ghost" onClick={() => setOpen(true)}>
+        <Icon name="gift" size={15} /> {t("منح أو خصم يدوي")}
+      </Button>
+    );
+  }
+
+  return (
+    <div className="card card-p stack gap">
+      <div className="row between">
+        <h3 className="t-sm">{t("منح أو خصم يدوي")}</h3>
+        <button type="button" className="link" onClick={() => setOpen(false)}>
+          {t("إلغاء")}
+        </button>
+      </div>
+
+      <Field label={t("البرنامج")}>
+        <select
+          className="input"
+          value={programId}
+          onChange={(event) => setProgramId(event.target.value)}
+        >
+          {programs.map((program) => (
+            <option key={program.id} value={program.id}>
+              {program.name}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <Field
+        label={t("المقدار")}
+        hint={t("موجب يمنح وسالب يخصم — بوحدة {unit}.", { unit: t(unit) })}
+      >
+        <input
+          className="input num"
+          inputMode="numeric"
+          value={amount}
+          onChange={(event) => setAmount(event.target.value.replace(/[^\d.-]/g, ""))}
+          placeholder="50"
+        />
+      </Field>
+
+      <Field
+        label={t("السبب")}
+        hint={t("يظهر للعميل في سجله وفي سجل التدقيق — اكتب ما يفهمه غيرك بعد شهر.")}
+      >
+        <input
+          className="input"
+          value={note}
+          onChange={(event) => setNote(event.target.value)}
+          placeholder={t("هدية عيد ميلاد العميل")}
+          maxLength={200}
+        />
+      </Field>
+
+      {grant.error != null && <ErrorBox error={grant.error} />}
+
+      <Button
+        block
+        loading={grant.loading}
+        disabled={!amount || note.trim().length < 4}
+        onClick={async () => {
+          const done = await grant.run({
+            membership_id: membershipId,
+            program_id: programId,
+            amount,
+            note: note.trim(),
+          });
+          if (done) {
+            setAmount("");
+            setNote("");
+            setOpen(false);
+            onDone();
+          }
+        }}
+      >
+        {t("تنفيذ")}
+      </Button>
+    </div>
+  );
+}
+
 function CustomerModal({
   id,
   onClose,
@@ -180,6 +302,7 @@ function CustomerModal({
     (signal) => (id ? queries.customer(id, signal) : Promise.resolve(null)),
     [id],
   );
+  const programs = useApi((signal) => queries.programs(signal), []);
 
   if (!id) return null;
 
@@ -219,6 +342,12 @@ function CustomerModal({
             )}
           </div>
 
+          <GrantPanel
+            programs={programs.data ?? []}
+            membershipId={detail.data.id}
+            onDone={detail.reload}
+          />
+
           <div className="stack gap">
             <h3 className="t-sm">{t("آخر النشاط")}</h3>
             {detail.data.recent_activity.length === 0 ? (
@@ -235,7 +364,12 @@ function CustomerModal({
                       {Number(line.delta) > 0 ? "+" : ""}
                       {fmt.number(line.delta)}
                     </span>
-                    <span className="grow t-sm">{line.reason_label}</span>
+                    <span className="grow t-sm">
+                      {t(line.reason_label)}
+                      {line.note && (
+                        <span className="t-xs muted"> — {line.note}</span>
+                      )}
+                    </span>
                     <span className="t-xs faint">
                       {fmt.relativeTime(line.created_at)}
                     </span>

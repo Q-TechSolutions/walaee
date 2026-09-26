@@ -7,6 +7,7 @@
 """
 
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -15,11 +16,15 @@ from rest_framework.views import APIView
 
 from apps.billing import services as billing
 from apps.common.pagination import DefaultPagination
+from apps.ledger.models import LedgerEntry
+from apps.ledger.services import apply_entry
 from apps.pos.permissions import IsManager, IsOwner, get_staff_user
 
 from .models import LoyaltyProgram, Membership, Reward
 from .serializers import (
     CustomerDetailSerializer,
+    ManualGrantResultSerializer,
+    ManualGrantSerializer,
     MembershipSerializer,
     ProgramRuleSerializer,
     ProgramSerializer,
@@ -273,3 +278,70 @@ class MerchantCustomerDetailView(APIView):
             .get(pk=pk, brand=staff.branch.brand)
         )
         return Response(CustomerDetailSerializer(membership).data)
+
+
+class ManualGrantView(APIView):
+    """
+    منح أو خصم يدوي بقرار من التاجر.
+
+    بدون هذا المسار يصير نموذج **الهدايا** — أحد النماذج الستة —
+    معلنًا وغير قابل للاستعمال: `compute_delta` تُرجع له صفرًا عمدًا
+    لأن الهدية تُمنح بمناسبة لا بفاتورة، ولم يكن هناك أي طريق يمنح
+    بها التاجر شيئًا. تاجر يختار النموذج يخرج ببرنامج لا يمنح أبدًا.
+
+    ويخدم ما هو أعمّ: تعويض عميل عن عطل، أو تصحيح خطأ كاشير، أو
+    هدية عيد ميلاد. كلها كانت تُحلّ سابقًا بفتح قاعدة البيانات.
+
+    ثلاثة ضوابط لأنه المسار الوحيد الذي يكتب في الرصيد بلا فاتورة:
+      • **المالك أو المدير فقط** — لا الكاشير. من يقف عند الصندوق
+        لا يملك منح نفسه نقاطًا، وهي أول صورة للاحتيال الداخلي في
+        المستند (م-٠٧).
+      • **سبب إلزامي** — يظهر في سجل العميل وفي سجل التدقيق، فلا
+        يوجد منح بلا تفسير مكتوب وقت وقوعه.
+      • **سقف للعملية الواحدة** يمنع الخطأ المطبعي من إنشاء التزام
+        بعشرات الآلاف بضغطة واحدة.
+    """
+
+    permission_classes = [IsManager]
+
+    @extend_schema(
+        request=ManualGrantSerializer,
+        responses=ManualGrantResultSerializer,
+        summary="منح أو خصم يدوي",
+    )
+    @transaction.atomic
+    def post(self, request):
+        staff = get_staff_user(request)
+        brand = staff.branch.brand
+
+        serializer = ManualGrantSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        membership = get_object_or_404(
+            Membership.objects.select_related("customer", "brand"),
+            pk=data["membership_id"],
+            brand=brand,
+        )
+        program = get_object_or_404(LoyaltyProgram, pk=data["program_id"], brand=brand)
+
+        entry = apply_entry(
+            membership=membership,
+            program=program,
+            delta=data["amount"],
+            reason=LedgerEntry.REASON_ADJUST,
+            actor=staff.user,
+            note=data["note"],
+        )
+
+        balance = membership.balances.get(program=program)
+        return Response(
+            {
+                "entry_id": str(entry.id),
+                "delta": str(entry.delta),
+                "balance_after": str(balance.amount),
+                "unit_label": program.unit_label,
+                "note": data["note"],
+            },
+            status=status.HTTP_201_CREATED,
+        )

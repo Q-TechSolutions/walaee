@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from rest_framework import serializers
 
 from .models import Balance, LoyaltyProgram, Membership, ProgramRule, Reward
@@ -134,3 +136,46 @@ class CustomerDetailSerializer(MembershipSerializer):
         ).aggregate(total=Sum("invoice_amount"))["total"]
 
         return str(total or Decimal("0"))
+
+
+class ManualGrantSerializer(serializers.Serializer):
+    """
+    منح أو خصم يدوي.
+
+    `amount` موجب يمنح وسالب يخصم — عمليةٌ واحدة لا اثنتان، لأن
+    الخصم اليدوي (تصحيح خطأ كاشير) يحتاج نفس الضوابط تمامًا:
+    نفس الصلاحية، ونفس السبب المكتوب، ونفس السقف.
+    """
+
+    #: سقف العملية الواحدة. الغرض منه الخطأ المطبعي لا سوء النية:
+    #: صفر زائد يحوّل ٥٠٠ إلى ٥٠٠٠ ويصنع التزامًا بضغطة واحدة.
+    MAX_ABS = Decimal("100000")
+
+    membership_id = serializers.UUIDField()
+    program_id = serializers.UUIDField()
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+    note = serializers.CharField(max_length=200, allow_blank=False, trim_whitespace=True)
+
+    def validate_amount(self, value: Decimal) -> Decimal:
+        if value == 0:
+            raise serializers.ValidationError("المقدار صفر لا يكتب قيدًا.")
+        if abs(value) > self.MAX_ABS:
+            raise serializers.ValidationError(
+                f"الحد الأقصى للعملية الواحدة {self.MAX_ABS:,.0f}. "
+                "قسّمها أو راجع الرقم — هذا الحدّ موجود لالتقاط الصفر الزائد."
+            )
+        return value
+
+    def validate_note(self, value: str) -> str:
+        # سبب من كلمة واحدة («تصحيح») لا يفسّر شيئًا بعد شهر
+        if len(value.strip()) < 4:
+            raise serializers.ValidationError("اكتب سببًا مفهومًا — يظهر للعميل وفي سجل التدقيق.")
+        return value.strip()
+
+
+class ManualGrantResultSerializer(serializers.Serializer):
+    entry_id = serializers.UUIDField()
+    delta = serializers.DecimalField(max_digits=12, decimal_places=2)
+    balance_after = serializers.DecimalField(max_digits=12, decimal_places=2)
+    unit_label = serializers.CharField()
+    note = serializers.CharField()

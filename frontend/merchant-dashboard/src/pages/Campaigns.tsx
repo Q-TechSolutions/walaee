@@ -27,6 +27,7 @@ import {
 } from "@walaee/shared";
 import type { Campaign, CampaignEstimate } from "@walaee/shared";
 
+import { SendTimeCard } from "../components/Suggestions";
 import { actions, queries } from "../lib/queries";
 
 const STATUS_TONE: Record<string, "muted" | "violet" | "green" | "red" | "amber"> = {
@@ -49,6 +50,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export function Campaigns() {
   const campaigns = useApi((signal) => queries.campaigns(signal), []);
+  const insights = useApi((signal) => queries.insights(signal), []);
   const [composing, setComposing] = useState(false);
 
   return (
@@ -57,6 +59,10 @@ export function Campaigns() {
         <p className="t-sm muted">{t("راسل عملاءك على أرخص قناة تصل إليهم — الإشعار أولًا، ثم ما يخرج إلى شبكة الاتصالات.")}</p>
         <Button onClick={() => setComposing(true)}>{t("حملة جديدة")}</Button>
       </div>
+
+      {/* التوقيت قبل القائمة: الرسالة تكلّف رصيدًا، وإرسالها
+          في الساعة الخطأ يدفع ثمنها بلا أن تُقرأ */}
+      <SendTimeCard data={insights.data?.send_time} loading={insights.loading} />
 
       {campaigns.loading && <Loading />}
       {campaigns.error != null && (

@@ -15,4 +15,8 @@ urlpatterns = [
         admin_views.PlatformMarkPaidView.as_view(),
         name="mark-paid",
     ),
+    path("health", admin_views.PlatformHealthView.as_view(), name="health"),
+    path("users", admin_views.PlatformUsersView.as_view(), name="users"),
+    path("ops", admin_views.PlatformOpsView.as_view(), name="ops"),
+    path("config", admin_views.PlatformConfigView.as_view(), name="config"),
 ]

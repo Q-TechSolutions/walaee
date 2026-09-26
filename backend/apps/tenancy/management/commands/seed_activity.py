@@ -60,6 +60,7 @@ from django.db.models import Count, Sum
 from django.utils import timezone
 
 from apps.accounts.models import Customer
+from apps.billing.models import Invoice, Subscription
 from apps.campaigns.models import Campaign, Channel, MessageJob
 from apps.fraud import services as fraud
 from apps.fraud.models import FraudSignal
@@ -200,6 +201,15 @@ class Command(BaseCommand):
         # نفس الأرقام فيصطدم بأول فاتورة كتبها التشغيل الأول.
         self.invoice_seq = Transaction.objects.count()
 
+        # مؤسستان تُتركان بفاتورة غير مسدّدة: شاشة التحصيل في
+        # لوحة المنصة تُفتح لمتابعة المتأخرين، وقاعدة كلها
+        # مسدّدة تجعلها فارغة بلا سبب
+        self.unpaid = set(
+            Subscription.objects.order_by("created_at").values_list("organization_id", flat=True)[
+                :2
+            ]
+        )
+
         brands = self._brands(options["only"])
         if not brands:
             raise CommandError("لا توجد علامات. شغّل seed_network أولًا.")
@@ -234,6 +244,8 @@ class Command(BaseCommand):
             )
 
         self._seed_campaigns(primary)
+        invoices = self._seed_billing()
+        self.stdout.write(f"  الفوترة: {invoices} فاتورة")
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -241,6 +253,72 @@ class Command(BaseCommand):
                 f"{totals['entries']} قيدًا · {totals['redemptions']} استبدالًا"
             )
         )
+
+    # ═══════════════════════ تاريخ الفوترة ═══════════════════════
+
+    def _seed_billing(self) -> int:
+        """
+        فواتير الأشهر الماضية لكل اشتراك.
+
+        بدونها تبقى شاشة «الاشتراكات والفواتير» في اللوحتين فارغة
+        على منصّة عمرها سنة: البذرة تبني اثني عشر شهرًا من تاريخ
+        الولاء ثم تترك دفتر الفوترة بلا سطر واحد. تاجر يفتح
+        اشتراكه يرى «لا توجد فواتير بعد» فيستنتج أنه لم يُحاسَب
+        قطّ — وفريق المنصة يفتح لوحته فلا يجد ما يراجعه.
+
+        الفواتير تُكتب مباشرةً لا عبر `issue_invoice`: تلك الدالة
+        تدفع الاشتراك دورةً إلى الأمام مع كل إصدار، فاستدعاؤها
+        اثنتي عشرة مرة كان يقذف تاريخ التجديد إلى سنة قادمة.
+        الغرض هنا استعادة ما **مضى** لا محاكاة ما سيأتي.
+        """
+        issued = 0
+        today = self.now.date()
+
+        for subscription in Subscription.objects.select_related("organization"):
+            price = Decimal(subscription.limit("monthly_price") or 0)
+            if price <= 0:
+                # الباقة المجانية لا تُصدَر لها فاتورة أصلًا
+                continue
+
+            # يُبدأ من الدورة السابقة للحالية رجوعًا: الدورة الجارية
+            # لم تنتهِ بعد، وإصدار فاتورتها الآن يقول للتاجر إنه
+            # مدين بشهر لم يستهلكه
+            period_end = subscription.current_period_start
+            for index in range(MONTHS):
+                period_start = period_end - timedelta(days=30)
+                if period_start.date() > today:
+                    break
+
+                number = f"INV-{period_start:%Y%m}-{str(subscription.organization_id)[:6]}"
+                if Invoice.objects.filter(number=number).exists():
+                    period_end = period_start
+                    continue
+
+                # آخر فاتورتين تبقيان مستحقّتين: لوحة المنصة تعرض
+                # «غير مسدّدة» وهي الشاشة التي تُفتح لمتابعة التحصيل،
+                # وقاعدة كلها مسدّدة تجعلها فارغة بلا سبب
+                overdue = index == 0 and subscription.organization_id in self.unpaid
+                status = Invoice.STATUS_ISSUED if overdue else Invoice.STATUS_PAID
+
+                invoice = Invoice.objects.create(
+                    subscription=subscription,
+                    number=number,
+                    amount=price,
+                    status=status,
+                    period_start=period_start,
+                    period_end=period_end,
+                    issued_at=period_start,
+                )
+                # `issued_at` و`created_at` يُكتبان بالتاريخ الماضي
+                # صراحةً: الأول حقل عادي والثاني افتراضه «الآن»
+                Invoice.objects.filter(pk=invoice.pk).update(
+                    created_at=period_start,
+                    paid_at=None if overdue else period_end,
+                )
+                issued += 1
+                period_end = period_start
+
+        return issued
 
     # ═══════════════════════ الحرّاس ═══════════════════════
 

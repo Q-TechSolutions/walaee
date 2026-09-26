@@ -11,6 +11,7 @@ urlpatterns = [
     path("merchant/shift", views.CashierShiftView.as_view(), name="shift"),
     path("merchant/liability", views.MerchantLiabilityView.as_view(), name="liability"),
     path("merchant/segments", views.MerchantSegmentsView.as_view(), name="segments"),
+    path("merchant/insights", views.MerchantInsightsView.as_view(), name="insights"),
     path("merchant/reports/<str:kind>", views.MerchantReportView.as_view(), name="report"),
     path("merchant/entries/<uuid:pk>/reverse", views.ReverseEntryView.as_view(), name="reverse"),
 ]

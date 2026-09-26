@@ -11,16 +11,24 @@ from datetime import timedelta
 from django.db import transaction
 from django.db.models import Count, Max, Sum
 from django.db.models.functions import TruncDate
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.campaigns.models import MessageJob
+from apps.campaigns.router import render as render_message
 from apps.common.exceptions import DomainError
 from apps.common.pagination import DefaultPagination
 from apps.ledger.models import LedgerEntry, Redemption, Transaction
-from apps.loyalty.models import Balance, Membership
+from apps.loyalty.models import (
+    Balance,
+    LoyaltyProgram,
+    Membership,
+    ProgramRule,
+)
 from apps.pos.permissions import IsCustomer
 
 from . import services
@@ -272,6 +280,11 @@ def _entry(entry) -> dict:
         "unit_label": entry.program.unit_label,
         "balance_after": str(entry.balance_after),
         "created_at": entry.created_at.isoformat(),
+        # معرّف العملية يفتح الإيصال من سجل النشاط. القيود بلا
+        # عملية — الترحيب والتسوية وانتهاء الصلاحية — تعود بـnull
+        # فلا يفتح الصف شاشةً فارغة
+        "transaction": str(entry.transaction_id) if entry.transaction_id else None,
+        "note": entry.note,
     }
 
 
@@ -628,3 +641,200 @@ def _week_streak(customer) -> list[dict]:
             }
         )
     return week
+
+
+class MyNotificationsView(APIView):
+    """
+    ما وصل العميل فعلًا — لا ما كان يمكن أن يصله.
+
+    المصدر هو `MessageJob`: سجل الرسالة الواحدة للمستلم الواحد.
+    بناء الشاشة على الحملات بدلًا منه كان سيعرض للعميل حملةً
+    تُخطّي إرسالها إليه أو فشلت — إشعارٌ لم يصل يُعرض كأنه وصل،
+    فيسأل العميل عن عرض لم يُعرض عليه.
+
+    ويُضمّ إليها ما تولّده المنصة نفسها: تنبيه الرصيد المقارب
+    للانتهاء. هذان معًا كل ما يصل العميل من المنصة، فيصير هذا
+    الصندوق مطابقًا لهاتفه.
+    """
+
+    permission_classes = [IsCustomer]
+
+    #: ما بعد هذا العدد لا يُقرأ. صندوق بلا حد يصير أرشيفًا يبطئ
+    #: الشاشة على أول فتح.
+    LIMIT = 40
+
+    #: الحالات التي تعني «وصل». `queued` لم تُرسل بعد، و`failed`
+    #: و`skipped` لم تصل أبدًا.
+    ARRIVED = (
+        MessageJob.STATUS_SENT,
+        MessageJob.STATUS_DELIVERED,
+        MessageJob.STATUS_READ,
+    )
+
+    @extend_schema(responses={200: None}, summary="الإشعارات التي وصلت العميل")
+    def get(self, request):
+        jobs = (
+            MessageJob.objects.filter(customer=request.user, status__in=self.ARRIVED)
+            .select_related("campaign__brand")
+            .order_by("-created_at")[: self.LIMIT]
+        )
+
+        # النصّ يُركَّب بنفس الدالة التي ركّبته عند الإرسال. عرض
+        # القالب الخام كان يُظهر للعميل «أهلًا {name}» بدل اسمه —
+        # نفس الرسالة التي وصلت هاتفه سليمة تبدو معطوبة في التطبيق
+        rows = [
+            {
+                "id": str(job.id),
+                "kind": "campaign",
+                "title": job.campaign.name,
+                "body": render_message(
+                    job.campaign.message_template,
+                    customer=job.customer,
+                    brand=job.campaign.brand,
+                ),
+                "brand_name": job.campaign.brand.name,
+                "channel": job.channel,
+                "channel_label": job.get_channel_display(),
+                "created_at": job.created_at,
+                # «مقروءة» حالة يرسلها المزوّد لا يخمّنها التطبيق
+                "read": job.status == MessageJob.STATUS_READ,
+            }
+            for job in jobs
+        ]
+
+        rows.extend(self._expiry_warnings(request.user))
+        rows.sort(key=lambda row: row["created_at"], reverse=True)
+
+        return Response(
+            {
+                "results": rows[: self.LIMIT],
+                "unread": sum(1 for row in rows if not row["read"]),
+            }
+        )
+
+    def _expiry_warnings(self, customer) -> list[dict]:
+        """
+        الأرصدة التي تنتهي خلال شهر.
+
+        تُبنى عند القراءة لا تُخزَّن: الرصيد يتحرّك بكل عملية،
+        وإشعارٌ مخزَّن يقول «ينتهي ٢٠٠ نقطة» بعد أن صُرفت يصير
+        كذبًا محفوظًا.
+        """
+        now = timezone.now()
+        soon = now + timedelta(days=30)
+
+        balances = (
+            Balance.objects.filter(
+                membership__customer=customer,
+                amount__gt=0,
+                expires_at__gte=now,
+                expires_at__lte=soon,
+            )
+            .select_related("membership__brand", "program")
+            .order_by("expires_at")
+        )
+
+        return [
+            {
+                "id": f"expiry-{balance.pk}",
+                "kind": "expiry",
+                "title": "رصيدك على وشك الانتهاء",
+                "body": (
+                    f"{balance.amount:g} {balance.program.unit_label} في "
+                    f"{balance.membership.brand.name} تنتهي قريبًا."
+                ),
+                "brand_name": balance.membership.brand.name,
+                "channel": "app",
+                "channel_label": "إشعار التطبيق",
+                "created_at": balance.expires_at - timedelta(days=30),
+                "read": False,
+            }
+            for balance in balances
+        ]
+
+
+class MyTransactionView(APIView):
+    """
+    إيصال عملية واحدة.
+
+    هذه الشاشة هي ما يفتحه العميل حين يشكّ: «دفعت ٦٥ جنيهًا وما
+    اتسجّلش ليه؟». فتُعرض العملية بكل ما يثبتها — رقم الفاتورة
+    وقيمتها والفرع والكاشير ووقت التأكيد — ومعها القيد الذي
+    نتج عنها إن وُجد.
+
+    والأهم: حين **لا** يوجد قيد، تُقال السبب صراحةً. فاتورة تحت
+    الحد الأدنى أو برنامج هدايا لا يمنح بالفاتورة هما سببان
+    مشروعان، وصمت الشاشة عنهما يجعل العميل يظن أن النظام أكل
+    نقاطه.
+    """
+
+    permission_classes = [IsCustomer]
+
+    @extend_schema(responses={200: None}, summary="تفاصيل عملية واحدة")
+    def get(self, request, pk):
+        txn = get_object_or_404(
+            Transaction.objects.select_related(
+                "terminal__branch__brand", "staff_user__user"
+            ).prefetch_related("entries__program"),
+            pk=pk,
+            customer=request.user,
+        )
+
+        entries = [
+            {
+                "id": str(entry.id),
+                "delta": str(entry.delta),
+                "reason": entry.reason,
+                "reason_label": entry.get_reason_display(),
+                "program": entry.program.name,
+                "unit_label": entry.program.unit_label,
+                "balance_after": str(entry.balance_after),
+            }
+            for entry in txn.entries.all()
+        ]
+
+        branch = txn.terminal.branch
+        cashier = getattr(txn.staff_user, "user", None)
+
+        return Response(
+            {
+                "id": str(txn.id),
+                "invoice_no": txn.invoice_no,
+                "invoice_amount": str(txn.invoice_amount),
+                "status": txn.status,
+                "status_label": txn.get_status_display(),
+                "created_at": txn.created_at,
+                "confirmed_at": txn.confirmed_at,
+                "brand_name": branch.brand.name,
+                "brand_id": str(branch.brand_id),
+                "primary_color": branch.brand.primary_color,
+                "branch_name": branch.name,
+                "cashier_name": getattr(cashier, "full_name", "") or "",
+                "entries": entries,
+                "nothing_earned_reason": None if entries else self._why_nothing(txn, branch.brand),
+            }
+        )
+
+    def _why_nothing(self, txn, brand) -> str:
+        """
+        لماذا لم تمنح هذه الفاتورة شيئًا.
+
+        يُقرأ من قواعد البرامج لا يُخمَّن: العميل يستحق السبب
+        نفسه الذي طبّقه المحرك.
+        """
+        rules = ProgramRule.objects.filter(program__brand=brand, program__is_active=True)
+        if not rules.exists():
+            return "لا يوجد برنامج ولاء نشط في هذا المتجر وقت العملية."
+
+        minimum = min(rule.min_invoice for rule in rules)
+        if txn.invoice_amount < minimum:
+            return (
+                f"الحد الأدنى للفاتورة في هذا المتجر {minimum:g} ج.م، "
+                f"وفاتورتك {txn.invoice_amount:g} ج.م."
+            )
+
+        types = {rule.program.type for rule in rules.select_related("program")}
+        if types == {LoyaltyProgram.TYPE_GIFTS}:
+            return "برنامج هذا المتجر هدايا تُمنح بمناسبة، لا نقاطًا على الفاتورة."
+
+        return "لم يُسجَّل رصيد على هذه العملية — راجع المتجر."

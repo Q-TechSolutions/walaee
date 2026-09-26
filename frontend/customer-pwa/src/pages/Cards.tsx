@@ -36,14 +36,19 @@ import type { Card, WeekDay } from "../lib/queries";
 /** عدد صفوف النشاط على الرئيسية — البقية خلف «الكل». */
 const RECENT = 4;
 
+/** مفتاح رفض دعوة التثبيت. لكل متصفّح على حدة — وهو المطلوب. */
+const DISMISS_KEY = "walaee.a2hs.dismissed";
+
 export function Cards() {
   const cards = useApi((signal) => queries.cards(signal), []);
   const summary = useApi((signal) => queries.summary(signal), []);
   const me = useApi((signal) => queries.me(signal), []);
   const activity = useApi((signal) => queries.activity(1, signal), []);
+  const inbox = useApi((signal) => queries.notifications(signal), []);
 
   const firstName = (me.data?.full_name ?? "").trim().split(" ")[0];
   const pending = summary.data?.pending_redemptions ?? 0;
+  const unread = inbox.data?.unread ?? 0;
 
   // أقرب هدف عبر كل البطاقات — أعلى نسبة اكتمال، لا أكبر رصيد:
   // من عنده ٩٠٠ نقطة على هدف ٥٠٠٠ أبعد ممن عنده ٩ أختام من ١٠
@@ -73,9 +78,12 @@ export function Cards() {
           </p>
         </div>
 
-        <Link to="/activity" className="iconbtn" aria-label={t("سجل النشاط")}>
-          <Icon name="clock" size={19} />
-          {pending > 0 && <span className="nd" aria-hidden="true" />}
+        <Link to="/notifications" className="iconbtn" aria-label={t("الإشعارات")}>
+          <Icon name="bell" size={19} />
+          {/* النقطة تظهر لما وصل ولم يُقرأ — لا لعدد المكافآت:
+              الجرس يعد بإشعار، فإظهاره لشيء آخر يعلّم العميل
+              تجاهله */}
+          {unread > 0 && <span className="nd" aria-hidden="true" />}
         </Link>
       </header>
 
@@ -133,7 +141,11 @@ export function Cards() {
               {activity.data.results.slice(0, RECENT).map((line) => {
                 const delta = Number(line.delta);
                 return (
-                  <div key={line.id} className="li">
+                  <Link
+                    key={line.id}
+                    to={line.transaction ? `/activity/${line.transaction}` : "/activity"}
+                    className="li"
+                  >
                     <span
                       className={`ibox ${delta > 0 ? "g" : "o"}`}
                       aria-hidden="true"
@@ -152,7 +164,7 @@ export function Cards() {
                       {delta > 0 ? "+" : ""}
                       {fmt.number(line.delta)}
                     </span>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -319,15 +331,54 @@ interface InstallEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+/** مثبَّت بالفعل — لا دعوة ولا إرشاد. */
+function isStandalone(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    window.matchMedia?.("(display-mode: standalone)").matches === true ||
+    // Safari على iOS لا يدعم display-mode ويعلن الحالة هنا
+    (window.navigator as { standalone?: boolean }).standalone === true
+  );
+}
+
+/** Safari على iOS — الوحيد الذي لا يُطلق `beforeinstallprompt` أبدًا. */
+function isIosSafari(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  const ios = /iPad|iPhone|iPod/.test(ua) ||
+    // iPadOS يعلن نفسه ماكنتوش، ويُميَّز باللمس
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  // كروم وفايرفوكس على iOS يلفّان WebKit ولا يملكان زر «أضف للشاشة»
+  return ios && !/CriOS|FxiOS|EdgiOS/.test(ua);
+}
+
 /**
- * تظهر فقط حين يعرضها المتصفّح.
+ * دعوة التثبيت — بمسارين لأن المتصفّحات مساران.
  *
- * `beforeinstallprompt` لا يُطلَق إلا حين يكون التطبيق قابلًا
- * للتثبيت فعلًا وغير مثبَّت بعد. رسم الدعوة دائمًا يعني زرًّا لا
- * يفعل شيئًا على iOS وعلى من ثبّته بالفعل — وهو أسوأ من غيابه.
+ * `beforeinstallprompt` حدث كروم وأندرويد، **ولا يُطلَق على iOS
+ * إطلاقًا**. الاعتماد عليه وحده كان يعني أن شريحة iOS — وهي
+ * الأعلى إنفاقًا في السوق المستهدف حسب التقرير (م-١٣) — لا ترى
+ * الدعوة أبدًا. ومنتج ولاء يعيش على إعادة التفاعل، وإشعارات
+ * الويب على iOS لا تعمل إلا بعد الإضافة إلى الشاشة الرئيسية
+ * يدويًا. فالنتيجة: أغلى شريحة لا يصلها إشعار واحد.
+ *
+ * ولأن iOS لا يملك زرًّا يُضغط، يُعرض الإرشاد اليدوي بدله: خطوتان
+ * بالاسم وبالأيقونة، لا جملة عامة «أضفه للشاشة».
+ *
+ * ولا شيء يُعرض لمن ثبّته بالفعل: دعوةٌ لفعل تمّ تجعل القارئ
+ * يشكّ في أن التطبيق يعرف حالته.
  */
 function InstallPrompt() {
   const [event, setEvent] = useState<InstallEvent | null>(null);
+  const [dismissed, setDismissed] = useState(() => {
+    // رفض الدعوة يُحترَم: إعادة عرضها كل فتحة هي الطريقة الأسرع
+    // لتعليم العميل تجاهل كل ما في أعلى الشاشة
+    try {
+      return localStorage.getItem(DISMISS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     const onPrompt = (e: Event) => {
@@ -339,29 +390,76 @@ function InstallPrompt() {
     return () => window.removeEventListener("beforeinstallprompt", onPrompt);
   }, []);
 
-  if (!event) return null;
+  function dismiss() {
+    setDismissed(true);
+    try {
+      localStorage.setItem(DISMISS_KEY, "1");
+    } catch {
+      /* وضع التصفّح الخاص — الرفض يعيش لهذه الجلسة وحدها */
+    }
+  }
+
+  if (dismissed || isStandalone()) return null;
+
+  if (event) {
+    return (
+      <div className="a2hs">
+        <span className="ic" aria-hidden="true">
+          <Icon name="phone" size={20} />
+        </span>
+        <div className="grow">
+          <b>{t("ثبّت ولائي على شاشتك")}</b>
+          <span>{t("يفتح زي أي تطبيق، ويوصلك إشعار أول ما تجهز مكافأة.")}</span>
+        </div>
+        <button
+          type="button"
+          className="btn btn-sm"
+          style={{ background: "#fff", color: "var(--violet-700)" }}
+          onClick={async () => {
+            await event.prompt();
+            await event.userChoice;
+            setEvent(null);
+          }}
+        >
+          {t("تثبيت")}
+        </button>
+      </div>
+    );
+  }
+
+  if (!isIosSafari()) return null;
 
   return (
-    <div className="a2hs">
-      <span className="ic" aria-hidden="true">
-        <Icon name="phone" size={20} />
-      </span>
-      <div className="grow">
-        <b>{t("ثبّت ولائي على شاشتك")}</b>
-        <span>{t("يفتح زي أي تطبيق، ويوصلك إشعار أول ما تجهز مكافأة.")}</span>
+    <div className="a2hs a2hs-ios">
+      <div className="row between">
+        <div className="row">
+          <span className="ic" aria-hidden="true">
+            <Icon name="phone" size={20} />
+          </span>
+          <b>{t("ثبّت ولائي على شاشتك")}</b>
+        </div>
+        <button
+          type="button"
+          className="a2hs-x"
+          onClick={dismiss}
+          aria-label={t("إخفاء")}
+        >
+          <Icon name="close" size={16} />
+        </button>
       </div>
-      <button
-        type="button"
-        className="btn btn-sm"
-        style={{ background: "#fff", color: "var(--violet-700)" }}
-        onClick={async () => {
-          await event.prompt();
-          await event.userChoice;
-          setEvent(null);
-        }}
-      >
-        {t("تثبيت")}
-      </button>
+
+      <span className="mt-2">
+        {t("إشعارات المكافآت على آيفون لا تعمل إلا بعد إضافته للشاشة الرئيسية.")}
+      </span>
+
+      <ol className="a2hs-steps">
+        <li>
+          <Icon name="external" size={15} /> {t("اضغط زر المشاركة أسفل المتصفّح")}
+        </li>
+        <li>
+          <Icon name="plus" size={15} /> {t("اختر «إضافة إلى الشاشة الرئيسية»")}
+        </li>
+      </ol>
     </div>
   );
 }

@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from apps.billing import services as billing
 from apps.pos.permissions import IsCashier, IsManager, IsOwner, get_staff_user
 
-from . import reports
+from . import insights, reports
 from .models import LedgerEntry
 from .services import reverse_entry
 
@@ -164,5 +164,47 @@ class ReverseEntryView(APIView):
                 "reversal_entry": str(reversal.id),
                 "delta": str(reversal.delta),
                 "balance_after": str(reversal.balance_after),
+            }
+        )
+
+
+class MerchantInsightsView(APIView):
+    """
+    التوصيات الإحصائية الثلاث — ما وصفه التقرير بـ«محرك التحليل».
+
+    ليست تعلّمًا آليًا ولا تدّعي أنها كذلك: متوسطات محسوبة على نافذة
+    تسعين يومًا، تُسلَّم من الشهر الأول بدل وعد يحتاج عامًا من
+    البيانات. الشريحة الثالثة — العملاء المعرّضون للفقدان — تعيش
+    في قائمة العملاء لأن التاجر يقرأها ليطلق عليها حملة لا ليقرأ
+    رقمًا.
+    """
+
+    permission_classes = [IsManager]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "days", int, description="نافذة القراءة بالأيام — الافتراضي ٩٠", required=False
+            )
+        ],
+        responses={200: None},
+        summary="قيمة المكافأة المقترحة وأفضل وقت للإرسال",
+    )
+    def get(self, request):
+        staff = get_staff_user(request)
+        brand = staff.branch.brand
+
+        try:
+            days = int(request.query_params.get("days", insights.WINDOW_DAYS))
+        except (TypeError, ValueError):
+            days = insights.WINDOW_DAYS
+        # نافذة خارج المدى تُقرَأ كخطأ مطبعي لا كطلب: صفر يعني
+        # قسمة على لا شيء، وألف يوم يخلط موسمًا بموسم
+        days = max(7, min(days, 365))
+
+        return Response(
+            {
+                "reward_value": insights.suggested_reward_value(brand, days=days),
+                "send_time": insights.best_send_time(brand, days=days),
             }
         )
