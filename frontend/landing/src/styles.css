@@ -1,0 +1,1077 @@
+/* ══════════════════════════════════════════════════════════
+   الصفحة العامة.
+
+   الفكرة التي تحكم الصفحة كلها: **ورق مطبوع لا لوحة تحكّم**.
+   خطوط فاصلة رفيعة، وشبكة مرئية، وعناوين كوفية كبيرة، ومساحة
+   بيضاء واسعة بين الأقسام. هذا ما يميّزها عن صفحة SaaS نمطية
+   مبنية من بطاقات مستديرة عائمة على تدرّج بنفسجي.
+
+   قاعدة عملية اتُّبعت في كل قسم: **لون واحد مشبع لكل شاشة**.
+   البنفسجي في القسم الأول وفي الدعوة الأخيرة فقط؛ ما بينهما
+   محايد والخريطة وحدها الملوّنة. التلوين المتساوي في كل مكان
+   يلغي أي تسلسل ويجعل الصفحة تصرخ من أولها لآخرها.
+   ══════════════════════════════════════════════════════════ */
+
+body {
+  background: var(--canvas-2);
+}
+
+.wrap {
+  width: min(var(--page), 100%);
+  margin-inline: auto;
+  padding-inline: 22px;
+}
+
+/* رابط التخطّي: أول ما يصله من يتنقّل بلوحة المفاتيح. يظهر عند
+   التركيز فقط — لكنه يجب أن يظهر فعلًا، ورابط مخفي بـdisplay:none
+   لا يستقبل تركيزًا أصلًا فلا يفيد أحدًا. */
+.skip {
+  position: absolute;
+  inset-block-start: -60px;
+  inset-inline-start: 16px;
+  z-index: 100;
+  padding: 10px 18px;
+  border-radius: 0 0 var(--r) var(--r);
+  background: var(--violet-700);
+  color: #fff;
+  font-weight: 700;
+  transition: top var(--t);
+}
+
+.skip:focus {
+  inset-block-start: 0;
+}
+
+/* ══════════════ الترويسة ══════════════ */
+
+.nav {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 40;
+  transition: background var(--t), box-shadow var(--t), border-color var(--t);
+  border-block-end: 1px solid transparent;
+}
+
+.nav.is-stuck {
+  background: var(--veil);
+  backdrop-filter: blur(12px);
+  border-block-end-color: var(--line);
+}
+
+.nav-in {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 72px;
+}
+
+.nav-logo {
+  flex: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 4px;
+  margin-inline-start: auto;
+}
+
+.nav-links a {
+  padding: 8px 14px;
+  border-radius: var(--r-sm);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--muted);
+  transition: color var(--t), background var(--t);
+}
+
+.nav-links a:hover {
+  color: var(--ink);
+  background: var(--line-2);
+}
+
+.nav-cta {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-cta .btn {
+  min-height: 40px;
+  padding: 8px 16px;
+  font-size: var(--t-sm);
+}
+
+.nav-burger {
+  display: none;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+@media (max-width: 900px) {
+  .nav-burger {
+    display: flex;
+    margin-inline-start: auto;
+  }
+
+  .nav-cta {
+    display: none;
+  }
+
+  /* القائمة المطوية تنسدل تحت الترويسة بعرضها كاملًا: قائمة
+     منسدلة ضيقة عند الحافة تُغلق بأول لمسة خاطئة */
+  .nav-links {
+    display: none;
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 100%;
+    flex-direction: column;
+    gap: 0;
+    padding: 10px 22px 18px;
+    background: var(--surface);
+    border-block-end: 1px solid var(--line);
+    box-shadow: var(--sh-2);
+  }
+
+  .nav-links.is-open {
+    display: flex;
+  }
+
+  .nav-links a {
+    padding: 13px 8px;
+    font-size: var(--t-md);
+    border-block-end: 1px solid var(--line-2);
+    border-radius: 0;
+  }
+}
+
+/* ══════════════ الأقسام ══════════════ */
+
+.section {
+  padding-block: var(--sp-7);
+  border-block-start: 1px solid var(--line-2);
+}
+
+.section-head {
+  max-width: 56ch;
+  margin-block-end: var(--sp-5);
+}
+
+.section-head h2 {
+  font-size: var(--t-2xl);
+  margin-block: 12px 10px;
+}
+
+.section-lede {
+  color: var(--muted);
+  font-size: var(--t-md);
+  line-height: var(--lh-snug);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 13px;
+  border-radius: var(--r-full);
+  background: var(--violet-50);
+  border: 1px solid var(--violet-100);
+  color: var(--violet-700);
+  font-size: var(--t-xs);
+  font-weight: 700;
+}
+
+/* ══════════════ القسم الأول ══════════════ */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-block: var(--sp-6) var(--sp-7);
+}
+
+.hero-art {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.5;
+}
+
+.hero-orb-a {
+  width: 38rem;
+  aspect-ratio: 1;
+  inset-block-start: -16rem;
+  inset-inline-start: -10rem;
+  background: var(--violet-100);
+}
+
+.hero-orb-b {
+  width: 30rem;
+  aspect-ratio: 1;
+  inset-block-start: -6rem;
+  inset-inline-end: -12rem;
+  background: var(--gold-100);
+}
+
+/* الخط الأفقي الرفيع أسفل القسم: يفصله عمّا بعده كما يفصل السطر
+   في الصفحة المطبوعة، بلا ظل ولا حافة بطاقة */
+.hero-rule {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line), transparent);
+}
+
+.hero-in {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+  gap: var(--sp-6);
+  align-items: center;
+}
+
+.hero-copy h1 {
+  font-size: clamp(30px, 5.2vw, 54px);
+  line-height: 1.22;
+  margin-block: 18px 16px;
+}
+
+.hero-lede {
+  color: var(--ink-2);
+  font-size: var(--t-md);
+  line-height: 1.75;
+  max-width: 46ch;
+}
+
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block-start: var(--sp-3);
+}
+
+.hero-marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-block-start: var(--sp-3);
+  color: var(--muted);
+  font-size: var(--t-sm);
+  font-weight: 600;
+}
+
+.hero-marks li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-marks .wl-icon {
+  color: var(--green-600);
+}
+
+/* ── مكدّس البطاقات ── */
+
+.stack-cards {
+  position: relative;
+  /* البطاقة تمثّل بطاقة ولاء في جيب — نسبتها تقارب نسبة البطاقة
+     البلاستيكية. بلا حدّ للعرض تتمدّد إلى عرض العمود كله فتصير
+     لافتة لا بطاقة، ويضيع المعنى كله. */
+  max-width: 400px;
+  margin-inline: auto;
+  display: grid;
+  /* الثلاثة في نفس الخلية ثم تُزاح كل واحدة: الوضع المطلق كان
+     سيُفقد الحاوية ارتفاعها فتنهار الشبكة حولها */
+  grid-template-areas: "card";
+  /* مساحة للحوافّ الظاهرة أعلى البطاقة الأمامية */
+  padding-block-start: 34px;
+}
+
+/* .lcard وتفاصيلها في @walaee/shared — نفس البطاقة التي يراها
+   العميل في تطبيقه، فلا تنحرف الصفحة عن المنتج.
+   ما هنا هو ترتيبها في مكدّس فقط. */
+
+.stack-cards .lcard {
+  grid-area: card;
+  /* البطاقات الخلفية تُزاح لأعلى لا لأسفل: الإزاحة لأسفل كانت
+     تُظهر أسفل البطاقات الخلفية فتبدو الثلاثة صفًّا من الأشرطة
+     المكرّرة لا مكدّسًا. المحفظة الحقيقية تُظهر الحوافّ العليا. */
+  transform: translateY(calc(var(--i) * -16px)) scale(calc(1 - var(--i) * 0.055))
+    rotate(calc(var(--i) * -1.1deg));
+  z-index: calc(10 - var(--i));
+  transition: transform var(--t-slow);
+}
+
+/* عند المرور تنفرج قليلًا — تلميح إلى أنها بطاقات متعدّدة */
+.stack-cards:hover .lcard {
+  transform: translateY(calc(var(--i) * -26px)) scale(calc(1 - var(--i) * 0.045))
+    rotate(calc(var(--i) * -1.9deg));
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-block-start: var(--sp-4);
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.hero-stats > div {
+  padding: 14px 10px;
+  text-align: center;
+  background: var(--surface);
+}
+
+.hero-stats dt {
+  color: var(--muted);
+  font-size: var(--t-xs);
+}
+
+.hero-stats dd {
+  margin: 2px 0 0;
+  font-size: var(--t-xl);
+  font-weight: 700;
+  color: var(--violet-700);
+}
+
+@media (max-width: 960px) {
+  .hero-in {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+  }
+
+  .hero-visual {
+    max-width: 460px;
+    margin-inline: auto;
+    width: 100%;
+  }
+}
+
+/* ══════════════ التغطية ══════════════ */
+
+.coverage-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: var(--sp-4);
+  align-items: start;
+}
+
+.coverage-map {
+  padding: 18px;
+  background: var(--surface);
+}
+
+.coverage-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-block-start: 14px;
+  margin-block-start: 6px;
+  border-block-start: 1px solid var(--line-2);
+  color: var(--muted);
+  font-size: var(--t-sm);
+}
+
+.coverage-legend b {
+  color: var(--ink);
+}
+
+.coverage-side h3 {
+  font-size: var(--t-md);
+  margin-block-end: 12px;
+}
+
+.gov-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gov-row {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--r-sm);
+  text-align: start;
+  transition: background var(--t);
+}
+
+.gov-row:hover {
+  background: var(--line-2);
+}
+
+.gov-row.is-on {
+  background: var(--violet-50);
+}
+
+.gov-name {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gov-bar {
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--line-2);
+  overflow: hidden;
+}
+
+.gov-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--violet-600);
+}
+
+.gov-row.is-on .gov-bar span {
+  background: var(--gold-600);
+}
+
+.gov-count {
+  color: var(--muted);
+  font-size: var(--t-sm);
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .coverage-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── الدليل ── */
+
+.dir {
+  margin-block-start: var(--sp-5);
+  padding-block-start: var(--sp-4);
+  border-block-start: 1px solid var(--line);
+}
+
+.dir-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-block-end: var(--sp-3);
+}
+
+.dir-head h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--t-lg);
+}
+
+.dir-count {
+  padding: 2px 10px;
+  border-radius: var(--r-full);
+  background: var(--line-2);
+  color: var(--muted);
+  font-size: var(--t-sm);
+  font-weight: 700;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  transition: var(--t);
+  transition-property: color, border-color, background;
+}
+
+.chip:hover {
+  color: var(--ink);
+  border-color: var(--violet-300);
+}
+
+.chip.is-on {
+  background: var(--violet-700);
+  border-color: var(--violet-700);
+  color: #fff;
+}
+
+.dir-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-block-end: var(--sp-2);
+  color: var(--violet-700);
+  font-size: var(--t-sm);
+  font-weight: 700;
+}
+
+.dir-empty {
+  padding: var(--sp-4);
+  text-align: center;
+  color: var(--muted);
+}
+
+.dir-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 12px;
+}
+
+.merchant {
+  display: flex;
+  gap: 13px;
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: border-color var(--t), transform var(--t);
+}
+
+.merchant:hover {
+  border-color: var(--brand);
+  transform: translateY(-2px);
+}
+
+/* الأيقونة بلون العلامة على خلفية شفافة منه: تُعطي كل متجر هوية
+   في الشبكة بلا شعارات لا نملكها */
+.merchant-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r);
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  color: var(--brand);
+}
+
+.merchant-name {
+  font-size: var(--t-base);
+  font-weight: 700;
+}
+
+.merchant-tag {
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  margin-block: 2px 8px;
+}
+
+.merchant-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--faint);
+  font-size: var(--t-xs);
+}
+
+.merchant-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ── حالتا التحميل والفشل ── */
+
+.coverage-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: var(--sp-6);
+  color: var(--muted);
+}
+
+.coverage-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: var(--sp-5);
+  text-align: center;
+  color: var(--muted);
+}
+
+.coverage-error .wl-icon {
+  color: var(--orange-600);
+}
+
+.coverage-error h2 {
+  font-size: var(--t-lg);
+  color: var(--ink);
+}
+
+/* ══════════════ كيف تعمل ══════════════ */
+
+.how {
+  background: var(--canvas);
+}
+
+.tracks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--sp-4);
+}
+
+.track {
+  padding: var(--sp-4);
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.track-badge {
+  display: inline-block;
+  padding: 3px 11px;
+  border-radius: var(--r-full);
+  font-size: var(--t-xs);
+  font-weight: 700;
+}
+
+.track-customer .track-badge {
+  background: var(--gold-100);
+  color: var(--gold-700);
+}
+
+.track-merchant .track-badge {
+  background: var(--violet-100);
+  color: var(--violet-700);
+}
+
+.track h3 {
+  font-size: var(--t-lg);
+  margin-block: 10px var(--sp-3);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.steps li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.step-mark {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r);
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+}
+
+.step-mark b {
+  position: absolute;
+  inset-block-start: -7px;
+  inset-inline-start: -7px;
+  display: grid;
+  place-items: center;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: var(--violet-700);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.steps strong {
+  display: block;
+  font-size: var(--t-base);
+}
+
+.steps p {
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.65;
+  margin-block-start: 3px;
+}
+
+/* ══════════════ للتجّار ══════════════ */
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.feature {
+  padding: 22px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+/* بطاقة دفتر القيود تأخذ عمودين: هي ما يميّز المنتج، وتسويتها
+   ببقية البطاقات تخفيها وسطها */
+.feature.is-wide {
+  grid-column: span 2;
+  background: linear-gradient(140deg, var(--violet-50), var(--surface) 62%);
+  border-color: var(--violet-100);
+}
+
+@media (max-width: 720px) {
+  .feature.is-wide {
+    grid-column: span 1;
+  }
+}
+
+.feature-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-block-end: 14px;
+  border-radius: var(--r);
+  background: var(--violet-100);
+  color: var(--violet-700);
+}
+
+.feature strong {
+  display: block;
+  font-size: var(--t-md);
+  margin-block-end: 6px;
+}
+
+.feature p {
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.7;
+}
+
+.merchants-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-block-start: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-xl);
+  border: 1px dashed var(--violet-300);
+  background: var(--violet-50);
+}
+
+.merchants-cta p {
+  max-width: 48ch;
+  color: var(--ink-2);
+  font-size: var(--t-base);
+}
+
+/* ══════════════ الأسعار ══════════════ */
+
+.pricing {
+  background: var(--canvas);
+}
+
+.plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+.plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px 20px;
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.plan.is-featured {
+  border-color: var(--violet-700);
+  box-shadow: var(--sh-3);
+}
+
+.plan-flag {
+  position: absolute;
+  inset-block-start: -11px;
+  inset-inline-start: 20px;
+  padding: 3px 12px;
+  border-radius: var(--r-full);
+  background: var(--violet-700);
+  color: #fff;
+  font-size: var(--t-xs);
+  font-weight: 700;
+}
+
+.plan h3 {
+  font-size: var(--t-lg);
+}
+
+.plan-pitch {
+  color: var(--muted);
+  font-size: var(--t-sm);
+}
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding-block: 10px;
+  border-block-end: 1px solid var(--line-2);
+}
+
+.plan-price b {
+  font-size: var(--t-2xl);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.plan-price span {
+  color: var(--muted);
+  font-size: var(--t-sm);
+}
+
+.plan ul {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  flex: 1;
+  padding-block: 6px;
+}
+
+.plan li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}
+
+.plan li .wl-icon {
+  margin-block-start: 3px;
+  color: var(--green-600);
+}
+
+.pricing-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 70ch;
+  margin-block-start: var(--sp-4);
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.7;
+}
+
+/* ══════════════ الأسئلة ══════════════ */
+
+.faq-list {
+  max-width: 78ch;
+  border-block-start: 1px solid var(--line);
+}
+
+.faq-list details {
+  border-block-end: 1px solid var(--line);
+}
+
+.faq-list summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 4px;
+  cursor: pointer;
+  font-size: var(--t-md);
+  font-weight: 600;
+  /* السهم الافتراضي يظهر يسارًا في RTL ويتضارب مع سهمنا */
+  list-style: none;
+}
+
+.faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-list summary:hover {
+  color: var(--violet-700);
+}
+
+.faq-caret {
+  flex: none;
+  color: var(--faint);
+  transition: transform var(--t);
+}
+
+.faq-list details[open] .faq-caret {
+  transform: rotate(180deg);
+}
+
+.faq-list details p {
+  max-width: var(--measure);
+  padding: 0 4px 22px;
+  color: var(--muted);
+  line-height: 1.85;
+}
+
+/* ══════════════ الدعوة الأخيرة ══════════════ */
+
+.cta {
+  position: relative;
+  overflow: hidden;
+  padding-block: var(--sp-7);
+  background: linear-gradient(150deg, var(--violet-900), var(--violet-700) 62%, #5b2cb6);
+  color: var(--on-dark);
+  text-align: center;
+}
+
+.cta-art {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cta-in {
+  position: relative;
+}
+
+.cta h2 {
+  font-size: clamp(24px, 3.6vw, 38px);
+  max-width: 22ch;
+  margin-inline: auto;
+}
+
+.cta p {
+  margin-block: 14px var(--sp-3);
+  color: var(--on-dark-2);
+  font-size: var(--t-md);
+}
+
+.cta-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.cta-primary {
+  background: #fff;
+  color: var(--violet-800);
+}
+
+.cta-primary:hover {
+  background: var(--violet-50);
+}
+
+.cta-ghost {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+
+.cta-ghost:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ══════════════ التذييل ══════════════ */
+
+.foot {
+  background: var(--surface);
+  border-block-start: 1px solid var(--line);
+}
+
+.foot-in {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+  padding-block: var(--sp-5);
+}
+
+.foot-brand p {
+  max-width: 42ch;
+  margin-block-start: 14px;
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.75;
+}
+
+.foot-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.foot-nav h3 {
+  font-family: var(--font);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--faint);
+  margin-block-end: 3px;
+}
+
+.foot-nav a {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  font-weight: 600;
+}
+
+.foot-nav a:hover {
+  color: var(--violet-700);
+}
+
+.foot-base {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding-block: 18px;
+  border-block-start: 1px solid var(--line-2);
+  color: var(--faint);
+  font-size: var(--t-xs);
+}
+
+@media (max-width: 760px) {
+  .foot-in {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .foot-brand {
+    grid-column: span 2;
+  }
+
+  .section {
+    padding-block: var(--sp-6);
+  }
+}

@@ -1,85 +1,266 @@
-/* لوحة إدارة المنصة — واجهة داخلية لفريق ولائي. */
+/* ══════════════════════════════════════════════════════════
+   لوحة إدارة المنصة.
 
-.admin {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+   نفس هيكل لوحة التاجر حرفًا بحرف — الشريط الجانبي والعلوي
+   وبطاقات المؤشرات — إلا أن الشريط هنا شبه أسود لا بنفسجي.
+
+   التطابق مقصود: من يعمل في فريق المنصة يفتح لوحة التاجر أيضًا
+   ليتابع شكوى أو يشرح ميزة، واختلاف الهيكل بين الاثنين يجعله
+   يبحث عن كل شيء مرتين. واختلاف اللون وحده يكفي ليعرف في أي
+   لوحة هو الآن قبل أن يقرأ حرفًا — وهو فارق مهم حين تكون إحداهما
+   تعرض بيانات عملاء والأخرى لا.
+   ══════════════════════════════════════════════════════════ */
+
+body {
+  background: var(--canvas);
 }
 
-.admin-hd {
+.shell {
   display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-  padding: 14px 24px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
+  min-height: 100dvh;
+}
+
+/* ══════════════ الشريط الجانبي ══════════════ */
+
+/* داكن لا أبيض: يفصل التنقّل عن المحتوى بلا خط فاصل، ويجعل
+   المنطقة البيضاء كلها «الشغل» — وهو ما يريده من يقضي يومه فيها. */
+.side {
+  width: 252px;
+  flex: none;
+  background: linear-gradient(180deg, var(--violet-800), var(--violet-900));
+  color: #fff;
+  display: flex;
+  flex-direction: column;
   position: sticky;
   top: 0;
-  z-index: 10;
+  height: 100dvh;
 }
 
-.admin-hd nav {
-  margin-inline-start: auto;
+.side-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 18px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.admin-mark {
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 11px;
-  background: var(--violet-900);
-  color: #fff;
-  font-size: 17px;
+.side-brand-name {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
-.admin-body {
-  flex: 1;
-  padding: 26px 24px 60px;
-  max-width: 1180px;
+.side-brand-sub {
+  font-size: var(--t-xs);
+  color: var(--on-dark-2);
+  font-weight: 600;
+}
+
+/* مبدّل الفرع: قائمة بلا مظهر قائمة. تبدو كعنوان اللوحة لأنها في
+   مكانه، والسهم وحده يقول إنها قابلة للتغيير. */
+.branch-switch {
+  /* العرض المتاح كله ولا شيء أكثر: القائمة لا تعرف الاقتصاص
+     بالنقاط، فالحلّ الوحيد أن تُعطى العرض ثم يُصغَّر الخط قليلًا
+     ليتّسع «علامة — فرع» بلا قطع. */
   width: 100%;
-  margin: 0 auto;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
 }
 
-.auth {
-  min-height: 100dvh;
+.branch-switch option {
+  color: var(--ink);
+}
+
+.branch-switch:focus-visible {
+  outline: 2px solid var(--orange-500);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+.side nav {
+  flex: 1;
+  padding: 10px 11px;
+  overflow-y: auto;
+}
+
+.side nav::-webkit-scrollbar {
+  width: 0;
+}
+
+.grp-t {
+  font-size: 10px;
+  color: var(--on-dark-faint);
+  font-weight: 800;
+  padding: 14px 10px 7px;
+}
+
+.nav-i {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  color: var(--on-dark-2);
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: var(--t);
+  margin-bottom: 2px;
+}
+
+.nav-i:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+
+/* الحدّ البرتقالي الداخلي يميّز النشط عن مجرّد «مؤشّر فوقه»:
+   الخلفية وحدها تتشابه مع حالة التمرير فيتردّد المستخدم. */
+.nav-i.on {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--orange-500);
+}
+
+.side-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--on-dark-2);
+}
+
+.side-foot .av {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.iconbtn-dark {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
-  padding: 20px;
+  color: var(--on-dark-2);
+  transition: var(--t);
+  flex: none;
 }
 
-.auth-card {
-  width: min(400px, 100%);
+.iconbtn-dark:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+/* ══════════════ المنطقة الرئيسية ══════════════ */
+
+.main {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 28px 24px;
+}
+
+.topnav {
+  min-height: 66px;
+  background: var(--veil);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 26px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.topnav h1 {
+  font-size: 19px;
+}
+
+.crumb {
+  font-size: var(--t-sm);
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.content {
+  padding: 24px 26px 46px;
+  max-width: var(--page);
+  width: 100%;
+}
+
+/* ══════════════ بطاقة مؤشر ══════════════ */
+
+.kpi {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  box-shadow: var(--sh-1);
+  transition: var(--t);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi:hover {
   box-shadow: var(--sh-2);
+  transform: translateY(-2px);
 }
 
-.auth-brand {
-  text-align: center;
+.kt {
+  font-size: var(--t-sm);
+  color: var(--muted);
+  font-weight: 700;
+  line-height: 1.4;
 }
 
-.auth-mark {
-  width: 54px;
-  height: 54px;
-  margin: 0 auto 10px;
-  display: grid;
-  place-items: center;
-  border-radius: 17px;
-  background: var(--violet-900);
-  color: #fff;
-  font-size: 24px;
+.kv {
+  font-size: 26px;
+  font-weight: 800;
+  margin-top: 5px;
+  line-height: 1.15;
 }
 
-.auth-brand h1 {
-  font-size: 21px;
+.ks {
+  font-size: var(--t-xs);
+  color: var(--faint);
+  font-weight: 600;
+  margin-top: 3px;
 }
+
+.spk {
+  width: 100%;
+  height: 40px;
+  margin: 10px -4px 6px;
+  overflow: visible;
+}
+
+/* مؤشّر بلا تاريخ كافٍ للرسم يحجز نفس الارتفاع، وإلا قفزت
+   البطاقات في الشبكة وتفاوتت أطوالها بلا سبب ظاهر */
+.spk-empty {
+  height: 40px;
+  margin: 10px 0 6px;
+}
+
+
+/* الشريط شبه الأسود يميّز لوحة المنصة عن لوحة التاجر بنظرة */
+.side-admin {
+  background: linear-gradient(180deg, #16132a, #0d0b1c);
+}
+
+
+/* شاشة الدخول في @walaee/shared — AuthLayout. */
 
 .stack {
   display: flex;
@@ -205,18 +386,58 @@ h2 {
   box-shadow: inset 3px 0 0 var(--red-600);
 }
 
-@media (max-width: 720px) {
-  .admin-hd {
-    padding: 12px 16px;
+@media (max-width: 860px) {
+  /* الشريط الجانبي يصير صفًّا أفقيًا — راجع نفس القاعدة في لوحة التاجر */
+  .shell {
+    flex-direction: column;
   }
 
-  .admin-hd nav {
-    margin-inline-start: 0;
+  .side {
     width: 100%;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
     overflow-x: auto;
   }
 
-  .admin-body {
-    padding: 18px 16px 40px;
+  .side-brand,
+  .side-foot {
+    border: none;
+    padding: 0;
+    flex: none;
+  }
+
+  .side nav {
+    display: flex;
+    gap: 4px;
+    padding: 0;
+    flex: 1;
+  }
+
+  .side nav > div {
+    display: flex;
+    gap: 4px;
+  }
+
+  .grp-t {
+    display: none;
+  }
+
+  .nav-i {
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .g3,
+  .g4 {
+    grid-template-columns: 1fr;
   }
 }
+

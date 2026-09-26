@@ -16,6 +16,8 @@
 import { useEffect, useState } from "react";
 
 import { api } from "../api/client";
+import { Icon } from "./icons";
+import { t } from "../i18n/locale";
 
 export type DemoApp = "customer" | "merchant" | "admin";
 
@@ -103,14 +105,16 @@ export function DemoAccountsPanel({
     customer: data.customers.map((c) => ({
       phone: c.phone,
       label: c.label,
-      hint: `الكود ${c.code}`,
+      hint: t("الكود {code}", { code: c.code }),
       secret: c.code,
     })),
     merchant: data.staff
       .filter((s) => s.app === "merchant")
       .map((s) => ({
         phone: s.phone,
-        label: s.label,
+        // اسم الدور لا اسم شخص — يُترجَم. أسماء العملاء أعلاه لا
+        // تُترجَم: «سارة عبد الله» اسمها كذلك في الشاشة الإنجليزية.
+        label: t(s.label),
         hint: s.phone,
         secret: s.password,
       })),
@@ -118,7 +122,9 @@ export function DemoAccountsPanel({
       .filter((s) => s.app === "admin")
       .map((s) => ({
         phone: s.phone,
-        label: s.label,
+        // اسم الدور لا اسم شخص — يُترجَم. أسماء العملاء أعلاه لا
+        // تُترجَم: «سارة عبد الله» اسمها كذلك في الشاشة الإنجليزية.
+        label: t(s.label),
         hint: s.phone,
         secret: s.password,
       })),
@@ -130,7 +136,7 @@ export function DemoAccountsPanel({
   return (
     <div className="wl-demo">
       <p className="wl-demo-title">
-        <span aria-hidden="true">◈</span> حسابات تجربة
+        <Icon name="bolt" size={15} /> {t("حسابات تجربة")}
       </p>
 
       {groups.map((key) => {
@@ -138,12 +144,12 @@ export function DemoAccountsPanel({
         return (
           <section key={key} className="wl-demo-group">
             <p className="wl-demo-group-title">
-              {APP_TITLES[key]}
+              {t(APP_TITLES[key])}
               {current ? (
-                <span className="wl-demo-badge">هنا</span>
+                <span className="wl-demo-badge">{t("هنا")}</span>
               ) : (
                 <a className="wl-demo-link" href={data.apps[key]}>
-                  انتقل إليه ›
+                  {t("انتقل إليه ›")}
                 </a>
               )}
             </p>

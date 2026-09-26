@@ -14,9 +14,11 @@ import {
   Button,
   Empty,
   ErrorBox,
+  Icon,
   Loading,
   Modal,
   fmt,
+  t,
   useAction,
   useApi,
 } from "@walaee/shared";
@@ -37,30 +39,25 @@ export function Fraud() {
 
   return (
     <div className="stack gap-lg">
-      <header className="row between wrap">
-        <div>
-          <h1>مراجعة العمليات</h1>
-          <p className="t-sm muted">
-            النظام يرفع راية على الأنماط غير المعتادة — والقرار لك
-          </p>
-        </div>
+      <FraudIntro />
 
-        <div className="range-switch" role="group" aria-label="الحالة">
+      <div className="row between wrap-f">
+        <div className="tabs" role="group" aria-label={t("الحالة")}>
           {[
-            { key: "open", label: "بانتظار المراجعة" },
-            { key: "all", label: "الكل" },
+            { key: "open", label: t("بانتظار المراجعة") },
+            { key: "all", label: t("الكل") },
           ].map((option) => (
             <button
               key={option.key}
               type="button"
-              className={status === option.key ? "active" : ""}
+              className={status === option.key ? "on" : ""}
               onClick={() => setStatus(option.key)}
             >
-              {option.label}
+              {t(option.label)}
             </button>
           ))}
         </div>
-      </header>
+      </div>
 
       {signals.loading && <Loading />}
       {signals.error != null && (
@@ -69,9 +66,9 @@ export function Fraud() {
 
       {signals.data?.length === 0 && (
         <Empty
-          icon="✓"
-          title="لا شيء يحتاج مراجعتك"
-          hint="كل العمليات ضمن الأنماط المعتادة لمتجرك."
+          icon="shield"
+          title={t("لا شيء يحتاج مراجعتك")}
+          hint={t("كل العمليات ضمن الأنماط المعتادة لمتجرك.")}
         />
       )}
 
@@ -84,12 +81,12 @@ export function Fraud() {
             onClick={() => setReviewing(signal)}
           >
             <Badge tone={SEVERITY[signal.severity].tone}>
-              {SEVERITY[signal.severity].label}
+              {t(SEVERITY[signal.severity].label)}
             </Badge>
             <div className="grow" style={{ textAlign: "start" }}>
-              <p className="w-7">{signal.rule_label}</p>
+              <p className="w-7">{t(signal.rule_label)}</p>
               <p className="t-sm muted">
-                فاتورة <span className="num">{signal.invoice_no}</span> ·{" "}
+                {t("فاتورة")} <span className="num">{signal.invoice_no}</span> ·{" "}
                 <span className="num">{fmt.money(signal.invoice_amount)}</span> ·{" "}
                 {signal.branch_name}
               </p>
@@ -99,12 +96,14 @@ export function Fraud() {
             </div>
             {signal.status !== "open" && (
               <Badge tone={signal.status === "accepted" ? "green" : "red"}>
-                {signal.status === "accepted" ? "قُبلت" : "عُكست"}
+                {signal.status === "accepted" ? t("قُبلت") : t("عُكست")}
               </Badge>
             )}
           </button>
         ))}
       </div>
+
+      <FraudControls />
 
       <ReviewModal
         signal={reviewing}
@@ -134,31 +133,31 @@ function ReviewModal({
   const closed = signal.status !== "open";
 
   return (
-    <Modal open title={signal.rule_label} onClose={onClose}>
+    <Modal open title={t(signal.rule_label)} onClose={onClose}>
       <div className="stack gap">
         <dl className="detail-list">
           <div>
-            <dt>الفاتورة</dt>
+            <dt>{t("الفاتورة")}</dt>
             <dd className="num">{signal.invoice_no}</dd>
           </div>
           <div>
-            <dt>المبلغ</dt>
+            <dt>{t("المبلغ")}</dt>
             <dd className="num">{fmt.money(signal.invoice_amount)}</dd>
           </div>
           <div>
-            <dt>الفرع</dt>
+            <dt>{t("الفرع")}</dt>
             <dd>{signal.branch_name}</dd>
           </div>
           <div>
-            <dt>الكاشير</dt>
+            <dt>{t("الكاشير")}</dt>
             <dd>{signal.staff_name ?? "—"}</dd>
           </div>
           <div>
-            <dt>العميل</dt>
+            <dt>{t("العميل")}</dt>
             <dd className="num">{fmt.phone(signal.customer_phone)}</dd>
           </div>
           <div>
-            <dt>الوقت</dt>
+            <dt>{t("الوقت")}</dt>
             <dd>{fmt.dateTime(signal.created_at)}</dd>
           </div>
         </dl>
@@ -178,14 +177,12 @@ function ReviewModal({
 
         {closed ? (
           <p className="t-sm muted">
-            روجعت هذه الإشارة في {fmt.dateTime(signal.reviewed_at)}.
+            {t("روجعت هذه الإشارة في")} {fmt.dateTime(signal.reviewed_at)}.
           </p>
         ) : (
           <>
             <p className="t-sm muted">
-              «العملية سليمة» تغلق الإشارة بلا أي تغيير على الرصيد.
-              «مخالفة» تعكس النقاط الممنوحة بقيود مضادة — والقيود الأصلية
-              تبقى في السجل.
+              {t("«العملية سليمة» تغلق الإشارة بلا أي تغيير على الرصيد. «مخالفة» تعكس النقاط الممنوحة بقيود مضادة — والقيود الأصلية تبقى في السجل.")}
             </p>
 
             <div className="row gap">
@@ -196,7 +193,7 @@ function ReviewModal({
                   if (done) onDone();
                 }}
               >
-                العملية سليمة
+                {t("العملية سليمة")}
               </Button>
               <Button
                 variant="danger"
@@ -206,12 +203,70 @@ function ReviewModal({
                   if (done) onDone();
                 }}
               >
-                مخالفة — اعكس النقاط
+                {t("مخالفة — اعكس النقاط")}
               </Button>
             </div>
           </>
         )}
       </div>
     </Modal>
+  );
+}
+
+/**
+ * لماذا هذه الشاشة موجودة.
+ *
+ * أي نظام ولاء بلا ضوابط يُستغَل خلال أسابيع — كاشير يمنح نقاطًا
+ * لرقمه أو لأصدقائه. الشرح هنا لا في التوثيق لأن من يفتح هذه
+ * الشاشة أول مرة يظن أنها تتّهم موظفيه، وسطران يمنعان ذلك.
+ */
+function FraudIntro() {
+  return (
+    <section className="card card-p tint-r">
+      <div className="row-t">
+        <span className="ibox r" style={{ background: "#fff" }}>
+          <Icon name="shield" size={20} />
+        </span>
+        <div className="grow">
+          <b>{t("ضوابط تحمي بياناتك وثقتك")}</b>
+          <p className="t-sm muted mt-1">
+            {t("النظام يربط كل منح برقم الفاتورة وقيمتها، ويكشف الشذوذ آليًا، ويحتفظ بسجل تدقيق غير قابل للحذف. ما يظهر هنا اقتراح للمراجعة لا اتهامًا — والقرار لك.")}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** الضوابط المفعّلة — سياسات النظام لا إعدادات لهذا المتجر. */
+const CONTROLS: [string, string][] = [
+  ["سقف يومي لكل عميل", "يضبطه كل برنامج في قواعده"],
+  ["ربط المنح برقم الفاتورة وقيمتها", "إلزامي — لا منح بلا فاتورة"],
+  ["رفض إعادة استخدام نفس الرمز", "الرمز صالح لمرة واحدة وثوانٍ معدودة"],
+  ["حساب مستقل لكل كاشير", "شرط نسبة أي نمط إلى شخص بعينه"],
+  ["سجل تدقيق غير قابل للحذف", "العكس يُسجَّل قيدًا جديدًا ولا يمحو القديم"],
+];
+
+function FraudControls() {
+  return (
+    <section className="card">
+      <div className="card-hd">
+        <h3>{t("الضوابط المفعّلة")}</h3>
+      </div>
+      <div className="card-p">
+        {CONTROLS.map(([title, note]) => (
+          <div key={title} className="li">
+            <span className="ibox g" aria-hidden="true">
+              <Icon name="lock" size={18} />
+            </span>
+            <div className="grow">
+              <p className="li-t">{t(title)}</p>
+              <p className="li-s">{t(note)}</p>
+            </div>
+            <Icon name="checkCircle" size={18} className="c-green" />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

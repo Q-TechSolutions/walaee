@@ -6,8 +6,11 @@
 العميل. المرجع: docs/architecture/security.md
 """
 
+from datetime import timedelta
+
 from django.db import transaction
-from django.db.models import Max, Sum
+from django.db.models import Count, Max, Sum
+from django.db.models.functions import TruncDate
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers, status
@@ -38,7 +41,99 @@ class CardSerializer(serializers.Serializer):
     balances = serializers.ListField()
 
 
-def _card(membership) -> dict:
+def program_rewards(brands) -> dict:
+    """
+    مكافآت كل برنامج مرتّبة بالثمن، مفهرسة بمعرّف البرنامج.
+
+    استعلام واحد لكل المحفظة لا استعلام لكل بطاقة: عميل في عشر
+    علامات كان سيولّد عشرة استعلامات في شاشة تُفتح عند كل تشغيل
+    للتطبيق.
+    """
+    from apps.loyalty.models import Reward
+
+    rows = (
+        Reward.objects.filter(
+            program__brand__in=brands,
+            is_active=True,
+            program__is_active=True,
+        )
+        .select_related("program")
+        .order_by("program_id", "cost_amount")
+    )
+
+    by_program: dict[str, list] = {}
+    for reward in rows:
+        by_program.setdefault(str(reward.program_id), []).append(reward)
+    return by_program
+
+
+def next_reward_for(amount, rewards: list):
+    """
+    الهدف التالي: **أرخص مكافأة لا يستطيع العميل صرفها بعد**.
+
+    وليست أرخص مكافأة إطلاقًا. الفرق ليس تفصيلًا: عميل رصيده ٣٤٠
+    وأرخص مكافأة بـ١٠٠ كان يرى «٣٤٠ من ١٠٠» فوق شريط ممتلئ —
+    جملة بلا معنى، وهدف تجاوزه من زمن. الهدف يجب أن يكون أمامه.
+
+    فإن كان يستطيع صرف كل المكافآت فلا هدف تالٍ: يُعاد الأغلى
+    بوصفها مكتملة، فيقول الشريط «جاهزة» بدل أن يختفي فجأة.
+    """
+    if not rewards:
+        return None, True
+
+    for reward in rewards:
+        if reward.cost_amount > amount:
+            return reward, False
+
+    return rewards[-1], True
+
+
+def _progress(amount, cost) -> float:
+    """نسبة الاكتمال نحو المكافأة، محصورة بين صفر وواحد."""
+    if cost is None or cost <= 0:
+        return 0.0
+    return min(float(amount) / float(cost), 1.0)
+
+
+def _card(membership, rewards: dict | None = None) -> dict:
+    rewards = rewards or {}
+    balances = []
+    target = None
+
+    for balance in membership.balances.all():
+        key = str(balance.program_id)
+        reward, reached = next_reward_for(balance.amount, rewards.get(key, []))
+        row = {
+            "program_id": key,
+            "program_name": balance.program.name,
+            "program_type": balance.program.type,
+            "unit_label": balance.program.unit_label,
+            "amount": str(balance.amount),
+            "expires_at": balance.expires_at,
+            # الهدف التالي على هذا البرنامج — يرسم شريط التقدّم
+            "next_reward": (
+                {
+                    "id": str(reward.id),
+                    "title": reward.title,
+                    "cost_amount": str(reward.cost_amount),
+                    "progress": 1.0 if reached else _progress(balance.amount, reward.cost_amount),
+                    "remaining": str(max(reward.cost_amount - balance.amount, 0)),
+                    # يميّز «وصلت إلى آخر مكافأة» عن «شريط ممتلئ»
+                    "reached": reached,
+                }
+                if reward is not None
+                else None
+            ),
+        }
+        balances.append(row)
+
+        # بطاقة العميل تعرض هدفًا واحدًا: الأقرب إلى الاكتمال، لأنه
+        # الذي سيصرفه أولًا
+        if row["next_reward"] is not None and (
+            target is None or row["next_reward"]["progress"] > target["progress"]
+        ):
+            target = {**row["next_reward"], "unit_label": balance.program.unit_label}
+
     return {
         "membership_id": str(membership.id),
         "brand_id": str(membership.brand_id),
@@ -48,17 +143,8 @@ def _card(membership) -> dict:
         "joined_at": membership.joined_at,
         "tier": membership.tier,
         "last_activity": getattr(membership, "last_activity", None),
-        "balances": [
-            {
-                "program_id": str(balance.program_id),
-                "program_name": balance.program.name,
-                "program_type": balance.program.type,
-                "unit_label": balance.program.unit_label,
-                "amount": str(balance.amount),
-                "expires_at": balance.expires_at,
-            }
-            for balance in membership.balances.all()
-        ],
+        "balances": balances,
+        "next_reward": target,
     }
 
 
@@ -95,7 +181,9 @@ class MyCardsView(APIView):
             # البطاقة التي يتعامل معها الآن لا التي سجّل بها أولًا
             .order_by("-last_activity", "-joined_at")
         )
-        return Response([_card(m) for m in memberships])
+        cards = list(memberships)
+        rewards = program_rewards([m.brand_id for m in cards])
+        return Response([_card(m, rewards) for m in cards])
 
 
 class CardDetailView(APIView):
@@ -141,19 +229,25 @@ class CardDetailView(APIView):
             .order_by("-created_at")[:20]
         )
 
+        # الإنفاق والزيارات من نفس المجموعة: العمليات المؤكَّدة على
+        # فروع هذه العلامة. عدّهما في استعلامين كان يمرّ على نفس
+        # الصفوف مرتين بلا داعٍ
+        visits = Transaction.objects.filter(
+            customer=request.user,
+            terminal__branch__brand=membership.brand,
+            status=Transaction.STATUS_CONFIRMED,
+        ).aggregate(spend=Sum("invoice_amount"), count=Count("id"))
+
         return Response(
             {
-                **_card(membership),
+                **_card(membership, program_rewards([membership.brand_id])),
                 "rewards": rewards,
                 "activity": [_entry(entry) for entry in entries],
-                "total_spend": str(
-                    Transaction.objects.filter(
-                        customer=request.user,
-                        terminal__branch__brand=membership.brand,
-                        status=Transaction.STATUS_CONFIRMED,
-                    ).aggregate(total=Sum("invoice_amount"))["total"]
-                    or 0
-                ),
+                "total_spend": str(visits["spend"] or 0),
+                # العدد من جدول العمليات لا من `activity` أعلاه:
+                # تلك مقصوصة على عشرين قيدًا، فعدّها يعطي «٢٠» لمن
+                # عنده مئتان — رقم خاطئ يبدو صحيحًا تمامًا
+                "total_visits": visits["count"],
             }
         )
 
@@ -485,5 +579,52 @@ class MyBalancesSummaryView(APIView):
                     status=Redemption.STATUS_PENDING,
                     expires_at__gt=timezone.now(),
                 ).count(),
+                "week": _week_streak(request.user),
             }
         )
+
+
+#: أوائل أسماء الأيام كما تظهر في شريط السلسلة.
+#: مكتوبة صراحةً لا مشتقّة من `Intl`: الاشتقاق يعطي حرفًا واحدًا
+#: متكرّرًا لأكثر من يوم («ا» للأحد والاثنين، «ث» للثلاثاء
+#: والثاء)، فيرى المستخدم عمودين متطابقين ولا يعرف أيهما اليوم.
+WEEKDAY_LETTERS = ["ن", "ث", "ر", "خ", "ج", "س", "ح"]
+
+
+def _week_streak(customer) -> list[dict]:
+    """
+    آخر سبعة أيام: أيّها زار فيه العميل متجرًا.
+
+    من العمليات المؤكَّدة وحدها — عملية ملغاة أو معلّقة ليست زيارة.
+    التقويم محلي (`Africa/Cairo`): «اليوم» عند العميل هو يومه هو،
+    لا يوم الخادم بتوقيت UTC، وإلا أضاء العمود الخطأ بعد منتصف
+    الليل بساعتين.
+
+    القيمة هنا ليست زينة: الشريط هو ما يجعل العميل يلاحظ أنه لم
+    يزر هذا الأسبوع — وهو بالضبط ما يعيده.
+    """
+    today = timezone.localdate()
+    start = today - timedelta(days=6)
+
+    days = set(
+        Transaction.objects.filter(
+            customer=customer,
+            status=Transaction.STATUS_CONFIRMED,
+            created_at__date__gte=start,
+        )
+        .annotate(day=TruncDate("created_at"))
+        .values_list("day", flat=True)
+    )
+
+    week = []
+    for offset in range(7):
+        day = start + timedelta(days=offset)
+        week.append(
+            {
+                "date": day.isoformat(),
+                "letter": WEEKDAY_LETTERS[day.weekday()],
+                "visited": day in days,
+                "today": day == today,
+            }
+        )
+    return week

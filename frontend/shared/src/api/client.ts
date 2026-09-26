@@ -9,6 +9,7 @@
 
 import { readTokens, writeTokens, clearTokens, setTokenNamespace } from "./tokens";
 import type { ApiError, Tokens } from "./types";
+import { t } from "../i18n/locale";
 
 const DEFAULT_BASE = "/api/v1";
 
@@ -57,6 +58,15 @@ export interface ClientConfig {
   appId?: string;
   /** يُستدعى حين تنتهي الجلسة نهائيًا ولا يمكن تجديدها */
   onUnauthenticated?: () => void;
+  /**
+   * ترويسات إضافية تُحسب عند كل طلب.
+   *
+   * دالة لا كائن: لوحة التاجر ترسل الفرع المختار، وهو يتغيّر أثناء
+   * الجلسة. كائن ثابت يُقرأ مرة عند الإعداد كان سيُجمّد أول اختيار
+   * ويجعل التبديل بلا أثر — والأسوأ أن الواجهة تعرض علامة بينما
+   * الخادم يجيب عن أخرى.
+   */
+  headers?: () => Record<string, string>;
 }
 
 let config: ClientConfig = {};
@@ -148,7 +158,10 @@ export async function request<T>(
   const { method = "GET", body, query, anonymous = false, signal } = options;
 
   const send = async (token?: string): Promise<Response> => {
-    const headers: Record<string, string> = { Accept: "application/json" };
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+      ...(anonymous ? {} : config.headers?.()),
+    };
     if (body !== undefined) headers["Content-Type"] = "application/json";
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -172,7 +185,7 @@ export async function request<T>(
     throw new WalaeeApiError(
       0,
       null,
-      "تعذّر الوصول إلى الخادم. تأكد من اتصالك، ومن أن الخادم يعمل على نفس العنوان.",
+      t("تعذّر الوصول إلى الخادم. تأكد من اتصالك، ومن أن الخادم يعمل على نفس العنوان."),
       cause,
     );
   }
@@ -199,7 +212,7 @@ export async function request<T>(
     throw new WalaeeApiError(
       response.status,
       payload,
-      `فشل الطلب (${response.status})`,
+      t("فشل الطلب ({status})", { status: response.status }),
     );
   }
 

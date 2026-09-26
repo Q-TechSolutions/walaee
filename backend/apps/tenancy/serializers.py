@@ -22,8 +22,11 @@ class BrandSerializer(serializers.ModelSerializer):
             "primary_color",
             "logo",
             "is_active",
+            "tagline",
             "organization_name",
+            "created_at",
         )
+        read_only_fields = ("id", "slug", "is_active", "created_at")
         # المؤسسة والمعرّف لا يُعدَّلان من لوحة التاجر: الأول يخص
         # التعاقد، والثاني يظهر في روابط منشورة
         read_only_fields = ("id", "slug", "organization_name")

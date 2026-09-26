@@ -285,3 +285,65 @@ class TestErrorCodesFollowStatus:
 
         assert response.status_code == 400
         assert response.json()["error"]["code"] == "validation_error"
+
+
+class TestStaffNeverListedAsCustomers:
+    """
+    وضع رقم موظف في `DEMO_LOGIN_PHONES` خطأ إعداد سهل الوقوع فيه —
+    وقد وقع فعلًا. النتيجة أن شاشة دخول العميل تعرض رقم مدير
+    المنصة كحساب عميل، فيدخل به المجرّب ولا يجد بطاقة واحدة
+    ويستنتج أن التطبيق فارغ.
+    """
+
+    STAFF = "01000000001"
+
+    @override_settings(
+        DEMO_LOGIN_PHONES=[STAFF, DEMO_PHONE],
+        DEMO_LOGIN_CODE=CODE,
+        DEMO_STAFF_PASSWORD="Walaee@2026",
+    )
+    def test_staff_phone_is_not_offered_as_a_customer(self, api):
+        body = api.get(reverse("accounts:demo-accounts")).json()
+
+        phones = [item["phone"] for item in body["customers"]]
+        assert "+201000000001" not in phones
+        assert DEMO_NORMALIZED in phones
+
+    @override_settings(
+        DEMO_LOGIN_PHONES=[STAFF, DEMO_PHONE],
+        DEMO_LOGIN_CODE=CODE,
+        DEMO_STAFF_PASSWORD="Walaee@2026",
+    )
+    def test_staff_still_listed_under_staff(self, api):
+        """الاستبعاد من قائمة العملاء لا يحذف الحساب من مكانه الصحيح."""
+        body = api.get(reverse("accounts:demo-accounts")).json()
+
+        assert "01000000001" in [item["phone"] for item in body["staff"]]
+
+    @override_settings(
+        DEMO_LOGIN_PHONES=[STAFF],
+        DEMO_LOGIN_CODE=CODE,
+        DEMO_STAFF_PASSWORD="Walaee@2026",
+    )
+    def test_staff_phone_still_logs_in_by_otp(self, api):
+        """
+        الإخفاء من القائمة عرضٌ لا تعطيل: الرقم يظل يقبل الكود
+        الثابت، وإلا صار هذا التغيير يكسر دخولًا يعمل.
+        """
+        response = api.post(reverse("accounts:otp-request"), {"phone": self.STAFF}, format="json")
+
+        assert response.json()["code"] == CODE
+
+    @override_settings(
+        DEMO_LOGIN_PHONES=[DEMO_PHONE],
+        DEMO_LOGIN_CODE=CODE,
+        DEMO_STAFF_PASSWORD="Walaee@2026",
+    )
+    def test_customer_app_url_points_at_the_app_not_the_landing(self, api):
+        """
+        الجذر صار للصفحة العامة. إبقاء `/` هنا كان سيرسل من يضغط
+        حساب عميل إلى صفحة تسويقية لا إلى شاشة دخوله.
+        """
+        body = api.get(reverse("accounts:demo-accounts")).json()
+
+        assert body["apps"]["customer"] == "/app/"

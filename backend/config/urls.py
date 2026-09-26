@@ -31,6 +31,8 @@ urlpatterns = [
     path(f"{API}", include("apps.billing.urls")),
     # لوحة إدارة المنصة — أعمال لا بيانات عملاء
     path(f"{API}platform/", include("apps.billing.admin_urls")),
+    # الدليل العام — بلا مصادقة، تغذّي الصفحة العامة والخريطة
+    path(f"{API}public/", include("apps.tenancy.public_urls")),
     path(f"{API}schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         f"{API}docs/",

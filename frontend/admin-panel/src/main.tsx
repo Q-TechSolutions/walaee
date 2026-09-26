@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { clearTokens, configureApi } from "@walaee/shared";
+import { LocaleBoundary, applyPreferences, clearTokens, configureApi } from "@walaee/shared";
 
 import "@walaee/shared/tokens.css";
 import "@walaee/shared/base.css";
@@ -19,8 +19,20 @@ configureApi({
   },
 });
 
+/**
+ * التفضيلات قبل أول رسم.
+ *
+ * `applyPreferences` يكتب `lang` و`dir` و`data-theme` على جذر
+ * المستند من المحفوظ في هذا المتصفّح. تأجيلها إلى ما بعد التركيب
+ * كان يُظهر ومضة بالوضع الخاطئ — كافية لتبدو الصفحة معطوبة على
+ * جهاز مضبوط على الداكن.
+ */
+applyPreferences();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <LocaleBoundary>
+        <App />
+      </LocaleBoundary>
   </StrictMode>,
 );

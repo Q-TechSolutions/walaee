@@ -17,11 +17,12 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.db.models import Count
 from django.utils import timezone
 
 from apps.accounts.models import Customer
 from apps.accounts.validators import normalize_phone
-from apps.billing.models import MessageCredit, Plan, Subscription
+from apps.billing.models import MessageCredit, Subscription
 from apps.billing.services import apply_credit, get_subscription
 from apps.loyalty.models import LoyaltyProgram, ProgramRule, Reward
 from apps.tenancy.models import Branch, Brand, StaffUser, Terminal
@@ -55,12 +56,14 @@ class Command(BaseCommand):
             help="ينشئ مكافآت وعمليات وأرصدة ليكون العرض غير فارغ",
         )
         parser.add_argument("--password", default=DEMO_PASSWORD, help="كلمة مرور موظفي التجربة")
+        parser.add_argument(
+            "--brand-slug",
+            help=("سلاگ العلامة التي يُربَط بها موظفو التجربة. " "الافتراضي: أوسع علامة فروعًا."),
+        )
 
     @transaction.atomic
     def handle(self, *args, **options):
-        brand = Brand.objects.order_by("created_at").first()
-        if brand is None:
-            raise CommandError("لا توجد علامة تجارية. شغّل bootstrap_platform أولًا.")
+        brand = self._brand(options.get("brand_slug"))
 
         branch = Branch.objects.filter(brand=brand).order_by("created_at").first()
         if branch is None:
@@ -78,6 +81,28 @@ class Command(BaseCommand):
             self._data(brand, branch, staff, customers)
 
         self._report(brand, password)
+
+    def _brand(self, slug: str | None) -> Brand:
+        """
+        العلامة التي يديرها موظفو التجربة.
+
+        الأوسع فروعًا لا الأقدم إنشاءً: من يفتح لوحة التاجر ليجرّبها
+        يجب أن يجد فروعًا وموظفين وأرقامًا. علامة بفرع واحد تجعل نصف
+        شاشات اللوحة فارغة، فيستنتج المجرِّب أن الميزة غير موجودة لا
+        أن البيانات قليلة.
+        """
+        if slug:
+            brand = Brand.objects.filter(slug=slug).first()
+            if brand is None:
+                raise CommandError(f"لا توجد علامة بالسلاگ {slug}")
+            return brand
+
+        brand = (
+            Brand.objects.annotate(reach=Count("branches")).order_by("-reach", "created_at").first()
+        )
+        if brand is None:
+            raise CommandError("لا توجد علامة تجارية. شغّل seed_network أو bootstrap_platform أولًا.")
+        return brand
 
     # ── الموظفون ───────────────────────────────────────────
 
@@ -155,16 +180,24 @@ class Command(BaseCommand):
 
     def _subscription(self, brand):
         from apps.billing.models import PLAN_LIMITS
+        from apps.tenancy.management.commands.seed_network import plan_for
 
         organization = brand.organization
         subscription = get_subscription(organization)
-        expected_mrr = PLAN_LIMITS[Plan.GROWTH]["monthly_price"]
+
+        # الباقة تتّسع لفروع العلامة فعلًا لا باقة ثابتة.
+        # تثبيتها على «نمو» كان يضع علامة بسبعة عشر فرعًا على باقة
+        # حدّها خمسة، فتفتح شاشة الاشتراك على شريطين أحمرين وتفشل
+        # أول محاولة لإضافة فرع — وهو عطل يبدو في العرض كأنه عطل
+        # في المنتج لا في بيانات التجربة.
+        plan = plan_for(Branch.objects.filter(brand=brand).count())
+        expected_mrr = PLAN_LIMITS[plan]["monthly_price"]
 
         # الشرط على الإيراد أيضًا لا على الباقة وحدها: اشتراك رُقّي
         # سابقًا بلا ضبط mrr يبقى صفرًا إلى الأبد، فتعرض لوحة المنصة
         # «MRR صفر» على مؤسسة مشتركة فعلًا — رقم خاطئ يقود قرارًا خاطئًا.
-        if subscription.plan != Plan.GROWTH or subscription.mrr != expected_mrr:
-            subscription.plan = Plan.GROWTH
+        if subscription.plan != plan or subscription.mrr != expected_mrr:
+            subscription.plan = plan
             subscription.status = Subscription.STATUS_ACTIVE
             subscription.mrr = expected_mrr
             subscription.save(update_fields=["plan", "status", "mrr"])

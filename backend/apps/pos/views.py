@@ -4,6 +4,8 @@
 المرجع: docs/architecture/api-contract.md
 """
 
+from decimal import Decimal
+
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -18,10 +20,10 @@ from apps.loyalty.models import Membership, Reward
 from . import codes, services
 from .permissions import IsCashier, IsCustomer, get_staff_user
 from .serializers import (
+    MyRewardSerializer,
     RedeemRequestSerializer,
     RedemptionSerializer,
     ResolveCodeSerializer,
-    RewardSerializer,
     TerminalCodeSerializer,
     TransactionCreateSerializer,
     TransactionSerializer,
@@ -219,18 +221,92 @@ class CreateTransactionView(APIView):
 
 
 class MyRewardsView(APIView):
+    """
+    المكافآت المتاحة للعميل — ومعها وقفته من كل واحدة.
+
+    الرصيد جزء من الرد لا نداء ثانٍ: الشاشة تفصل «جاهزة للاستبدال»
+    عن «قريبة منك»، وبلا الرصيد لا تستطيع التفرقة فتعرض الكل صفًا
+    واحدًا بلا زر استبدال — وهو ما كان يحدث. العميل الواقف عند
+    الكاشير لا يريد قائمة، يريد أن يعرف ماذا يصرف الآن.
+    """
+
     permission_classes = [IsCustomer]
 
-    @extend_schema(responses=RewardSerializer(many=True), summary="المكافآت المتاحة")
+    @extend_schema(responses=MyRewardSerializer(many=True), summary="المكافآت المتاحة")
     def get(self, request):
         customer = _current_customer(request)
-        brand_ids = Membership.objects.filter(customer=customer).values_list("brand_id", flat=True)
+        memberships = list(
+            Membership.objects.filter(customer=customer)
+            .select_related("brand")
+            .prefetch_related("balances")
+        )
+
+        # الرصيد لكل برنامج مرة واحدة، لا استعلام داخل الحلقة
+        standing = {
+            str(balance.program_id): balance.amount
+            for membership in memberships
+            for balance in membership.balances.all()
+        }
+        brands = {membership.brand_id: membership.brand for membership in memberships}
+
         rewards = (
-            Reward.objects.filter(program__brand_id__in=list(brand_ids), is_active=True)
+            Reward.objects.filter(program__brand_id__in=list(brands), is_active=True)
             .select_related("program__brand")
             .order_by("cost_amount")
         )
-        return Response(RewardSerializer(rewards, many=True).data)
+
+        rows = []
+        for reward in rewards:
+            balance = standing.get(str(reward.program_id), Decimal("0"))
+            cost = reward.cost_amount
+            remaining = max(cost - balance, Decimal("0"))
+            brand = reward.program.brand
+            rows.append(
+                {
+                    "id": str(reward.id),
+                    "title": reward.title,
+                    "description": reward.description,
+                    "cost_amount": _money(cost),
+                    "cost_unit": reward.cost_unit,
+                    "unit_label": reward.program.unit_label,
+                    "stock": reward.stock,
+                    "in_stock": reward.in_stock,
+                    "brand_id": str(brand.id),
+                    "brand_name": brand.name,
+                    "primary_color": brand.primary_color,
+                    "program_id": str(reward.program_id),
+                    "program_name": reward.program.name,
+                    "balance": _money(balance),
+                    "remaining": _money(remaining),
+                    # «جاهزة» تعني قابلة للصرف الآن: الرصيد كافٍ
+                    # والمخزون غير منتهٍ. أحدهما وحده يعد بما لا يُصرف
+                    "ready": remaining <= 0 and reward.in_stock,
+                    "progress": _reward_progress(balance, cost),
+                }
+            )
+
+        # الجاهز أولًا، ثم الأقرب اكتمالًا: ترتيب الشاشة هو ترتيب
+        # ما يفعله العميل، لا ترتيب التكلفة
+        rows.sort(key=lambda row: (not row["ready"], -row["progress"]))
+        return Response(rows)
+
+
+def _money(value: Decimal) -> str:
+    """
+    مبلغ بمنزلتين عشريتين دائمًا.
+
+    `str(Decimal('0'))` يعطي «0» بينما رصيد محفوظ في القاعدة
+    يعطي «0.00». رد يحمل الشكلين لنفس الحقل يكسر أي قارئ يقارن
+    النصوص، ويظهر في الواجهة رصيدًا بلا كسور بجوار آخر بكسور.
+    """
+    return str(value.quantize(Decimal("0.01")))
+
+
+def _reward_progress(balance: Decimal, cost: Decimal) -> float:
+    """نسبة الاقتراب من المكافأة، محصورة بين صفر وواحد."""
+    if cost <= 0:
+        return 1.0
+    return min(float(balance / cost), 1.0)
 
 
 class RedeemView(APIView):

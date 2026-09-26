@@ -70,6 +70,32 @@ export function endSession(): void {
   }
 }
 
+/**
+ * يبدّل الفرع/العلامة النشطة.
+ *
+ * الاختيار يُحفظ ويُرسَل مع كل طلب في ترويسة `X-Walaee-Branch`،
+ * والخادم يتحقّق منه مقابل أدوار المستخدم قبل أن يعمل به. تخزينه
+ * هنا وحده كان سيغيّر ما تخفيه الواجهة بلا أن يغيّر ما يجيب به
+ * الخادم — وهي أسوأ حالة: لوحة تقول «مخبز» وأرقامها من «مقهى».
+ */
+export function setActiveRole(roleId: string): void {
+  const session = readSession();
+  if (!session || !session.roles.some((role) => role.id === roleId)) return;
+
+  cached = { ...session, activeRoleId: roleId };
+  try {
+    localStorage.setItem(key(), JSON.stringify(cached));
+  } catch {
+    /* الجلسة تعيش في الذاكرة */
+  }
+}
+
+/** ترويسة الفرع المختار — يقرؤها عميل API عند كل طلب. */
+export function branchHeaders(): Record<string, string> {
+  const branchId = activeRole()?.branch_id;
+  return branchId ? { "X-Walaee-Branch": branchId } : {};
+}
+
 export function activeRole(): StaffRole | null {
   const session = readSession();
   if (!session) return null;

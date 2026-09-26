@@ -19,8 +19,8 @@ html {
 body {
   margin: 0;
   font-family: var(--font);
-  font-size: 15px;
-  line-height: 1.7;
+  font-size: var(--t-base);
+  line-height: var(--lh);
   color: var(--ink);
   background: var(--canvas);
   -webkit-font-smoothing: antialiased;
@@ -30,10 +30,17 @@ body {
 h1,
 h2,
 h3,
-h4 {
+h4,
+h5 {
   margin: 0;
   line-height: 1.4;
   font-weight: 800;
+  /* تضييق سالب على مستوى العنوان كله.
+     هذا ليس نقضًا لقاعدة «لا تباعد على العربية»: القاعدة تمنع
+     المسافات الموجبة التي تفكّ اتصال الحروف، والتضييق البسيط هنا
+     يشدّ الكلمات إلى بعضها فيبدو العنوان أمتن — وهو ما يفعله
+     العرض التقديمي المعتمد. */
+  letter-spacing: -0.2px;
 }
 
 p {
@@ -91,6 +98,9 @@ ol {
    الكاشير ١٢٣ على أنها ٣٢١ — خطأ صامت في شاشة مالية. */
 .num {
   font-variant-numeric: tabular-nums;
+  /* بعض المتصفّحات تتجاهل الخاصية أعلاه مع الخطوط المتغيّرة،
+     فيُطلَب نفس الشيء من الخط مباشرةً */
+  font-feature-settings: "tnum" 1;
   direction: ltr;
   display: inline-block;
   unicode-bidi: isolate;
@@ -142,7 +152,7 @@ ol {
   padding: 11px 18px;
   border-radius: var(--r);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--t-base);
   transition: var(--t);
   transition-property: background, border-color, transform, opacity;
   /* الحد الأدنى لهدف اللمس — شاشة الكاشير تُستخدم بإبهام مستعجل */
@@ -189,7 +199,7 @@ ol {
 
 .btn-lg {
   padding: 15px 24px;
-  font-size: 16px;
+  font-size: var(--t-md);
   min-height: 52px;
 }
 
@@ -279,8 +289,13 @@ ol {
 }
 
 .empty-icon {
-  font-size: 34px;
-  opacity: 0.5;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--line-2);
+  color: var(--faint);
 }
 
 .skeleton {
@@ -320,4 +335,25 @@ ol {
 :focus-visible {
   outline: 2px solid var(--violet-600);
   outline-offset: 2px;
+}
+
+/* ══════════════ شريط التمرير ══════════════
+   الافتراضي في ويندوز عريض ورمادي يقطع حافة كل لوحة. النحيف
+   البنفسجي يختفي داخل الهوية بدل أن يزاحمها. */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d9d2ee;
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c4b9e4;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }

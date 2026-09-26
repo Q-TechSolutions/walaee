@@ -24,6 +24,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from . import demo
+from .validators import normalize_phone
 
 # الأدوار كما ينشئها أمر demo_accounts
 STAFF_ACCOUNTS = [
@@ -44,7 +45,7 @@ CUSTOMER_NAMES = {
 # بدلها يبقى المستخدم يجرّب حسابًا في التطبيق الخطأ.
 # تُضبَط بـDEMO_APP_URLS حين تُخدَم التطبيقات على نطاقات منفصلة.
 DEFAULT_APP_URLS = {
-    "customer": "/",
+    "customer": "/app/",
     "merchant": "/merchant/",
     "admin": "/admin/",
 }
@@ -71,6 +72,21 @@ def app_urls() -> dict:
             urls[key] = value
 
     return urls
+
+
+def staff_phones() -> set[str]:
+    """
+    أرقام الموظفين بصيغتها الدولية.
+
+    تُستبعَد من قائمة «عملاء التجربة» حتى لو وُضعت في
+    `DEMO_LOGIN_PHONES` بالخطأ. بدون هذا يظهر رقم مدير المنصة
+    كحساب عميل على شاشة دخول التطبيق، فيضغطه المجرّب ويدخل بحساب
+    لا يملك بطاقة واحدة — ثم يستنتج أن التطبيق فارغ.
+
+    الاستبعاد هنا لا في الإعداد: الإعداد يخطئ، وهذه الشاشة أول من
+    يُظهر خطأه للمستخدم.
+    """
+    return {normalize_phone(phone) for phone, _, _, _ in STAFF_ACCOUNTS}
 
 
 def is_enabled() -> bool:
@@ -118,7 +134,7 @@ class DemoAccountsView(APIView):
             }
             # مرتّبة لأن القائمة تُعرض للمستخدم، والترتيب العشوائي
             # يجعل الحساب يقفز مكانه بين كل تحديث
-            for phone in sorted(demo.demo_phones())
+            for phone in sorted(demo.demo_phones() - staff_phones())
         ]
 
         return Response(

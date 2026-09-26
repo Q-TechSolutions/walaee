@@ -3,6 +3,7 @@
 import { api } from "@walaee/shared";
 import type {
   Branch,
+  Brand,
   Campaign,
   CampaignEstimate,
   CreditLine,
@@ -24,6 +25,29 @@ import type {
   Transaction,
 } from "@walaee/shared";
 
+/** صف في تدفّق «أحدث العمليات». */
+export interface ActivityRow {
+  id: string;
+  kind: string;
+  at: string;
+  customer: string;
+  branch: string;
+  cashier: string;
+  amount: string;
+  delta: string;
+  status: string;
+}
+
+/** ملخّص وردية الكاشير الحالي. */
+export interface Shift {
+  transactions: number;
+  revenue: string;
+  customers: number;
+  staff_name: string;
+  role_label: string;
+  branch_name: string;
+}
+
 export const queries = {
   // ── الكاشير ──
   terminalCode: (signal?: AbortSignal) =>
@@ -34,6 +58,10 @@ export const queries = {
   // ── اللوحة ──
   dashboard: (days: number, signal?: AbortSignal) =>
     api.get<Dashboard>("/merchant/dashboard", { days }, signal),
+  activity: (signal?: AbortSignal) =>
+    api.get<{ activity: ActivityRow[] }>("/merchant/activity", undefined, signal),
+  shift: (signal?: AbortSignal) =>
+    api.get<Shift>("/merchant/shift", undefined, signal),
   series: (days: number, signal?: AbortSignal) =>
     api.get<{ series: SeriesPoint[] }>("/merchant/series", { days }, signal),
   liability: (signal?: AbortSignal) =>
@@ -63,7 +91,7 @@ export const queries = {
 
   // ── الحوكمة ──
   brand: (signal?: AbortSignal) =>
-    api.get<Record<string, string>>("/merchant/brand", undefined, signal),
+    api.get<Brand>("/merchant/brand", undefined, signal),
   branches: (signal?: AbortSignal) =>
     api.get<Branch[]>("/merchant/branches", undefined, signal),
   terminals: (signal?: AbortSignal) =>
@@ -95,6 +123,9 @@ export const queries = {
 };
 
 export const actions = {
+  updateBrand: (input: { name?: string; category?: string }) =>
+    api.patch<Brand>("/merchant/brand", input),
+
   login: (phone: string, password: string) =>
     api.anonymous.post<StaffSession>("/auth/staff/login", { phone, password }),
 

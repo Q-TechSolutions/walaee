@@ -17,6 +17,10 @@ ignore = [
 "conftest.py" = ["S"]
 "tests/*" = ["S"]
 "*/settings/*" = ["F403", "F405", "S105"]
+# أوامر البذرة تولّد أرقامًا عشوائية للعرض لا للتشفير. S311 هنا
+# ضجيج: استبدال `random` بـ `secrets` يفقدها ما تحتاجه فعلًا —
+# بذرة ثابتة تجعل تشغيلين يعطيان نفس اللوحة.
+"*/management/commands/seed_*.py" = ["S311"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["apps", "config", "tests"]

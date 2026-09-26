@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.billing import services as billing
-from apps.pos.permissions import IsManager, IsOwner, get_staff_user
+from apps.pos.permissions import IsCashier, IsManager, IsOwner, get_staff_user
 
 from . import reports
 from .models import LedgerEntry
@@ -70,6 +70,46 @@ class MerchantSegmentsView(APIView):
     def get(self, request):
         staff = get_staff_user(request)
         return Response(reports.customer_segments(staff.branch.brand))
+
+
+class MerchantActivityView(APIView):
+    """
+    تدفّق ما يحدث عند الصندوق الآن.
+
+    للمدير فما فوق: يعرض اسم العميل واسم الكاشير معًا، وهو ربط لا
+    يخصّ كاشيرًا يرى زملاءه.
+    """
+
+    permission_classes = [IsManager]
+
+    @extend_schema(responses={200: None}, summary="أحدث العمليات")
+    def get(self, request):
+        staff = get_staff_user(request)
+        limit = min(int(request.query_params.get("limit", 12) or 12), 50)
+        return Response({"activity": reports.recent_activity(staff.branch.brand, limit=limit)})
+
+
+class CashierShiftView(APIView):
+    """
+    ملخّص وردية الكاشير الحالي.
+
+    متاح للكاشير نفسه لا للمدير وحده: هو رقمه هو، ورؤيته لما أنجزه
+    اليوم جزء من الشاشة التي يقف أمامها.
+    """
+
+    permission_classes = [IsCashier]
+
+    @extend_schema(responses={200: None}, summary="مناوبة اليوم")
+    def get(self, request):
+        staff = get_staff_user(request)
+        return Response(
+            {
+                **reports.cashier_shift(staff),
+                "staff_name": staff.user.full_name,
+                "role_label": staff.get_role_display(),
+                "branch_name": staff.branch.name,
+            }
+        )
 
 
 class MerchantReportView(APIView):

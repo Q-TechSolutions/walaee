@@ -1,13 +1,22 @@
-/** دخول الموظفين بالهاتف وكلمة المرور. */
+/**
+ * دخول الموظفين بالهاتف وكلمة المرور.
+ *
+ * الشاشة نصفان — `AuthLayout`. لوح الهوية يقول ماذا تجد خلف
+ * الباب: الكاشير الذي يفتحها أول مرة يحتاج أن يتأكّد أنها شاشته
+ * لا شاشة العميل، والثلاثة على نفس الدومين.
+ */
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
+  AuthLayout,
+  AuthPoint,
   Button,
   DemoAccountsPanel,
   ErrorBox,
   Field,
+  t,
   useAction,
 } from "@walaee/shared";
 
@@ -34,23 +43,47 @@ export function Login() {
   }
 
   return (
-    <div className="auth">
+    <AuthLayout
+      badge={t("لوحة المتجر")}
+      headline={t("برنامج ولائك، تحت سيطرتك")}
+      subline={t("امنح النقاط، اصرف المكافآت، واعرف مَن عاد ومَن غاب — من شاشة واحدة.")}
+      aside={
+        <ul>
+          <AuthPoint title={t("شاشة كاشير في خطوتين")}>
+            {t("رقم العميل ثم قيمة الفاتورة. لا تدريب ولا جهاز إضافي.")}
+          </AuthPoint>
+          <AuthPoint title={t("تقارير تقول ما الذي نجح")}>
+            {t("أي مكافأة تُصرف فعلًا، وكم يكلّفك الالتزام القائم.")}
+          </AuthPoint>
+          <AuthPoint title={t("صلاحيات لكل دور")}>
+            {t("الكاشير يؤكّد العمليات ولا يرى التقارير ولا يضيف موظفين.")}
+          </AuthPoint>
+        </ul>
+      }
+      footer={
+        <DemoAccountsPanel
+          app="merchant"
+          onPick={({ phone: p, secret }) => {
+            setPhone(p);
+            setPassword(secret);
+            void signIn(p, secret);
+          }}
+        />
+      }
+    >
       <form
-        className="auth-card"
+        className="auth-fields"
         onSubmit={async (event) => {
           event.preventDefault();
           await signIn(phone, password);
         }}
       >
-        <div className="auth-brand">
-          <div className="auth-mark" aria-hidden="true">
-            ♥
-          </div>
-          <h1>لوحة المتجر</h1>
-          <p className="muted t-sm">ولائي — كلنا كسبانين</p>
-        </div>
+        <h2>{t("دخول الموظفين")}</h2>
+        <p className="auth-lede">
+          {t("استخدم الرقم الذي سجّله مالك المتجر لك. لكل موظف حساب مستقل.")}
+        </p>
 
-        <Field label="رقم الهاتف">
+        <Field label={t("رقم الهاتف")}>
           <input
             className="input num"
             type="tel"
@@ -63,7 +96,7 @@ export function Login() {
           />
         </Field>
 
-        <Field label="كلمة المرور">
+        <Field label={t("كلمة المرور")}>
           <input
             className="input"
             type="password"
@@ -77,18 +110,13 @@ export function Login() {
         {login.error != null && <ErrorBox error={login.error} />}
 
         <Button type="submit" size="lg" block loading={login.loading}>
-          دخول
+          {t("دخول")}
         </Button>
 
-        <DemoAccountsPanel
-          app="merchant"
-          onPick={({ phone: p, secret }) => {
-            setPhone(p);
-            setPassword(secret);
-            void signIn(p, secret);
-          }}
-        />
+        <p className="auth-fine">
+          {t("نسيت كلمة المرور؟ مالك المتجر يستطيع إعادة ضبطها لك من صفحة الموظفين.")}
+        </p>
       </form>
-    </div>
+    </AuthLayout>
   );
 }

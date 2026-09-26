@@ -9,18 +9,24 @@
 import { useState } from "react";
 
 import {
+  AuthLayout,
+  AuthPoint,
   Badge,
   Button,
   DemoAccountsPanel,
   Empty,
   ErrorBox,
   Field,
+  Icon,
   Loading,
+  LogoMark,
   Modal,
-  Stat,
+  PreferenceBar,
   clearTokens,
+  fetchNetwork,
   fmt,
   isAuthenticated,
+  t,
   useAction,
   useApi,
   writeTokens,
@@ -28,14 +34,65 @@ import {
 
 import { actions, queries } from "./lib/queries";
 import type { MerchantRow, UnpaidInvoice } from "./lib/queries";
+import type { IconName } from "@walaee/shared";
 
 type Tab = "overview" | "merchants" | "invoices";
 
-const TABS: { key: Tab; label: string }[] = [
-  { key: "overview", label: "نظرة عامة" },
-  { key: "merchants", label: "المتاجر" },
-  { key: "invoices", label: "الفواتير" },
+interface NavItem {
+  key: Tab;
+  label: string;
+  title: string;
+  crumb: string;
+  icon: IconName;
+}
+
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
+
+/**
+ * التنقّل مجمَّعًا — نفس هيكل لوحة التاجر.
+ *
+ * التطابق مقصود: من يعمل في فريق المنصة يفتح لوحة التاجر أيضًا
+ * ليتابع شكوى أو يشرح ميزة، واختلاف الهيكل بين الاثنين يجعله
+ * يبحث عن كل شيء مرتين.
+ */
+const NAV: NavGroup[] = [
+  {
+    title: "المنصة",
+    items: [
+      {
+        key: "overview",
+        label: "نظرة عامة",
+        title: "نظرة عامة",
+        crumb: "أداء المنصة بالكامل",
+        icon: "chart",
+      },
+    ],
+  },
+  {
+    title: "الإدارة",
+    items: [
+      {
+        key: "merchants",
+        label: "المتاجر",
+        title: "المتاجر",
+        crumb: "المؤسسات المشتركة وآخر نشاط لكل واحدة",
+        icon: "store",
+      },
+      {
+        key: "invoices",
+        label: "الاشتراكات والفواتير",
+        title: "الاشتراكات والفواتير",
+        crumb: "ما لم يُسدَّد بعد",
+        icon: "receipt",
+      },
+    ],
+  },
 ];
+
+const ALL_ITEMS = NAV.flatMap((group) => group.items);
 
 export function App() {
   const [authed, setAuthed] = useState(isAuthenticated());
@@ -43,59 +100,92 @@ export function App() {
 
   if (!authed) return <Login onDone={() => setAuthed(true)} />;
 
+  const page = ALL_ITEMS.find((item) => item.key === tab) ?? ALL_ITEMS[0]!;
+
   return (
-    <div className="admin">
-      <header className="admin-hd">
-        <div className="row" style={{ gap: 10 }}>
-          <span className="admin-mark" aria-hidden="true">
-            ♥
-          </span>
-          <div>
-            <p className="w-8">إدارة المنصة</p>
-            <p className="t-xs muted">ولائي</p>
+    <div className="shell">
+      <aside className="side side-admin">
+        <div className="side-brand">
+          <LogoMark size={34} inverted />
+          <div className="grow">
+            <p className="side-brand-name">{t("ولائي")}</p>
+            <p className="side-brand-sub">{t("لوحة إدارة المنصة")}</p>
           </div>
         </div>
 
-        <nav className="range-switch" role="tablist">
-          {TABS.map((option) => (
-            <button
-              key={option.key}
-              type="button"
-              role="tab"
-              aria-selected={tab === option.key}
-              className={tab === option.key ? "active" : ""}
-              onClick={() => setTab(option.key)}
-            >
-              {option.label}
-            </button>
+        <nav>
+          {NAV.map((group) => (
+            <div key={group.title}>
+              <p className="grp-t">{t(group.title)}</p>
+              {group.items.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === item.key}
+                  className={`nav-i ${tab === item.key ? "on" : ""}`}
+                  onClick={() => setTab(item.key)}
+                >
+                  <Icon name={item.icon} size={18} />
+                  <span>{t(item.label)}</span>
+                </button>
+              ))}
+            </div>
           ))}
         </nav>
 
-        <button
-          type="button"
-          className="link"
-          onClick={() => {
-            clearTokens();
-            setAuthed(false);
-          }}
-        >
-          خروج
-        </button>
-      </header>
+        <div className="side-foot">
+          <span className="av av-sm" aria-hidden="true">
+            <Icon name="shield" size={15} />
+          </span>
+          <div className="grow">
+            <p className="t-sm w-7">{t("فريق ولائي")}</p>
+            <p className="t-xs">{t("إدارة المنصة")}</p>
+          </div>
+          <button
+            type="button"
+            className="iconbtn-dark"
+            aria-label={t("تسجيل الخروج")}
+            onClick={() => {
+              clearTokens();
+              setAuthed(false);
+            }}
+          >
+            <Icon name="logout" size={17} />
+          </button>
+        </div>
+      </aside>
 
-      <main className="admin-body">
-        {tab === "overview" && <Overview />}
-        {tab === "merchants" && <Merchants />}
-        {tab === "invoices" && <Invoices />}
-      </main>
+      <div className="main">
+        <header className="topnav">
+          <div className="grow">
+            <h1>{t(page.title)}</h1>
+            <p className="crumb">{t(page.crumb)}</p>
+          </div>
+          <PreferenceBar />
+        </header>
+
+        <main className="content">
+          {tab === "overview" && <Overview />}
+          {tab === "merchants" && <Merchants />}
+          {tab === "invoices" && <Invoices />}
+        </main>
+      </div>
     </div>
   );
 }
 
+/**
+ * دخول فريق المنصة — نصفان مثل بقية التطبيقات.
+ *
+ * لوح الهوية هنا يعرض حجم الشبكة الفعلي لا وعدًا تسويقيًا: هذه
+ * شاشة داخلية، ومن يفتحها يريد أن يعرف حالة المنصة قبل أن يدخل.
+ */
 function Login({ onDone }: { onDone: () => void }) {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const login = useAction(actions.login);
+  const network = useApi((signal) => fetchNetwork(signal), []);
 
   async function signIn(phoneValue: string, passwordValue: string) {
     const session = await login.run(phoneValue.trim(), passwordValue);
@@ -105,35 +195,69 @@ function Login({ onDone }: { onDone: () => void }) {
     }
   }
 
+  const stats = network.data?.stats;
+
   return (
-    <div className="auth">
+    <AuthLayout
+      badge={t("إدارة المنصة")}
+      headline={t("حالة الشبكة في لوحة واحدة")}
+      subline={t("الإيراد المتكرّر، والمتاجر المتوقّفة عن النشاط، والفواتير المتأخرة — قبل أن تتحوّل إلى إلغاءات.")}
+      aside={
+        <ul>
+          <AuthPoint title={t("الشبكة الآن")}>
+            {stats
+              ? t("{brands} متجرًا · {branches} فرعًا · {govs} محافظة", {
+                  brands: fmt.number(stats.brands),
+                  branches: fmt.number(stats.branches),
+                  govs: fmt.number(stats.governorates),
+                })
+              : t("الأرقام تُحمَّل من الدليل العام.")}
+          </AuthPoint>
+          <AuthPoint title={t("آخر نشاط لكل مؤسسة")}>
+            {t("متجر توقّف أسبوعين هو متجر على وشك الإلغاء — واستدراكه أرخص من استعادته.")}
+          </AuthPoint>
+          <AuthPoint title={t("بيانات أعمال لا بيانات عملاء")}>
+            {t("هذه اللوحة لا ترى أرصدة العملاء ولا عملياتهم.")}
+          </AuthPoint>
+        </ul>
+      }
+      footer={
+        <DemoAccountsPanel
+          app="admin"
+          onPick={({ phone: p, secret }) => {
+            setPhone(p);
+            setPassword(secret);
+            void signIn(p, secret);
+          }}
+        />
+      }
+    >
       <form
-        className="auth-card"
+        className="auth-fields"
         onSubmit={async (event) => {
           event.preventDefault();
           await signIn(phone, password);
         }}
       >
-        <div className="auth-brand">
-          <div className="auth-mark" aria-hidden="true">
-            ♥
-          </div>
-          <h1>إدارة المنصة</h1>
-          <p className="t-sm muted">لفريق ولائي فقط</p>
-        </div>
+        <h2>{t("دخول الفريق")}</h2>
+        <p className="auth-lede">
+          {t("هذه الشاشة لفريق ولائي وحده. حسابات التجّار والعملاء لا تعمل هنا.")}
+        </p>
 
-        <Field label="رقم الهاتف">
+        <Field label={t("رقم الهاتف")}>
           <input
             className="input num"
             type="tel"
+            inputMode="tel"
             autoComplete="username"
+            placeholder="01012345678"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
           />
         </Field>
 
-        <Field label="كلمة المرور">
+        <Field label={t("كلمة المرور")}>
           <input
             className="input"
             type="password"
@@ -147,19 +271,45 @@ function Login({ onDone }: { onDone: () => void }) {
         {login.error != null && <ErrorBox error={login.error} />}
 
         <Button type="submit" size="lg" block loading={login.loading}>
-          دخول
+          {t("دخول")}
         </Button>
-
-        <DemoAccountsPanel
-          app="admin"
-          onPick={({ phone: p, secret }) => {
-            setPhone(p);
-            setPassword(secret);
-            void signIn(p, secret);
-          }}
-        />
       </form>
-    </div>
+    </AuthLayout>
+  );
+}
+
+/**
+ * بطاقة مؤشر — نفس مكوّن لوحة التاجر شكلًا.
+ *
+ * بلا رسم مصغّر هنا: لوحة المنصة لا تملك سلسلة زمنية لكل مؤشر،
+ * ورسم خطّ من نقطتين يوحي باتجاه لا تسنده بيانات.
+ */
+function AdminKpi({
+  tone,
+  icon,
+  label,
+  value,
+  sub,
+}: {
+  tone: "v" | "g" | "o" | "r" | "b" | "a";
+  icon: IconName;
+  label: string;
+  value: string;
+  sub: string;
+}) {
+  return (
+    <article className="kpi">
+      <div className="row between">
+        <div className="grow">
+          <p className="kt">{label}</p>
+          <p className="kv num">{value}</p>
+          <p className="ks">{sub}</p>
+        </div>
+        <span className={`ibox ${tone}`} aria-hidden="true">
+          <Icon name={icon} size={20} />
+        </span>
+      </div>
+    </article>
   );
 }
 
@@ -183,60 +333,99 @@ function Overview() {
   return (
     <div className="stack gap-lg">
       <section className="mrr">
-        <p className="t-sm">الإيراد الشهري المتكرّر</p>
+        <p className="t-sm">{t("الإيراد الشهري المتكرّر")}</p>
         <p className="mrr-value num">{fmt.money(board.mrr)}</p>
         <p className="t-sm">
-          <span className="num">{board.organizations.paying}</span> مؤسسة مشتركة
-          من <span className="num">{board.organizations.total}</span>
+          <span className="num">{fmt.number(board.organizations.paying)}</span>{" "}
+          {t("مؤسسة مشتركة من")}{" "}
+          <span className="num">{fmt.number(board.organizations.total)}</span>
           {board.organizations.past_due > 0 && (
             <>
               {" · "}
-              <span className="num">{board.organizations.past_due}</span> متأخرة
-              السداد
+              <span className="num">
+                {fmt.number(board.organizations.past_due)}
+              </span>{" "}
+              {t("متأخرة السداد")}
             </>
           )}
         </p>
       </section>
 
-      <div className="stats-grid">
-        <Stat label="العلامات" value={fmt.number(board.brands)} />
-        <Stat label="الفروع" value={fmt.number(board.branches)} />
-        <Stat
-          label="العملاء"
+      <div className="grid g3">
+        <AdminKpi
+          tone="v"
+          icon="store"
+          label={t("العلامات المفعّلة")}
+          value={fmt.number(board.brands)}
+          sub={t("{n} فرعًا", { n: fmt.number(board.branches) })}
+        />
+        <AdminKpi
+          tone="b"
+          icon="users"
+          label={t("عملاء نهائيون")}
           value={fmt.number(board.customers.total)}
-          hint={`${fmt.number(board.customers.new_30d)} جديد في ٣٠ يومًا`}
+          sub={t("{n} جديد في ٣٠ يومًا", {
+            n: fmt.number(board.customers.new_30d),
+          })}
         />
-        <Stat label="العضويات" value={fmt.number(board.memberships)} />
-        <Stat
-          label="العمليات — ٣٠ يومًا"
+        <AdminKpi
+          tone="g"
+          icon="card"
+          label={t("العضويات")}
+          value={fmt.number(board.memberships)}
+          sub={t("بطاقة نشطة عبر كل العلامات")}
+        />
+        <AdminKpi
+          tone="a"
+          icon="receipt"
+          label={t("العمليات — ٣٠ يومًا")}
           value={fmt.number(board.transactions_30d)}
+          sub={t("{n} قيدًا في الدفتر", { n: fmt.number(board.entries_30d) })}
         />
-        <Stat
-          label="قيمة المبيعات — ٣٠ يومًا"
+        <AdminKpi
+          tone="o"
+          icon="coins"
+          label={t("قيمة المبيعات — ٣٠ يومًا")}
           value={fmt.money(board.gmv_30d)}
-          hint="إجمالي فواتير المتاجر لا إيراد المنصة"
+          sub={t("إجمالي فواتير المتاجر لا إيراد المنصة")}
         />
-        <Stat label="القيود — ٣٠ يومًا" value={fmt.number(board.entries_30d)} />
-        <Stat
-          label="فواتير غير مسدّدة"
+        <AdminKpi
+          tone={board.unpaid_invoices > 0 ? "r" : "g"}
+          icon="alert"
+          label={t("فواتير غير مسدّدة")}
           value={fmt.number(board.unpaid_invoices)}
-          tone={board.unpaid_invoices > 0 ? "warn" : "good"}
+          sub={board.unpaid_invoices > 0 ? t("تحتاج متابعة") : t("لا شيء متأخر")}
         />
       </div>
 
-      <section className="card wl-card-p stack gap">
-        <h2>التوزيع على الباقات</h2>
-        {Object.entries(board.by_plan).map(([plan, count]) => (
-          <div key={plan} className="row between t-sm">
-            <span>{PLAN_LABELS[plan] ?? plan}</span>
-            <span className="num w-7">{fmt.number(count)}</span>
-          </div>
-        ))}
+      <section className="card">
+        <div className="card-hd">
+          <h3>{t("التوزيع على الباقات")}</h3>
+        </div>
+        <div className="card-p stack gap">
+          {Object.entries(board.by_plan).map(([plan, count]) => {
+            const total = Object.values(board.by_plan).reduce(
+              (sum, n) => sum + n,
+              0,
+            );
+            const share = total > 0 ? (count / total) * 100 : 0;
+            return (
+              <div key={plan} className="usage">
+                <span className="t-sm w-7" style={{ width: "5.5rem" }}>
+                  {t(PLAN_LABELS[plan] ?? plan)}
+                </span>
+                <span className="bar">
+                  <i style={{ width: `${Math.max(share, 2)}%` }} />
+                </span>
+                <span className="t-sm num w-7">{fmt.number(count)}</span>
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       <p className="t-xs faint">
-        لا تعرض هذه اللوحة بيانات شراء أي فرد. بيانات العملاء ملك التاجر
-        وعميله، والمنصة وسيط — راجع مصفوفة الأدوار في التوثيق.
+        {t("لا تعرض هذه اللوحة بيانات شراء أي فرد. بيانات العملاء ملك التاجر وعميله، والمنصة وسيط — راجع مصفوفة الأدوار في التوثيق.")}
       </p>
     </div>
   );
@@ -256,25 +445,24 @@ function Merchants() {
     return <ErrorBox error={merchants.error} onRetry={merchants.reload} />;
 
   if (merchants.data?.length === 0) {
-    return <Empty icon="◻" title="لا توجد مؤسسات بعد" />;
+    return <Empty icon="building" title={t("لا توجد مؤسسات بعد")} />;
   }
 
   return (
     <div className="stack gap">
       <div className="notice">
-        «آخر نشاط» هو مؤشر الخطر الأول: مؤسسة بلا عملية منذ أسبوعين على وشك
-        الإلغاء، والتدخل قبل ذلك أرخص من استعادتها.
+        {t("«آخر نشاط» هو مؤشر الخطر الأول: مؤسسة بلا عملية منذ أسبوعين على وشك الإلغاء، والتدخل قبل ذلك أرخص من استعادتها.")}
       </div>
 
       <div className="table-wrap">
         <table className="table">
           <thead>
             <tr>
-              <th>المؤسسة</th>
-              <th>الباقة</th>
-              <th>الإيراد</th>
-              <th>عمليات ٣٠ يومًا</th>
-              <th>آخر نشاط</th>
+              <th>{t("المؤسسة")}</th>
+              <th>{t("الباقة")}</th>
+              <th>{t("الإيراد")}</th>
+              <th>{t("عمليات ٣٠ يومًا")}</th>
+              <th>{t("آخر نشاط")}</th>
             </tr>
           </thead>
           <tbody>
@@ -296,14 +484,14 @@ function MerchantRowView({ row }: { row: MerchantRow }) {
     <tr className={atRisk ? "row-risk" : ""}>
       <td>
         <p className="w-7">{row.name}</p>
-        <p className="t-xs muted">{row.brand_names.join("، ") || "بلا علامات"}</p>
+        <p className="t-xs muted">{row.brand_names.join(t("، ")) || t("بلا علامات")}</p>
       </td>
       <td>
         <Badge tone={row.plan === "free" ? "muted" : "violet"}>
-          {row.plan_label}
+          {t(row.plan_label)}
         </Badge>
         {row.subscription_status === "past_due" && (
-          <Badge tone="red">متأخرة</Badge>
+          <Badge tone="red">{t("متأخرة")}</Badge>
         )}
       </td>
       <td className="num">{fmt.money(row.mrr)}</td>
@@ -314,7 +502,7 @@ function MerchantRowView({ row }: { row: MerchantRow }) {
             {fmt.relativeTime(row.last_activity)}
           </span>
         ) : (
-          <span className="c-red">لا نشاط إطلاقًا</span>
+          <span className="c-red">{t("لا نشاط إطلاقًا")}</span>
         )}
       </td>
     </tr>
@@ -331,25 +519,24 @@ function Invoices() {
 
   if (invoices.data?.length === 0) {
     return (
-      <Empty icon="✓" title="كل الفواتير مسدّدة" hint="لا شيء يحتاج متابعة." />
+      <Empty icon="checkCircle" title={t("كل الفواتير مسدّدة")} hint={t("لا شيء يحتاج متابعة.")} />
     );
   }
 
   return (
     <div className="stack gap">
       <div className="notice">
-        السداد بالتحويل البنكي يُعلَّم يدويًا بعد مطابقة كشف الحساب — وهذا
-        ما يستخدمه عملاء المنصة الأوائل فعلًا.
+        {t("السداد بالتحويل البنكي يُعلَّم يدويًا بعد مطابقة كشف الحساب — وهذا ما يستخدمه عملاء المنصة الأوائل فعلًا.")}
       </div>
 
       <div className="table-wrap">
         <table className="table">
           <thead>
             <tr>
-              <th>الفاتورة</th>
-              <th>المؤسسة</th>
-              <th>المبلغ</th>
-              <th>صدرت</th>
+              <th>{t("الفاتورة")}</th>
+              <th>{t("المؤسسة")}</th>
+              <th>{t("المبلغ")}</th>
+              <th>{t("صدرت")}</th>
               <th />
             </tr>
           </thead>
@@ -366,7 +553,7 @@ function Invoices() {
                     className="link"
                     onClick={() => setPaying(invoice)}
                   >
-                    تعليم كمسدّدة
+                    {t("تعليم كمسدّدة")}
                   </button>
                 </td>
               </tr>
@@ -404,7 +591,7 @@ function MarkPaidModal({
   return (
     <Modal
       open
-      title={`سداد ${invoice.number}`}
+      title={t("سداد {number}", { number: invoice.number })}
       onClose={onClose}
       footer={
         <>
@@ -419,10 +606,10 @@ function MarkPaidModal({
               }
             }}
           >
-            تأكيد السداد
+            {t("تأكيد السداد")}
           </Button>
           <Button variant="ghost" onClick={onClose}>
-            تراجع
+            {t("تراجع")}
           </Button>
         </>
       }
@@ -434,8 +621,8 @@ function MarkPaidModal({
         </div>
 
         <Field
-          label="مرجع التحويل"
-          hint="رقم العملية في كشف الحساب — يُحفظ للمراجعة"
+          label={t("مرجع التحويل")}
+          hint={t("رقم العملية في كشف الحساب — يُحفظ للمراجعة")}
         >
           <input
             className="input num"

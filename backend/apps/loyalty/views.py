@@ -9,6 +9,7 @@
 from django.db import transaction
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -87,13 +88,24 @@ class RewardListView(APIView):
 
     @extend_schema(responses=RewardWriteSerializer(many=True), summary="مكافآت العلامة")
     def get(self, request):
+        from apps.ledger.reports import reward_usage
+
         staff = get_staff_user(request)
         rewards = (
             Reward.objects.filter(program__brand=staff.branch.brand)
             .select_related("program")
             .order_by("program__name", "cost_amount")
         )
-        return Response(RewardWriteSerializer(rewards, many=True).data)
+
+        # عدد مرات الصرف بجانب كل مكافأة: مكافأة لم تُصرف مرة واحدة
+        # ليست مكافأة بل شرط تعجيزي، ولا يكتشف التاجر ذلك من قائمة
+        # تعرض الأسماء والأثمان وحدها.
+        usage = reward_usage(staff.branch.brand)
+        rows = RewardWriteSerializer(rewards, many=True).data
+        for row in rows:
+            row["redeemed_count"] = usage.get(str(row.get("id")), 0)
+
+        return Response(rows)
 
     @extend_schema(
         request=RewardWriteSerializer,
@@ -140,7 +152,7 @@ class MerchantCustomerListView(APIView):
             OpenApiParameter(
                 name="segment",
                 type=str,
-                description="active · dormant · new — شرائح جاهزة",
+                description="active · dormant · new · at_risk — شرائح جاهزة",
             ),
         ],
         responses=MembershipSerializer(many=True),
@@ -182,11 +194,29 @@ class MerchantCustomerListView(APIView):
         return paginator.get_paginated_response(MembershipSerializer(page, many=True).data)
 
 
+#: الشرائح التي تفهمها هذه الواجهة.
+#:
+#: مذكورة صراحةً لأن الشريحة المجهولة كانت تُعاد بلا تصفية: اللوحة
+#: تطلب `at_risk`، والخلفية لا تعرفها فتُجيب بكل العملاء — فتظهر
+#: «١٬٢٥١ عميلًا معرّضًا للفقدان» فوق قائمة انضمّ أصحابها أمس.
+#: الرفض الصريح يحوّل ميزة ناقصة إلى خطأ يُقرأ، لا إلى رقم يُصدَّق.
+SEGMENTS = ("active", "dormant", "new", "at_risk")
+
+
+class UnknownSegment(ValidationError):
+    pass
+
+
 def _apply_segment(queryset, segment: str):
     from datetime import timedelta
 
-    from django.db.models import Max, Q
+    from django.db.models import Count, DurationField, ExpressionWrapper, F, Max, Min, Q, Value
     from django.utils import timezone
+
+    if segment not in SEGMENTS:
+        raise UnknownSegment(
+            {"segment": f"شريحة غير معروفة: {segment}. المتاح: {', '.join(SEGMENTS)}."}
+        )
 
     now = timezone.now()
     annotated = queryset.annotate(last_activity=Max("entries__created_at"))
@@ -199,7 +229,36 @@ def _apply_segment(queryset, segment: str):
     if segment == "new":
         return annotated.filter(joined_at__gte=now - timedelta(days=7))
 
-    return annotated
+    # ── معرّض للفقدان ──
+    #
+    # ليس «غاب ٩٠ يومًا»: عميل يشتري كل أسبوع ثم يختفي شهرًا فقدته
+    # فعلًا، وعميل يشتري مرتين في السنة لم يتأخر أصلًا. العتبة
+    # نسبية لعادة كل عميل لا مطلقة للجميع — وهو ما تقوله الشاشة
+    # حرفيًا: «لم يعودوا خلال ضعف متوسط فترة زيارتهم المعتادة».
+    #
+    # الزيارات تُعدّ بالعمليات لا بالقيود: مكافأة الانضمام قيد بلا
+    # عملية، وعدّها كان يعطي كل عميل جديد «زيارتين» فيدخل الشريحة
+    # في يومه الأول.
+    visits = Q(entries__transaction__isnull=False)
+    measured = queryset.annotate(
+        first_visit=Min("entries__created_at", filter=visits),
+        last_visit=Max("entries__created_at", filter=visits),
+        visit_count=Count("entries__transaction", distinct=True, filter=visits),
+    ).filter(visit_count__gte=2)
+
+    # الفترة المعتادة = المدة بين أول زيارة وآخرها ÷ عدد الفجوات.
+    # وعدد الفجوات = الزيارات ناقص واحدة، لا الزيارات نفسها.
+    usual_gap = ExpressionWrapper(
+        (F("last_visit") - F("first_visit")) / (F("visit_count") - 1),
+        output_field=DurationField(),
+    )
+    idle = ExpressionWrapper(Value(now) - F("last_visit"), output_field=DurationField())
+
+    return (
+        measured.annotate(usual_gap=usual_gap, idle=idle)
+        .filter(idle__gt=F("usual_gap") * 2)
+        .order_by("last_visit")
+    )
 
 
 class MerchantCustomerDetailView(APIView):

@@ -3,17 +3,28 @@
  *
  * خطوتان لا صفحتان: التنقّل بين مسارين يفقد الرقم المُدخل إذا ضغط
  * المستخدم رجوع، والدخول يجب أن يكون أقصر مسار في التطبيق كله.
+ *
+ * الشاشة نصفان — `AuthLayout`. لوح الهوية هنا يعرض أرقام الشبكة
+ * الحقيقية لا وعودًا: من يفتح التطبيق لأول مرة يريد أن يعرف إن
+ * كانت متاجره موجودة فيه قبل أن يعطي رقم هاتفه.
  */
 
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
+  AuthLayout,
+  AuthPoint,
   Button,
   DemoAccountsPanel,
   ErrorBox,
+  Icon,
   api,
+  fetchNetwork,
+  fmt,
+  t,
   useAction,
+  useApi,
   useCountdown,
   writeTokens,
 } from "@walaee/shared";
@@ -51,6 +62,9 @@ export function Login() {
 
   const codeInput = useRef<HTMLInputElement>(null);
 
+  // الشبكة للوح الهوية وحده — فشلها لا يمنع الدخول
+  const network = useApi((signal) => fetchNetwork(signal), []);
+
   const requestOtp = useAction(async (value: string) =>
     api.anonymous.post<OtpRequestResponse>("/auth/otp/request", { phone: value }),
   );
@@ -75,7 +89,7 @@ export function Login() {
     const result = await requestOtp.run(account.phone);
     if (result?.code) {
       setCode(result.code);
-      setDemoNotice(result.notice ?? "حساب تجربة — الكود مُدخَل تلقائيًا.");
+      setDemoNotice(result.notice ?? t("حساب تجربة — الكود مُدخَل تلقائيًا."));
       setStep("code");
       restartCountdown();
     }
@@ -92,7 +106,7 @@ export function Login() {
       // بدل أن ينتظر المستخدم رسالة لن تأتي
       if (result.demo && result.code) {
         setCode(result.code);
-        setDemoNotice(result.notice ?? "حساب تجربة — الكود مُدخَل تلقائيًا.");
+        setDemoNotice(result.notice ?? t("حساب تجربة — الكود مُدخَل تلقائيًا."));
       } else {
         setDemoNotice(null);
       }
@@ -121,25 +135,42 @@ export function Login() {
     }
   }
 
-  return (
-    <div className="login">
-      <div className="login-brand">
-        <div className="login-mark" aria-hidden="true">
-          ♥
-        </div>
-        <h1>ولائي</h1>
-        <p className="muted">كلنا كسبانين</p>
-      </div>
+  const stats = network.data?.stats;
 
+  return (
+    <AuthLayout
+      headline={t("بطاقات ولائك كلها في محفظة واحدة")}
+      subline={t("لا كروت ورق تضيع ولا تطبيق لكل متجر. رقم هاتفك هو بطاقتك في كل متجر متعاقد.")}
+      aside={
+        <ul>
+          <AuthPoint title={t("اجمع من غير ما تعمل حاجة")}>
+            {t("قول رقمك عند الكاشير، والنقاط تتسجّل في ثانية.")}
+          </AuthPoint>
+          <AuthPoint title={t("رصيدك واضح دايمًا")}>
+            {t("تعرف كام باقي على المكافأة القادمة، ومتى ينتهي رصيدك.")}
+          </AuthPoint>
+          <AuthPoint title={t("متاجر في كل محافظة")}>
+            {stats
+              ? t("{branches} فرعًا لـ{brands} متجرًا في {govs} محافظة.", {
+                  branches: fmt.number(stats.branches),
+                  brands: fmt.number(stats.brands),
+                  govs: fmt.number(stats.governorates),
+                })
+              : t("شبكة تكبر كل شهر بمتاجر جديدة قريبة منك.")}
+          </AuthPoint>
+        </ul>
+      }
+      footer={<DemoAccountsPanel app="customer" onPick={pickDemo} />}
+    >
       {step === "phone" ? (
-        <form className="login-card" onSubmit={submitPhone}>
-          <h2>سجّل دخولك</h2>
-          <p className="t-sm muted">
-            أدخل رقم هاتفك وسنرسل لك كود تحقق من أربعة إلى ستة أرقام.
+        <form className="auth-fields" onSubmit={submitPhone}>
+          <h2>{t("سجّل دخولك")}</h2>
+          <p className="auth-lede">
+            {t("أدخل رقم هاتفك وسنرسل لك كود تحقق من أربعة إلى ستة أرقام.")}
           </p>
 
           <div className="field">
-            <label htmlFor="phone">رقم الهاتف</label>
+            <label htmlFor="phone">{t("رقم الهاتف")}</label>
             <input
               id="phone"
               className="input num"
@@ -156,37 +187,26 @@ export function Login() {
           {requestOtp.error != null && <ErrorBox error={requestOtp.error} />}
 
           <Button type="submit" size="lg" block loading={requestOtp.loading}>
-            إرسال الكود
+            {t("إرسال الكود")}
           </Button>
 
-          <p className="t-xs faint center">
-            بالمتابعة أنت توافق على تلقّي رسائل من المتاجر التي تنضم إليها.
-            يمكنك إلغاء الموافقة في أي وقت من صفحة حسابك.
+          <p className="auth-fine">
+            {t("بالمتابعة أنت توافق على تلقّي رسائل من المتاجر التي تنضم إليها. يمكنك إلغاء الموافقة في أي وقت من صفحة حسابك.")}
           </p>
-
-          <DemoAccountsPanel app="customer" onPick={pickDemo} />
         </form>
       ) : (
-        <form className="login-card" onSubmit={submitCode}>
-          <h2>أدخل الكود</h2>
-          <p className="t-sm muted">
-            أرسلنا كودًا إلى <span className="num">{phone}</span>
-            {" · "}
-            <button
-              type="button"
-              className="link"
-              onClick={() => setStep("phone")}
-            >
-              تغيير الرقم
-            </button>
+        <form className="auth-fields" onSubmit={submitCode}>
+          <h2>{t("أدخل الكود")}</h2>
+          <p className="auth-lede">
+            {t("أرسلنا كودًا إلى")} <span className="num">{phone}</span>
           </p>
 
           <div className="field">
-            <label htmlFor="code">كود التحقق</label>
+            <label htmlFor="code">{t("كود التحقق")}</label>
             <input
               id="code"
               ref={codeInput}
-              className="input code-input num"
+              className="input auth-code num"
               type="text"
               inputMode="numeric"
               autoComplete="one-time-code"
@@ -199,28 +219,35 @@ export function Login() {
           </div>
 
           {demoNotice && (
-            <p className="demo-notice">
-              <span aria-hidden="true">◈</span> {demoNotice}
+            <p className="auth-note">
+              <Icon name="info" size={16} />
+              <span>{demoNotice}</span>
             </p>
           )}
 
           {verifyOtp.error != null && <ErrorBox error={verifyOtp.error} />}
 
           <Button type="submit" size="lg" block loading={verifyOtp.loading}>
-            دخول
+            {t("دخول")}
           </Button>
 
-          {remaining > 0 ? (
-            <p className="t-sm faint center">
-              يمكنك طلب كود جديد بعد <span className="num">{remaining}</span> ثانية
-            </p>
-          ) : (
-            <button type="button" className="link center" onClick={resend}>
-              إرسال كود جديد
+          <p className="auth-switch">
+            <button type="button" onClick={() => setStep("phone")}>
+              {t("تغيير الرقم")}
             </button>
-          )}
+            <span aria-hidden="true">·</span>
+            {remaining > 0 ? (
+              <span>
+                {t("كود جديد بعد")} <span className="num">{remaining}</span> {t("ثانية")}
+              </span>
+            ) : (
+              <button type="button" onClick={resend}>
+                {t("إرسال كود جديد")}
+              </button>
+            )}
+          </p>
         </form>
       )}
-    </div>
+    </AuthLayout>
   );
 }

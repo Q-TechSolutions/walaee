@@ -7,12 +7,16 @@ import {
   Button,
   Empty,
   ErrorBox,
+  Icon,
   Loading,
   Modal,
   fmt,
+  t,
   useApi,
   useDebounced,
 } from "@walaee/shared";
+
+import type { IconName } from "@walaee/shared";
 
 import { queries } from "../lib/queries";
 
@@ -42,17 +46,12 @@ export function Customers() {
 
   return (
     <div className="stack gap-lg">
-      <header>
-        <h1>العملاء</h1>
-        <p className="t-sm muted">
-          عملاء علامتك فقط — لا ترى المنصة ولا أي تاجر آخر هذه القائمة
-        </p>
-      </header>
+      <Segments />
 
-      <div className="row gap wrap">
+      <div className="row gap wrap-f">
         <input
           className="input grow"
-          placeholder="ابحث بالاسم أو رقم الهاتف"
+          placeholder={t("ابحث بالاسم أو رقم الهاتف")}
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -60,18 +59,18 @@ export function Customers() {
           }}
         />
 
-        <div className="range-switch" role="group" aria-label="الشريحة">
+        <div className="tabs" role="group" aria-label={t("الشريحة")}>
           {SEGMENTS.map((option) => (
             <button
               key={option.key}
               type="button"
-              className={segment === option.key ? "active" : ""}
+              className={segment === option.key ? "on" : ""}
               onClick={() => {
                 setSegment(option.key);
                 setPage(1);
               }}
             >
-              {option.label}
+              {t(option.label)}
             </button>
           ))}
         </div>
@@ -84,12 +83,12 @@ export function Customers() {
 
       {customers.data?.results.length === 0 && (
         <Empty
-          icon="👥"
-          title="لا يوجد عملاء"
+          icon="users"
+          title={t("لا يوجد عملاء")}
           hint={
             debounced
-              ? "لا نتائج مطابقة لبحثك."
-              : "سيظهر العملاء هنا بعد أول عملية."
+              ? t("لا نتائج مطابقة لبحثك.")
+              : t("سيظهر العملاء هنا بعد أول عملية.")
           }
         />
       )}
@@ -99,10 +98,10 @@ export function Customers() {
           <table className="table">
             <thead>
               <tr>
-                <th>العميل</th>
-                <th>الهاتف</th>
-                <th>الرصيد</th>
-                <th>عضو منذ</th>
+                <th>{t("العميل")}</th>
+                <th>{t("الهاتف")}</th>
+                <th>{t("الرصيد")}</th>
+                <th>{t("عضو منذ")}</th>
                 <th />
               </tr>
             </thead>
@@ -118,7 +117,7 @@ export function Customers() {
                       row.balances.map((balance) => (
                         <span key={balance.program_id} className="balance-chip">
                           <span className="num">{fmt.number(balance.amount)}</span>{" "}
-                          {balance.unit_label}
+                          {t(balance.unit_label)}
                         </span>
                       ))
                     )}
@@ -130,7 +129,7 @@ export function Customers() {
                       className="link"
                       onClick={() => setSelected(row.id)}
                     >
-                      التفاصيل
+                      {t("التفاصيل")}
                     </button>
                   </td>
                 </tr>
@@ -147,10 +146,10 @@ export function Customers() {
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
           >
-            السابق
+            {t("السابق")}
           </Button>
           <span className="t-sm muted">
-            <span className="num">{page}</span> من{" "}
+            <span className="num">{page}</span> {t("من")}{" "}
             <span className="num">
               {Math.ceil(customers.data.count / customers.data.results.length)}
             </span>
@@ -160,7 +159,7 @@ export function Customers() {
             disabled={!customers.data.next}
             onClick={() => setPage((p) => p + 1)}
           >
-            التالي
+            {t("التالي")}
           </Button>
         </div>
       )}
@@ -185,35 +184,35 @@ function CustomerModal({
   if (!id) return null;
 
   return (
-    <Modal open title="ملف العميل" onClose={onClose}>
+    <Modal open title={t("ملف العميل")} onClose={onClose}>
       {detail.loading && <Loading />}
       {detail.error != null && <ErrorBox error={detail.error} />}
 
       {detail.data && (
         <div className="stack gap">
           <div>
-            <p className="w-8 t-lg">{detail.data.full_name || "بلا اسم"}</p>
+            <p className="w-8 t-lg">{detail.data.full_name || t("بلا اسم")}</p>
             <p className="t-sm muted num">{fmt.phone(detail.data.phone)}</p>
           </div>
 
           <div className="row gap wrap">
             <Badge tone="violet">
-              أنفق <span className="num">{fmt.money(detail.data.total_spend)}</span>
+              {t("أنفق")} <span className="num">{fmt.money(detail.data.total_spend)}</span>
             </Badge>
-            <Badge tone="muted">عضو منذ {fmt.date(detail.data.joined_at)}</Badge>
+            <Badge tone="muted"> {t("عضو منذ")} {fmt.date(detail.data.joined_at)}</Badge>
             {detail.data.tier && <Badge tone="amber">{detail.data.tier}</Badge>}
           </div>
 
           <div className="stack gap">
-            <h3 className="t-sm">الأرصدة</h3>
+            <h3 className="t-sm">{t("الأرصدة")}</h3>
             {detail.data.balances.length === 0 ? (
-              <p className="faint t-sm">لا يوجد رصيد.</p>
+              <p className="faint t-sm">{t("لا يوجد رصيد.")}</p>
             ) : (
               detail.data.balances.map((balance) => (
                 <div key={balance.program_id} className="row between">
                   <span className="t-sm">{balance.program_name}</span>
                   <span className="num w-7">
-                    {fmt.number(balance.amount)} {balance.unit_label}
+                    {fmt.number(balance.amount)} {t(balance.unit_label)}
                   </span>
                 </div>
               ))
@@ -221,9 +220,9 @@ function CustomerModal({
           </div>
 
           <div className="stack gap">
-            <h3 className="t-sm">آخر النشاط</h3>
+            <h3 className="t-sm">{t("آخر النشاط")}</h3>
             {detail.data.recent_activity.length === 0 ? (
-              <p className="faint t-sm">لا يوجد نشاط.</p>
+              <p className="faint t-sm">{t("لا يوجد نشاط.")}</p>
             ) : (
               <ul className="activity">
                 {detail.data.recent_activity.map((line) => (
@@ -248,5 +247,80 @@ function CustomerModal({
         </div>
       )}
     </Modal>
+  );
+}
+
+/**
+ * مؤشرات شرائح العملاء.
+ *
+ * الأربعة من `/merchant/segments` — تعريف الشريحة نفسه الذي
+ * تستخدمه الحملات، فالرقم الذي يراه التاجر هنا هو عدد من ستصلهم
+ * الرسالة هناك. تعريفان مختلفان كانا سيجعلان «٤٢ معرّضًا للفقدان»
+ * تتحوّل إلى ٣٧ عند الإرسال بلا تفسير.
+ */
+function Segments() {
+  const segments = useApi((signal) => queries.segments(signal), []);
+
+  if (!segments.data) return null;
+  const data = segments.data as Record<string, number>;
+
+  // المفاتيح كما تُرجعها /merchant/segments حرفًا بحرف. اختراع
+  // أسماء هنا كان يجعل البطاقة تختفي بصمت بدل أن تُظهر رقمًا.
+  const cards: {
+    key: string;
+    label: string;
+    sub: string;
+    tone: string;
+    icon: IconName;
+  }[] = [
+    {
+      key: "total",
+      label: t("إجمالي العملاء"),
+      sub: t("مسجّلون في برنامجك"),
+      tone: "v",
+      icon: "users",
+    },
+    {
+      key: "active_30d",
+      label: t("نشطون خلال ٣٠ يومًا"),
+      sub: t("سجّلوا حركة واحدة على الأقل"),
+      tone: "g",
+      icon: "refresh",
+    },
+    {
+      key: "dormant_90d",
+      label: t("خاملون ٩٠ يومًا"),
+      sub: t("يحتاجون حملة استرجاع"),
+      tone: "r",
+      icon: "alert",
+    },
+    {
+      key: "new_7d",
+      label: t("جدد هذا الأسبوع"),
+      sub: t("انضمّوا خلال سبعة أيام"),
+      tone: "b",
+      icon: "plus",
+    },
+  ];
+
+  return (
+    <div className="grid g4">
+      {cards
+        .filter((card) => data[card.key] !== undefined)
+        .map((card) => (
+          <article key={card.key} className="kpi">
+            <div className="row between">
+              <div className="grow">
+                <p className="kt">{t(card.label)}</p>
+                <p className="kv num">{fmt.number(data[card.key] ?? 0)}</p>
+                <p className="ks">{t(card.sub)}</p>
+              </div>
+              <span className={`ibox ${card.tone}`} aria-hidden="true">
+                <Icon name={card.icon} size={20} />
+              </span>
+            </div>
+          </article>
+        ))}
+    </div>
   );
 }

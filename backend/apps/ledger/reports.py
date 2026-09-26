@@ -158,29 +158,52 @@ def _pct(part, whole) -> float:
 
 
 def daily_series(brand, *, days: int = 30) -> list[dict]:
-    """سلسلة يومية للرسم البياني."""
-    since = timezone.now() - timedelta(days=days)
+    """
+    سلسلة يومية للرسم البياني — **يوم لكل يوم في المدى**.
+
+    الأيام الفارغة تُرجَع أصفارًا لا تُحذف. الحذف يبدو توفيرًا وهو
+    تزوير للشكل: أربع عمليات في أربعة أيام متفرّقة من الشهر كانت
+    تُرسَم كخطّ صاعد متّصل لا يُفرَّق عن أربع عمليات في أربعة أيام
+    متتالية. والأسوأ أن متجرًا بيوم نشاط واحد كان يعطي نقطة واحدة،
+    فيرسم الخط مثلّثًا لا معنى له بدل أن يقول «يوم واحد».
+
+    المدى يُحسَب بالتقويم المحلي (`Africa/Cairo`): «آخر ٣٠ يومًا»
+    لصاحب المتجر تعني ثلاثين يومًا تقويميًا تنتهي اليوم، لا ٧٢٠
+    ساعة تبدأ من لحظة فتح الصفحة — وإلا تغيّر أول عمود كلما حُدِّثت
+    اللوحة.
+    """
+    today = timezone.localdate()
+    start = today - timedelta(days=days - 1)
 
     rows = (
         Transaction.objects.filter(
             terminal__branch__brand=brand,
             status=Transaction.STATUS_CONFIRMED,
-            created_at__gte=since,
+            created_at__date__gte=start,
         )
         .annotate(day=TruncDate("created_at"))
         .values("day")
         .annotate(count=Count("id"), revenue=Sum("invoice_amount"))
-        .order_by("day")
     )
 
-    return [
-        {
-            "date": row["day"].isoformat(),
-            "transactions": row["count"],
-            "revenue": str(row["revenue"] or Decimal("0")),
-        }
+    found = {
+        row["day"]: (row["count"], row["revenue"] or Decimal("0"))
         for row in rows
-    ]
+        if row["day"] is not None
+    }
+
+    series = []
+    for offset in range(days):
+        day = start + timedelta(days=offset)
+        count, revenue = found.get(day, (0, Decimal("0")))
+        series.append(
+            {
+                "date": day.isoformat(),
+                "transactions": count,
+                "revenue": str(revenue),
+            }
+        )
+    return series
 
 
 def customer_segments(brand) -> dict:
@@ -297,3 +320,89 @@ def program_performance(brand) -> list[dict]:
             }
         )
     return result
+
+
+def recent_activity(brand, *, limit: int = 12) -> list[dict]:
+    """
+    آخر ما حدث على نقاط البيع — عمليات واستبدالات معًا.
+
+    الاثنان في تدفّق واحد مرتَّب زمنيًا لا في جدولين: من يفتح هذه
+    الشاشة يسأل «إيه اللي بيحصل عند الصندوق دلوقتي؟»، وفصل المنح
+    عن الصرف يجبره على قراءة جدولين ودمجهما في رأسه.
+
+    يُعرَض اسم الكاشير لأن المساءلة نصف الغرض: رقم بلا اسم لا
+    يكشف نمطًا، والنمط هو ما يُكتشَف به الاستغلال الداخلي.
+    """
+    rows = (
+        Transaction.objects.filter(terminal__branch__brand=brand)
+        .select_related("customer", "terminal__branch", "staff_user__user")
+        .prefetch_related("entries")
+        .order_by("-created_at")[:limit]
+    )
+
+    activity = []
+    for txn in rows:
+        # مجموع أثر العملية على الأرصدة — قد يكون قيدين (ترحيب + منح)
+        delta = sum((entry.delta for entry in txn.entries.all()), Decimal("0"))
+
+        activity.append(
+            {
+                "id": str(txn.id),
+                "kind": "transaction",
+                "at": txn.created_at,
+                "customer": (
+                    txn.customer.full_name or "عميل بلا اسم" if txn.customer_id else "زائر جديد"
+                ),
+                "branch": txn.terminal.branch.name,
+                "cashier": (
+                    txn.staff_user.user.full_name
+                    if txn.staff_user_id and txn.staff_user.user_id
+                    else "—"
+                ),
+                "amount": str(txn.invoice_amount),
+                "delta": str(delta),
+                "status": txn.status,
+            }
+        )
+    return activity
+
+
+def cashier_shift(staff) -> dict:
+    """
+    ما أنجزه هذا الكاشير اليوم.
+
+    بتقويم محلي لا بآخر ٢٤ ساعة: «عمليات اليوم» عند من يقف خلف
+    الصندوق تعني ورديته، ونافذة متحرّكة تجعل الرقم يتغيّر كلما
+    حُدّثت الشاشة بلا سبب مفهوم.
+    """
+    today = timezone.localdate()
+    rows = Transaction.objects.filter(
+        staff_user=staff,
+        status=Transaction.STATUS_CONFIRMED,
+        created_at__date=today,
+    )
+
+    return {
+        "transactions": rows.count(),
+        "revenue": str(rows.aggregate(total=Sum("invoice_amount"))["total"] or Decimal("0")),
+        "customers": rows.values("customer_id").distinct().count(),
+    }
+
+
+def reward_usage(brand) -> dict[str, int]:
+    """
+    كم مرة صُرفت كل مكافأة فعلًا، مفهرسة بمعرّفها.
+
+    المصروفة وحدها (`used`) لا المُصدَرة: كود أُصدر وانتهت صلاحيته
+    بلا استعمال ليس استبدالًا، وعدّه يجعل المكافأة تبدو رائجة وهي
+    لم تُستلَم قط.
+    """
+    rows = (
+        Redemption.objects.filter(
+            reward__program__brand=brand,
+            status=Redemption.STATUS_USED,
+        )
+        .values("reward_id")
+        .annotate(count=Count("id"))
+    )
+    return {str(row["reward_id"]): row["count"] for row in rows}

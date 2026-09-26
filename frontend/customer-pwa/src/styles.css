@@ -1,10 +1,19 @@
 /* ══════════════════════════════════════════════════════════
-   تطبيق العميل — أنماط خاصة بالجوال.
+   تطبيق العميل — أنماط الجوال.
 
-   الهاتف هو الجهاز الوحيد المستهدف هنا: لا يوجد مستخدم يفتح
-   محفظة ولاء على شاشة مكتب. التصميم يبدأ من ٣٢٠ بكسل ويتوسّع
-   بحد أقصى إلى ٥٢٠ في المنتصف.
+   منقولة عن `docs/demo/assets/css/mobile.css`، وهو التصميم الذي
+   اعتُمد في العرض. الفرق الوحيد أن العرض يرسم إطار هاتف حول
+   الشاشة لأنه يُعرَض على سطح مكتب، أما هنا فالتطبيق **هو** الهاتف:
+   ما كان `.screen` صار جسم الصفحة، و`.view` صار منطقة التمرير.
+
+   الهاتف هو الجهاز الوحيد المستهدف: لا يوجد مستخدم يفتح محفظة
+   ولاء على شاشة مكتب. يبدأ من ٣٢٠ بكسل، وعلى الشاشات الأوسع
+   يتوسّط بعرض أقصى ٤٦٠ بدل أن يتمدّد إلى لافتة.
    ══════════════════════════════════════════════════════════ */
+
+body {
+  background: var(--canvas);
+}
 
 .app {
   min-height: 100dvh;
@@ -13,565 +22,503 @@
   background: var(--canvas);
 }
 
+/* عمود التطبيق: يتوسّط على الشاشات الكبيرة ويملأ الهاتف */
 .app-main {
   flex: 1;
+  width: min(460px, 100%);
+  margin-inline: auto;
   /* حجز مساحة الشريط السفلي + المنطقة الآمنة، وإلا غطّى الشريط
      آخر عنصر في القائمة ولم يصل إليه المستخدم أبدًا */
-  padding-bottom: calc(var(--tabbar-h) + var(--safe-b) + 12px);
+  padding-bottom: calc(var(--tabbar-h) + var(--safe-b) + 14px);
 }
 
-.page {
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 18px 16px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
+.pad {
+  padding-inline: 18px;
 }
 
-.page > h1 {
-  font-size: 22px;
-}
+/* ══════════════ رأس الصفحة ══════════════ */
 
-.mb {
-  margin-bottom: 0;
-}
-
-.stack.gap {
-  gap: 12px;
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.section > h2 {
-  font-size: 15px;
-  color: var(--ink-2);
-}
-
-.link {
-  color: var(--violet-700);
-  font-weight: 700;
-  font-size: 13px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.center {
-  text-align: center;
-  align-self: center;
-}
-
-.w-full {
-  width: 100%;
-}
-
-.back-link {
-  align-self: flex-start;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-/* ══════════════ الدخول ══════════════ */
-
-.login {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--sp-4);
-  padding: 24px 18px;
-  max-width: 440px;
-  margin: 0 auto;
-}
-
-.login-brand {
-  text-align: center;
-}
-
-.login-mark {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 12px;
-  display: grid;
-  place-items: center;
-  border-radius: 20px;
-  background: var(--violet-700);
-  color: #fff;
-  font-size: 30px;
-  box-shadow: var(--sh-brand);
-}
-
-.login-brand h1 {
-  font-size: 30px;
-}
-
-.login-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 24px 20px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-xl);
-  box-shadow: var(--sh-2);
-}
-
-.login-card h2 {
-  font-size: 19px;
-}
-
-.code-input {
-  text-align: center;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: 6px;
-  padding: 14px;
-}
-
-/* التباعد هنا آمن: الحقل يقبل أرقامًا ولاتينية فقط، ولا حرف
-   عربي واحد يمر به فلا يوجد اتصال يُكسَر. */
-
-.amount-input {
-  font-size: 26px;
-  font-weight: 800;
-  text-align: center;
-}
-
-/* تنبيه حساب التجربة — بنفسجي لا أخضر: ليس نجاحًا بل حالة خاصة */
-.demo-notice {
+.mhead {
+  padding: 14px 18px 14px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 13px;
-  border-radius: var(--r);
-  background: var(--violet-50);
-  border: 1px solid var(--violet-100);
-  color: var(--violet-700);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-/* ══════════════ الرئيسية ══════════════ */
-
-.home-hd {
-  display: flex;
-  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
 
-.home-hd h1 {
-  font-size: 26px;
+.mhead h1 {
+  font-size: 22px;
 }
 
-.home-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 14px;
-  border-radius: var(--r);
-  background: var(--violet-100);
+.mhead .sub {
+  font-size: var(--t-sm);
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.iconbtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
+  transition: var(--t);
+  flex: none;
+  position: relative;
+}
+
+.iconbtn:hover {
+  border-color: var(--violet-300);
   color: var(--violet-700);
-  line-height: 1.2;
 }
 
-.home-chip .num {
-  font-size: 19px;
+/* نقطة الإشعار — حدّها بلون الخلفية يفصلها عن الأيقونة تحتها */
+.iconbtn .nd {
+  position: absolute;
+  top: 7px;
+  inset-inline-end: 7px;
+  width: 8px;
+  height: 8px;
+  background: var(--orange-600);
+  border-radius: 50%;
+  border: 2px solid var(--surface);
 }
+
+/* شريط علوي داخلي — شاشات التفاصيل */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px 12px;
+}
+
+.topbar h2 {
+  font-size: var(--t-lg);
+  flex: 1;
+  min-width: 0;
+}
+
+/* عنوان قسم داخل الصفحة */
+.sec-t {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 22px 0 11px;
+}
+
+.sec-t h3 {
+  font-size: 15.5px;
+}
+
+.sec-t a,
+.sec-t button {
+  font-size: 12px;
+  color: var(--violet-700);
+  font-weight: 700;
+}
+
+/* بطاقة الولاء وشبكة الأختام في @walaee/shared — تستعملهما
+   الصفحة العامة أيضًا لتعرض البطاقة كما يراها العميل تمامًا. */
+
+/* ══════════════ شبكة الأختام ══════════════ */
+
+.stamps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 11px;
+}
+
+.stamp {
+  aspect-ratio: 1;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--line);
+  background: var(--canvas-2);
+  color: var(--faint);
+  transition: var(--t);
+}
+
+.stamp.fill {
+  background: var(--green-100);
+  border: 2px solid var(--green-600);
+  color: var(--green-700);
+}
+
+/* الختم التالي ينبض: هو الفعل المطلوب من العميل، والنبض يقول
+   «ده اللي ناقصك» بلا سطر نص إضافي */
+.stamp.next {
+  border-color: var(--orange-500);
+  color: var(--orange-600);
+  background: var(--orange-50);
+  animation: wl-pulse 1.8s ease-in-out infinite;
+}
+
+/* صفوف القوائم (.li) وبطاقة المكافأة (.rw) في @walaee/shared —
+   تستعملهما لوحة التاجر أيضًا في الفروع والاشتراك والمراجعة. */
+
+/* ══════════════ شريط المستوى ══════════════ */
+
+.tier {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, var(--violet-800), var(--violet-600));
+  color: #fff;
+  box-shadow: var(--sh-brand);
+}
+
+.tier .tb {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.tier b {
+  font-size: 13.5px;
+  display: block;
+}
+
+.tier span {
+  font-size: var(--t-xs);
+  opacity: 0.85;
+  font-weight: 600;
+  display: block;
+}
+
+.tier .tp {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 9px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.tier .tp i {
+  display: block;
+  height: 100%;
+  background: #fff;
+  border-radius: 9px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ══════════════ سلسلة الزيارات ══════════════ */
+
+.streak {
+  display: flex;
+  gap: 5px;
+}
+
+.streak i {
+  flex: 1;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--line-2);
+  display: grid;
+  place-items: center;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--faint);
+  font-style: normal;
+}
+
+.streak i.on {
+  background: var(--green-100);
+  color: var(--green-700);
+}
+
+.streak i.today {
+  background: var(--orange-600);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(249, 115, 22, 0.35);
+}
+
+/* ══════════════ دعوة التثبيت ══════════════ */
+
+.a2hs {
+  background: linear-gradient(135deg, var(--violet-800), var(--violet-600));
+  border-radius: 18px;
+  padding: 15px;
+  color: #fff;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  box-shadow: var(--sh-brand);
+}
+
+.a2hs .ic {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.a2hs b {
+  font-size: 13.5px;
+  display: block;
+}
+
+.a2hs span {
+  font-size: var(--t-sm);
+  opacity: 0.85;
+  font-weight: 600;
+  line-height: 1.5;
+  display: block;
+}
+
+/* ══════════════ شريط تنبيه ══════════════ */
 
 .alert-strip {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  border-radius: var(--r);
+  border-radius: 14px;
   background: var(--orange-50);
-  border: 1px solid var(--orange-100);
-  color: var(--orange-600);
-  font-size: 13.5px;
+  border: 1px solid #fbdcc4;
+  color: #c2410c;
+  font-size: 13px;
   font-weight: 700;
 }
 
-/* ══════════════ البطاقات ══════════════ */
+/* ══════════════ الإيصال ══════════════ */
 
-.cards {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.loyalty-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.rcpt {
+  background: var(--surface);
+  border-radius: 18px;
   padding: 18px;
-  border-radius: var(--r-xl);
-  color: #fff;
-  overflow: hidden;
-  background: linear-gradient(
-    135deg,
-    var(--brand, var(--violet-700)),
-    color-mix(in srgb, var(--brand, var(--violet-700)) 70%, #000)
-  );
+  position: relative;
   box-shadow: var(--sh-2);
-  transition: transform var(--t);
+  border: 1px solid var(--line);
 }
 
-.loyalty-card:active {
-  transform: scale(0.985);
-}
-
-/* لمعة قطرية خفيفة تعطي إحساس البطاقة البلاستيكية */
-.loyalty-card::after {
+/* ثقبا التذكرة — يُرسَمان بلون الخلفية لا بشفافية، وإلا ظهر ما
+   تحتهما حين تُوضع البطاقة فوق أي سطح ملوّن */
+.rcpt::before,
+.rcpt::after {
   content: "";
   position: absolute;
-  inset-inline-end: -40px;
-  top: -60px;
-  width: 160px;
-  height: 160px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--canvas);
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-.loyalty-card-top {
+.rcpt::before { inset-inline-start: -10px; }
+.rcpt::after { inset-inline-end: -10px; }
+
+.rcpt .rl {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  position: relative;
-}
-
-.loyalty-card-name {
-  font-weight: 800;
-  font-size: 16px;
-}
-
-.loyalty-card-tier {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 9px;
-  border-radius: var(--r-full);
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.loyalty-card-balance {
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-  position: relative;
-}
-
-.loyalty-card-balance .num {
-  font-size: 36px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.loyalty-card-unit {
-  font-size: 14px;
-  opacity: 0.85;
-}
-
-.loyalty-card-foot {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  opacity: 0.8;
-  position: relative;
-}
-
-.loyalty-card-expiry {
-  position: relative;
-  align-self: flex-start;
-  font-size: 11.5px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: var(--r-full);
-  background: rgba(255, 255, 255, 0.18);
-}
-
-/* ══════════════ تفاصيل البطاقة ══════════════ */
-
-.detail-hero {
-  padding: 22px 18px;
-  border-radius: var(--r-xl);
-  color: #fff;
-  background: linear-gradient(
-    135deg,
-    var(--brand, var(--violet-700)),
-    color-mix(in srgb, var(--brand, var(--violet-700)) 70%, #000)
-  );
-  box-shadow: var(--sh-2);
-}
-
-.detail-hero h1 {
-  font-size: 24px;
-  margin-bottom: 14px;
-}
-
-.detail-balances {
-  display: flex;
-  gap: 22px;
-  flex-wrap: wrap;
-}
-
-.detail-balance {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.25;
-}
-
-.detail-balance .num {
-  font-size: 30px;
-  font-weight: 800;
-}
-
-.detail-program {
-  opacity: 0.75;
-}
-
-.detail-meta {
-  margin-top: 14px;
-  opacity: 0.8;
-}
-
-/* ══════════════ المكافآت ══════════════ */
-
-.reward-row {
-  display: flex;
-  align-items: center;
   gap: 12px;
-  padding: 14px 16px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
+  padding: 6px 0;
+  font-size: var(--t-sm);
 }
 
-.reward-progress {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
-  min-width: 96px;
+.rcpt .dash {
+  border-top: 1.5px dashed var(--line);
+  margin: 12px -4px;
 }
 
-.reward-bar {
-  width: 92px;
-  height: 6px;
-  border-radius: var(--r-full);
-  background: var(--line);
-  overflow: hidden;
-}
+/* ══════════════ شريط التنقّل السفلي ══════════════ */
 
-.reward-bar > span {
-  display: block;
-  height: 100%;
-  border-radius: var(--r-full);
-  background: var(--violet-600);
-  transition: width 0.4s ease-out;
-}
-
-.code-card {
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  inset-inline: 0;
+  height: calc(var(--tabbar-h) + var(--safe-b));
+  width: min(460px, 100%);
+  margin-inline: auto;
+  background: var(--veil);
+  backdrop-filter: blur(18px);
+  border-top: 1px solid var(--line);
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: var(--r-lg);
-  background: var(--green-50);
-  border: 1px solid var(--green-100);
+  padding: 0 6px calc(14px + var(--safe-b));
+  z-index: 40;
 }
 
-.code-card-code {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.code-card-code .num {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--green-700);
-}
-
-.redeem-result {
+.tab {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  text-align: center;
+  gap: 3px;
+  padding-top: 11px;
+  color: var(--faint);
+  transition: var(--t);
+  font-size: 10px;
+  font-weight: 700;
 }
 
-.redeem-code {
-  font-size: 34px;
-  font-weight: 800;
-  letter-spacing: 5px;
+.tab-active {
   color: var(--violet-700);
-  padding: 12px 20px;
-  border-radius: var(--r);
-  background: var(--violet-50);
-  border: 2px dashed var(--violet-300);
 }
 
-/* ══════════════ النشاط ══════════════ */
-
-.activity {
-  display: flex;
-  flex-direction: column;
+/* زر المسح مرفوع فوق الشريط: هو الإجراء الوحيد الذي يقوم به
+   العميل وهو واقف عند الصندوق، ويجب أن يُصاب بالإبهام بلا نظر */
+.tab-primary {
+  margin-top: -30px;
 }
 
-.activity > li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 4px;
-  border-bottom: 1px solid var(--line-2);
-}
-
-.activity > li:last-child {
-  border-bottom: none;
-}
-
-.activity-delta {
-  min-width: 58px;
-  font-weight: 800;
-  font-size: 15px;
-}
-
-.activity-delta.plus {
-  color: var(--green-600);
-}
-
-.activity-delta.minus {
-  color: var(--red-600);
-}
-
-/* ══════════════ المسح ══════════════ */
-
-.qr {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-#qr-reader {
-  width: 100%;
-  border-radius: var(--r-xl);
-  overflow: hidden;
-  background: var(--surface);
-  border: 1px solid var(--line);
-}
-
-.qr-idle {
-  aspect-ratio: 1;
+.tab-fab {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  background: linear-gradient(140deg, var(--violet-600), var(--violet-800));
   display: grid;
   place-items: center;
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(75, 30, 158, 0.45);
+  transition: var(--t);
+}
+
+.tab-primary:active .tab-fab {
+  transform: scale(0.92);
+}
+
+
+/* ══════════════ شاشة المسح ══════════════ */
+
+.scanview {
+  position: fixed;
+  inset: 0;
+  background: #0b0918;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.scan-cam {
+  flex: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 42%, #241a45, #0b0918 72%);
 }
 
 .qr-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 24px;
+  gap: 12px;
   text-align: center;
+  padding: 24px;
+  color: var(--muted);
 }
 
-.qr-placeholder > span {
-  font-size: 54px;
-  color: var(--violet-300);
+.qr {
+  position: relative;
+  border-radius: 26px;
+  overflow: hidden;
+  background: var(--canvas-2);
+  border: 1px solid var(--line);
+  min-height: 240px;
+  display: grid;
+  place-items: center;
 }
 
-.manual-code {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-top: 6px;
-  border-top: 1px solid var(--line-2);
+.qr-live {
+  width: 100%;
 }
 
-.scan-brand {
-  padding: 18px;
-  border-radius: var(--r-lg);
+/* ══════════════ كود الاستبدال ══════════════ */
+
+.code-card {
+  background: linear-gradient(160deg, var(--violet-800), var(--violet-700) 60%, var(--violet-900));
+  border-radius: var(--r-xl);
+  padding: 26px;
   color: #fff;
-  background: var(--brand, var(--violet-700));
+  text-align: center;
+  box-shadow: var(--sh-brand);
+  position: relative;
+  overflow: hidden;
 }
 
-.scan-brand h2 {
-  font-size: 21px;
+.code-card-code {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  direction: ltr;
+  margin: 10px 0;
 }
 
-.scan-balance {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.25);
-  font-size: 14px;
+.manual-code,
+.code-input {
+  text-align: center;
+  font-size: var(--t-xl);
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  padding-inline-start: 0.3em;
+}
+
+.amount-input {
+  font-size: var(--t-2xl);
+  font-weight: 800;
+  text-align: center;
 }
 
 .waiting {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 14px;
-  text-align: center;
-  padding: var(--sp-4) 10px;
-}
-
-.waiting h2 {
-  font-size: 20px;
+  justify-content: center;
+  gap: 9px;
+  color: var(--muted);
+  font-size: var(--t-sm);
+  font-weight: 700;
 }
 
 .waiting-pulse {
-  width: 76px;
-  height: 76px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: var(--violet-100);
-  position: relative;
-}
-
-.waiting-pulse::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 3px solid var(--violet-600);
-  animation: wait-ring 1.6s ease-out infinite;
-}
-
-@keyframes wait-ring {
-  0% {
-    transform: scale(0.7);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.35);
-    opacity: 0;
-  }
+  background: var(--violet-600);
+  animation: wl-pulse 1.3s ease-in-out infinite;
 }
 
 /* ══════════════ المتاجر ══════════════ */
+
+.near-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, var(--violet-50), var(--green-50));
+  border: 1px solid var(--line);
+  color: var(--violet-700);
+  text-align: start;
+  min-height: 56px;
+}
 
 .store-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line-2);
+  width: 100%;
+  text-align: start;
 }
 
-.store-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--brand, var(--violet-600));
-  flex: none;
+.store-row:last-child {
+  border-bottom: none;
 }
 
 /* ══════════════ الحساب ══════════════ */
@@ -580,91 +527,142 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-}
-
-.profile-avatar {
-  width: 54px;
-  height: 54px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--violet-100);
-  color: var(--violet-700);
-  font-size: 22px;
-  font-weight: 800;
-  flex: none;
+  padding: 4px 0 8px;
 }
 
 .privacy-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line-2);
 }
 
-/* ══════════════ الشريط السفلي ══════════════ */
-
-.tabbar {
-  position: fixed;
-  inset-inline: 0;
-  bottom: 0;
-  z-index: 20;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  align-items: center;
-  height: calc(var(--tabbar-h) + var(--safe-b));
-  padding-bottom: var(--safe-b);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid var(--line);
+.privacy-row:last-child {
+  border-bottom: none;
 }
 
-.tab {
+/* ══════════════ مساعدات ══════════════ */
+
+.link {
+  color: var(--violet-700);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.w-full { width: 100%; }
+.mb { margin-bottom: 0; }
+.stack.gap { gap: 12px; }
+.gap { gap: 12px; }
+
+.section {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  color: var(--faint);
-  font-size: 10.5px;
-  font-weight: 700;
-  transition: color var(--t);
+  gap: 12px;
 }
 
-.tab-icon {
-  font-size: 19px;
-  line-height: 1;
-}
+/* ══════════════ أفاتار العلامة ══════════════ */
 
-.tab-active {
+/**
+ * حرف العلامة بلونها.
+ *
+ * دليل من تسعين صفًّا بأيقونة متجر واحدة مكرّرة لا يُمسَح بالعين،
+ * ولا يربط الصفَّ بالبطاقة الملوّنة التي يعرفها العميل في محفظته.
+ * اللون يأتي من `--brand` على الصف نفسه، والخلفية مزيج خفيف منه
+ * ليبقى النص مقروءًا مهما كان اللون داكنًا.
+ */
+.brandav {
+  background: var(--violet-100);
   color: var(--violet-700);
+  flex: none;
 }
 
-/* زر المسح مرفوع: الإجراء الوحيد الذي يُستخدم والعميل واقف عند
-   الصندوق، ويجب أن يُصاب بالإبهام بلا نظر */
-.tab-primary {
+@supports (background: color-mix(in oklab, red, blue)) {
+  .brandav {
+    background: color-mix(in oklab, var(--brand, var(--violet-700)) 16%, transparent);
+    color: color-mix(in oklab, var(--brand, var(--violet-700)) 88%, #000);
+  }
+}
+
+/* في الوضع الليلي يُقلب المزيج: لون فاتح على خلفية داكنة */
+@media (prefers-color-scheme: dark) {
+  @supports (background: color-mix(in oklab, red, blue)) {
+    :root:not([data-theme="light"]) .brandav {
+      background: color-mix(in oklab, var(--brand, var(--violet-700)) 30%, transparent);
+      color: color-mix(in oklab, var(--brand, var(--violet-700)) 55%, #fff);
+    }
+  }
+}
+
+@supports (background: color-mix(in oklab, red, blue)) {
+  :root[data-theme="dark"] .brandav {
+    background: color-mix(in oklab, var(--brand, var(--violet-700)) 30%, transparent);
+    color: color-mix(in oklab, var(--brand, var(--violet-700)) 55%, #fff);
+  }
+}
+
+/* ══════════════ مربّع البحث ══════════════ */
+
+.searchbox {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.tab-primary .tab-icon {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  margin-top: -22px;
-  border-radius: 16px;
-  background: var(--violet-700);
-  color: #fff;
-  font-size: 21px;
-  box-shadow: var(--sh-brand);
+.searchbox > svg {
+  position: absolute;
+  inset-inline-start: 13px;
+  color: var(--faint);
+  pointer-events: none;
 }
 
-.tab-primary.tab-active .tab-icon {
-  background: var(--violet-800);
+.searchbox .input {
+  width: 100%;
+  padding-inline-start: 40px;
+}
+
+/* زر المسح الأصلي في Safari/Chrome يقع فوق الأيقونة في RTL */
+.searchbox .input::-webkit-search-cancel-button {
+  margin-inline-start: 6px;
+}
+
+/* ══════════════ صف أرقام العلاقة ══════════════ */
+
+/**
+ * ثلاثة مربعات متساوية.
+ *
+ * قيمة أطول من خانتها تلتفّ سطرين فيرتفع مربعها وحده ويبدو الصف
+ * مكسورًا. الارتفاع الأدنى يسوّيها، والتوسيط العمودي يبقي الرقم
+ * في منتصف مربعه أيًّا كان طول التسمية تحته.
+ */
+.facts .fact {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 86px;
+  padding: 14px 10px;
+}
+
+.facts .fact > p {
+  overflow-wrap: anywhere;
+}
+
+/* ══════════════ ردّ الفعل على اللمس ══════════════ */
+
+/**
+ * الصف القابل للضغط ينكمش قليلًا.
+ *
+ * على الهاتف لا يوجد `hover` يقول «هذا قابل للضغط». بلا ردّ فعل
+ * لحظي يضغط المستخدم مرة ثانية ظنًّا أن الأولى لم تصل.
+ */
+a.li:active,
+a.tier:active,
+.rw:active {
+  transform: scale(0.99);
+}
+
+a.tier {
+  transition: var(--t);
 }

@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
-import { configureApi, hardRedirect, isAt } from "@walaee/shared";
+import { LocaleBoundary, applyPreferences, configureApi, hardRedirect, isAt } from "@walaee/shared";
 
 import "@walaee/shared/tokens.css";
 import "@walaee/shared/base.css";
@@ -27,10 +27,23 @@ configureApi({
   },
 });
 
+/**
+ * التفضيلات قبل أول رسم.
+ *
+ * `applyPreferences` يكتب `lang` و`dir` و`data-theme` على جذر
+ * المستند من المحفوظ في هذا المتصفّح. تأجيلها إلى ما بعد التركيب
+ * كان يُظهر ومضة بالوضع الخاطئ — كافية لتبدو الصفحة معطوبة على
+ * جهاز مضبوط على الداكن.
+ */
+applyPreferences();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
+    {/* يجب أن يطابق `base` في vite.config.ts — راجع التعليق هناك */}
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <LocaleBoundary>
+        <App />
+      </LocaleBoundary>
     </BrowserRouter>
   </StrictMode>,
 );

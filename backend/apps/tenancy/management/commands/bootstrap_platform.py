@@ -26,6 +26,7 @@ from apps.billing.models import Plan, Subscription
 from apps.billing.services import get_subscription
 from apps.loyalty.models import LoyaltyProgram, ProgramRule
 from apps.tenancy.models import Branch, Brand, Organization, StaffUser, Terminal
+from apps.tenancy.palette import brand_color
 
 User = get_user_model()
 
@@ -110,7 +111,7 @@ class Command(BaseCommand):
         brand, _ = Brand.objects.get_or_create(
             organization=organization,
             name=options["brand"],
-            defaults={"slug": slug},
+            defaults={"slug": slug, "primary_color": brand_color(options["brand"])},
         )
         branch, _ = Branch.objects.get_or_create(brand=brand, name=options["branch"])
         Terminal.objects.get_or_create(branch=branch, label="كاشير ١")

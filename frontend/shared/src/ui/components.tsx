@@ -7,6 +7,10 @@
 
 import type { ReactNode } from "react";
 
+import { Icon } from "./icons";
+import type { IconName } from "./icons";
+import { t } from "../i18n/locale";
+
 /* ══════════════ الحالات ══════════════ */
 
 export function Spinner({ size = 20 }: { size?: number }) {
@@ -15,12 +19,12 @@ export function Spinner({ size = 20 }: { size?: number }) {
       className="wl-spinner"
       style={{ width: size, height: size }}
       role="status"
-      aria-label="جارٍ التحميل"
+      aria-label={t("جارٍ التحميل")}
     />
   );
 }
 
-export function Loading({ label = "جارٍ التحميل…" }: { label?: string }) {
+export function Loading({ label = t("جارٍ التحميل…") }: { label?: string }) {
   return (
     <div className="empty">
       <Spinner size={26} />
@@ -30,20 +34,20 @@ export function Loading({ label = "جارٍ التحميل…" }: { label?: stri
 }
 
 export function Empty({
-  icon = "◇",
+  icon = "layers",
   title,
   hint,
   action,
 }: {
-  icon?: string;
+  icon?: IconName;
   title: string;
   hint?: string;
   action?: ReactNode;
 }) {
   return (
     <div className="empty">
-      <div className="empty-icon" aria-hidden="true">
-        {icon}
+      <div className="empty-icon">
+        <Icon name={icon} size={30} weight={1.5} />
       </div>
       <p style={{ fontWeight: 700, color: "var(--ink)" }}>{title}</p>
       {hint && <p className="t-sm muted">{hint}</p>}
@@ -67,15 +71,15 @@ export function ErrorBox({
   onRetry?: () => void;
 }) {
   const message =
-    error instanceof Error ? error.message : "تعذّر إتمام العملية.";
+    error instanceof Error ? error.message : t("تعذّر إتمام العملية.");
 
   return (
     <div className="wl-error" role="alert">
-      <span aria-hidden="true">⚠</span>
+      <Icon name="alert" size={18} />
       <span className="grow">{message}</span>
       {onRetry && (
         <button type="button" className="btn btn-ghost" onClick={onRetry}>
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       )}
     </div>
@@ -242,8 +246,8 @@ export function Modal({
       <div className="wl-modal">
         <div className="wl-modal-hd">
           <h3>{title}</h3>
-          <button type="button" onClick={onClose} aria-label="إغلاق">
-            ✕
+          <button type="button" onClick={onClose} aria-label={t("إغلاق")}>
+            <Icon name="close" size={18} />
           </button>
         </div>
         <div className="wl-modal-body">{children}</div>
@@ -270,5 +274,68 @@ export function PageHeader({
       </div>
       {actions && <div className="row">{actions}</div>}
     </header>
+  );
+}
+
+/* ══════════════ حلقة التقدّم ══════════════ */
+
+/**
+ * التقدّم كحلقة — للأرصدة التي لا تُعدّ.
+ *
+ * الأختام تُرسَم شبكةً لأن العميل يعدّها كما كان يعدّ أختام الكرت
+ * الورقي. أما «٨٢٠ من ١٠٠٠ نقطة» فلا يُعدّ، ويهمّ فيه القرب من
+ * الهدف — والحلقة تقول القرب بنظرة واحدة، والرقم الكبير في وسطها
+ * يقول الرصيد بلا سطر ثانٍ.
+ *
+ * `children` هو ما يُكتب في المنتصف: يُمرَّر من الخارج لأن
+ * الحلقة لا تعرف وحدة الرصيد ولا كيف يُنسَّق رقمه في كل لغة.
+ */
+export function Ring({
+  value,
+  size = 148,
+  stroke = 12,
+  color = "var(--violet-700)",
+  children,
+}: {
+  /** بين ٠ و١ */
+  value: number;
+  size?: number;
+  stroke?: number;
+  color?: string;
+  children?: ReactNode;
+}) {
+  const safe = Math.min(Math.max(value, 0), 1);
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+
+  return (
+    <div className="wl-ring" style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="var(--line-2)"
+          strokeWidth={stroke}
+        />
+        {/* يبدأ من أعلى الحلقة لا من يمينها: الدوران يجعل الامتلاء
+            يُقرأ كعقرب ساعة، وهو ما يتوقّعه العين */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference * (1 - safe)}
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          className="wl-ring-fill"
+        />
+      </svg>
+      <div className="wl-ring-mid">{children}</div>
+    </div>
   );
 }

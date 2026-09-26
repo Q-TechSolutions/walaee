@@ -68,6 +68,33 @@ class RewardSerializer(serializers.ModelSerializer):
         )
 
 
+class MyRewardSerializer(serializers.Serializer):
+    """
+    مكافأة كما يراها عميل بعينه.
+
+    توثيق شكل رد `/me/rewards` للمخطّط — الرد يُبنى في العرض لأنه
+    يضمّ حقول المكافأة وحقول رصيد العميل معًا، وهما من جدولين.
+    """
+
+    id = serializers.UUIDField()
+    title = serializers.CharField()
+    description = serializers.CharField()
+    cost_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+    cost_unit = serializers.CharField()
+    unit_label = serializers.CharField()
+    stock = serializers.IntegerField(allow_null=True)
+    in_stock = serializers.BooleanField()
+    brand_id = serializers.UUIDField()
+    brand_name = serializers.CharField()
+    primary_color = serializers.CharField()
+    program_id = serializers.UUIDField()
+    program_name = serializers.CharField()
+    balance = serializers.DecimalField(max_digits=12, decimal_places=2)
+    remaining = serializers.DecimalField(max_digits=12, decimal_places=2)
+    ready = serializers.BooleanField()
+    progress = serializers.FloatField()
+
+
 class RedeemRequestSerializer(serializers.Serializer):
     reward_id = serializers.UUIDField()
 

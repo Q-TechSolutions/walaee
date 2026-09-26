@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
-import { configureApi, hardRedirect, isAt } from "@walaee/shared";
+import { LocaleBoundary, applyPreferences, configureApi, hardRedirect, isAt } from "@walaee/shared";
 
 import "@walaee/shared/tokens.css";
 import "@walaee/shared/base.css";
@@ -10,11 +10,13 @@ import "@walaee/shared/components.css";
 import "./styles.css";
 
 import { App } from "./App";
-import { endSession } from "./lib/session";
+import { branchHeaders, endSession } from "./lib/session";
 
 configureApi({
   // يفصل تخزين التوكن عن التطبيقين الآخرين على نفس الأصل
   appId: "merchant",
+  // الفرع المختار مع كل طلب — الموظف قد يعمل في أكثر من علامة
+  headers: branchHeaders,
   onUnauthenticated: () => {
     endSession();
     if (!isAt("/login")) {
@@ -23,11 +25,23 @@ configureApi({
   },
 });
 
+/**
+ * التفضيلات قبل أول رسم.
+ *
+ * `applyPreferences` يكتب `lang` و`dir` و`data-theme` على جذر
+ * المستند من المحفوظ في هذا المتصفّح. تأجيلها إلى ما بعد التركيب
+ * كان يُظهر ومضة بالوضع الخاطئ — كافية لتبدو الصفحة معطوبة على
+ * جهاز مضبوط على الداكن.
+ */
+applyPreferences();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     {/* BASE_URL يأتي من Vite ويطابق `base` في إعداده */}
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <App />
+      <LocaleBoundary>
+        <App />
+      </LocaleBoundary>
     </BrowserRouter>
   </StrictMode>,
 );

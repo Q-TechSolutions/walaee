@@ -15,6 +15,17 @@ import type {
   Transaction,
 } from "@walaee/shared";
 
+/** الهدف التالي على برنامج — أرخص مكافأة نشطة فيه. */
+export interface NextReward {
+  id: string;
+  title: string;
+  cost_amount: string;
+  /** بين ٠ و١ — محسوبة في الخلفية ومحصورة هناك */
+  progress: number;
+  remaining: string;
+  unit_label?: string;
+}
+
 export interface BalanceRow {
   program_id: string;
   program_name: string;
@@ -22,6 +33,7 @@ export interface BalanceRow {
   unit_label: string;
   amount: string;
   expires_at: string | null;
+  next_reward: NextReward | null;
 }
 
 export interface Card {
@@ -34,6 +46,8 @@ export interface Card {
   tier: string;
   last_activity: string | null;
   balances: BalanceRow[];
+  /** أقرب مكافأة إلى الاكتمال عبر برامج هذه العلامة */
+  next_reward: (NextReward & { unit_label: string }) | null;
 }
 
 export interface CardReward {
@@ -50,12 +64,24 @@ export interface CardDetail extends Card {
   rewards: CardReward[];
   activity: (ActivityLine & { unit_label: string })[];
   total_spend: string;
+  /** عدد العمليات المؤكَّدة على فروع هذه العلامة — من جدول
+      العمليات لا من `activity` أعلاه، فتلك مقصوصة على عشرين */
+  total_visits: number;
+}
+
+/** يوم واحد في شريط سلسلة الزيارات. */
+export interface WeekDay {
+  date: string;
+  letter: string;
+  visited: boolean;
+  today: boolean;
 }
 
 export interface WalletSummary {
   cards: number;
   by_type: Record<string, string>;
   pending_redemptions: number;
+  week: WeekDay[];
 }
 
 export interface NearbyStore {
@@ -68,6 +94,34 @@ export interface NearbyStore {
   category: string;
   is_member: boolean;
   distance_km: number;
+}
+
+/**
+ * مكافأة كما تراها الشاشة — بوقفة العميل منها.
+ *
+ * `ready` و`remaining` يحسبهما الخادم لا العميل: حسابهما هنا كان
+ * يعني جلب كل الأرصدة ومطابقتها ببرامجها في المتصفّح، ثم عرض زر
+ * «استبدال» على مكافأة يرفضها الخادم لأن الرصيد تغيّر.
+ */
+export interface AvailableReward {
+  id: string;
+  title: string;
+  description: string;
+  cost_amount: string;
+  cost_unit: string;
+  unit_label: string;
+  stock: number | null;
+  in_stock: boolean;
+  brand_id: string;
+  brand_name: string;
+  primary_color: string;
+  program_id: string;
+  program_name: string;
+  balance: string;
+  remaining: string;
+  ready: boolean;
+  /** بين ٠ و١ */
+  progress: number;
 }
 
 export interface MyRedemption {
@@ -102,18 +156,7 @@ export const queries = {
     api.get<MyRedemption[]>("/me/redemptions", undefined, signal),
 
   rewards: (signal?: AbortSignal) =>
-    api.get<
-      {
-        id: string;
-        title: string;
-        description: string;
-        cost_amount: string;
-        cost_unit: string;
-        stock: number | null;
-        brand_name: string;
-        program_name: string;
-      }[]
-    >("/me/rewards", undefined, signal),
+    api.get<AvailableReward[]>("/me/rewards", undefined, signal),
 
   nearby: (lat: number, lng: number, signal?: AbortSignal) =>
     api.get<NearbyStore[]>("/stores/nearby", { lat, lng }, signal),

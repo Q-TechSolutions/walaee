@@ -12,10 +12,14 @@ import {
   ErrorBox,
   Field,
   Loading,
+  LocaleToggle,
   Modal,
+  ThemeToggle,
   clearTokens,
   fmt,
   hardRedirect,
+  request,
+  t,
   useAction,
   useApi,
 } from "@walaee/shared";
@@ -30,11 +34,11 @@ export function Profile() {
   const save = useAction(actions.updateProfile);
   const exportData = useAction(async () => {
     const data = await queries.me();
-    const full = await fetch("/api/v1/me/export", {
-      headers: {
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("walaee.tokens") ?? "{}").access}`,
-      },
-    }).then((r) => r.json());
+    // التوكن من المكتبة لا من `localStorage` مباشرةً: المفتاح صار
+    // يحمل اسم التطبيق بعد فصل التخزين بين الواجهات الثلاث، وقراءة
+    // الاسم القديم هنا كانت ترسل الطلب بلا ترويسة مصادقة أصلًا —
+    // فيفشل التصدير بصمت ويُنزَّل ملف يحمل رسالة خطأ.
+    const full = await request<unknown>("/me/export");
 
     // التنزيل من الذاكرة لا من رابط خادم: الملف يحتوي بيانات
     // شخصية ولا يجب أن يعيش على أي خادم ولو مؤقتًا
@@ -67,31 +71,51 @@ export function Profile() {
   }
 
   return (
-    <div className="page">
-      <h1 className="mb">حسابي</h1>
+    <>
+      <header className="mhead">
+        <div className="grow">
+          <h1>{t("حسابي")}</h1>
+          <p className="sub">{t("بياناتك وخصوصيتك")}</p>
+        </div>
+      </header>
 
-      <section className="section">
+      <div className="pad section">
+      <section className="card card-p">
         <div className="profile-head">
-          <div className="profile-avatar" aria-hidden="true">
-            {(me.data.full_name || "؟").trim().charAt(0)}
+          <div className="av av-lg" aria-hidden="true">
+            {(me.data.full_name || t("؟")).trim().charAt(0)}
           </div>
-          <div>
-            <p className="w-7">{me.data.full_name || "بلا اسم"}</p>
+          <div className="grow">
+            <p className="w-8 t-md">{me.data.full_name || t("بلا اسم")}</p>
             <p className="t-sm muted num">{fmt.phone(me.data.phone)}</p>
-            <p className="t-xs faint">عضو منذ {fmt.date(me.data.created_at)}</p>
+            <p className="t-xs faint"> {t("عضو منذ")} {fmt.date(me.data.created_at)}</p>
           </div>
         </div>
       </section>
 
       <section className="section">
-        <h2>بياناتي</h2>
+        <div className="sec-t"><h3>{t("المظهر واللغة")}</h3></div>
+        <div className="card card-p stack gap">
+          <div className="row between">
+            <span className="t-sm">{t("اللغة")}</span>
+            <LocaleToggle />
+          </div>
+          <div className="row between">
+            <span className="t-sm">{t("السمة")}</span>
+            <ThemeToggle compact />
+          </div>
+        </div>
+      </section>
 
-        <Field label="الاسم" hint="يظهر للمتاجر التي تنضم إليها">
+      <section className="section">
+        <div className="sec-t"><h3>{t("بياناتي")}</h3></div>
+
+        <Field label={t("الاسم")} hint={t("يظهر للمتاجر التي تنضم إليها")}>
           <input
             className="input"
             value={current}
             onChange={(e) => setName(e.target.value)}
-            placeholder="اكتب اسمك"
+            placeholder={t("اكتب اسمك")}
           />
         </Field>
 
@@ -108,19 +132,19 @@ export function Profile() {
             }
           }}
         >
-          حفظ
+          {t("حفظ")}
         </Button>
       </section>
 
       <section className="section">
-        <h2>الخصوصية</h2>
+        <div className="sec-t"><h3>{t("الخصوصية")}</h3></div>
 
         <div className="stack gap">
           <div className="privacy-row">
             <div className="grow">
-              <p className="w-7">تحميل نسخة من بياناتي</p>
+              <p className="w-7">{t("تحميل نسخة من بياناتي")}</p>
               <p className="t-sm muted">
-                كل ما تحتفظ به المنصة عنك في ملف واحد.
+                {t("كل ما تحتفظ به المنصة عنك في ملف واحد.")}
               </p>
             </div>
             <Button
@@ -128,20 +152,19 @@ export function Profile() {
               loading={exportData.loading}
               onClick={() => exportData.run()}
             >
-              تحميل
+              {t("تحميل")}
             </Button>
           </div>
 
           <div className="privacy-row">
             <div className="grow">
-              <p className="w-7">حذف حسابي</p>
+              <p className="w-7">{t("حذف حسابي")}</p>
               <p className="t-sm muted">
-                تُمحى بياناتك الشخصية نهائيًا. سجلات المعاملات تبقى بمعرّف
-                مجهول لأن أرصدة المتاجر محسوبة عليها.
+                {t("تُمحى بياناتك الشخصية نهائيًا. سجلات المعاملات تبقى بمعرّف مجهول لأن أرصدة المتاجر محسوبة عليها.")}
               </p>
             </div>
             <Button variant="danger" onClick={() => setDeleting(true)}>
-              حذف
+              {t("حذف")}
             </Button>
           </div>
         </div>
@@ -149,12 +172,13 @@ export function Profile() {
 
       <section className="section">
         <Button variant="ghost" block onClick={signOut}>
-          تسجيل الخروج
+          {t("تسجيل الخروج")}
         </Button>
       </section>
 
       <DeleteAccountModal open={deleting} onClose={() => setDeleting(false)} />
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -178,15 +202,14 @@ function DeleteAccountModal({
   const confirmDelete = useAction(actions.confirmDeletion);
 
   return (
-    <Modal open={open} title="حذف الحساب" onClose={onClose}>
+    <Modal open={open} title={t("حذف الحساب")} onClose={onClose}>
       {stage === "confirm" ? (
         <div className="stack gap">
           <p>
-            سنرسل كود تأكيد إلى رقمك. بعد التأكيد تُمحى بياناتك الشخصية ولا
-            يمكن استرجاعها.
+            {t("سنرسل كود تأكيد إلى رقمك. بعد التأكيد تُمحى بياناتك الشخصية ولا يمكن استرجاعها.")}
           </p>
           <p className="t-sm muted">
-            نقاطك في كل المتاجر ستُفقد، وسجلات المعاملات تبقى بمعرّف مجهول.
+            {t("نقاطك في كل المتاجر ستُفقد، وسجلات المعاملات تبقى بمعرّف مجهول.")}
           </p>
 
           {requestCode.error != null && <ErrorBox error={requestCode.error} />}
@@ -200,16 +223,16 @@ function DeleteAccountModal({
                 if (sent) setStage("code");
               }}
             >
-              أرسل كود التأكيد
+              {t("أرسل كود التأكيد")}
             </Button>
             <Button variant="ghost" onClick={onClose}>
-              تراجع
+              {t("تراجع")}
             </Button>
           </div>
         </div>
       ) : (
         <div className="stack gap">
-          <Field label="كود التأكيد">
+          <Field label={t("كود التأكيد")}>
             <input
               className="input num code-input"
               inputMode="numeric"
@@ -235,7 +258,7 @@ function DeleteAccountModal({
               }
             }}
           >
-            تأكيد الحذف نهائيًا
+            {t("تأكيد الحذف نهائيًا")}
           </Button>
         </div>
       )}

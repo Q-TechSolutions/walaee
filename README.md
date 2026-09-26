@@ -72,6 +72,7 @@ walaee/
 │   └── manage.py
 │
 ├── frontend/                 ويب فقط — لا سطح مكتب ولا Electron
+│   ├── landing/                 الصفحة العامة · خريطة التغطية · 5172
 │   ├── customer-pwa/           تطبيق العميل — PWA · قراءة QR · 5173
 │   ├── merchant-dashboard/     لوحة صاحب المتجر · شاشة الكاشير · 5174
 │   ├── admin-panel/            لوحة إدارة المنصة · 5175
@@ -106,6 +107,7 @@ make seed                  # بيانات تجريبية جاهزة للتصفّ
 make run                   # http://127.0.0.1:8000
 
 make web-install           # اعتماديات الواجهات
+make web-landing           # الصفحة العامة على 5172
 make web-merchant          # لوحة المتجر على 5174
 ```
 
@@ -124,8 +126,8 @@ make prod-build && make prod-up
 docker compose --env-file .env -f infra/docker/docker-compose.prod.yml   exec api python manage.py bootstrap_platform     --admin-phone 01000000000 --org "مؤسستك"     --brand "علامتك" --owner-phone 01011111111
 ```
 
-سبع حاويات على منفذ واحد: `/` تطبيق العميل · `/merchant/` لوحة المتجر ·
-`/admin/` إدارة المنصة · `/api/v1/` الواجهات.
+سبع حاويات على منفذ واحد: `/` الصفحة العامة · `/app/` تطبيق العميل ·
+`/merchant/` لوحة المتجر · `/admin/` إدارة المنصة · `/api/v1/` الواجهات.
 **دليل النشر الكامل:** [`docs/DEPLOY.md`](docs/DEPLOY.md)
 
 | العنوان | ماذا |

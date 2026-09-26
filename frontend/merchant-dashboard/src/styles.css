@@ -1,188 +1,294 @@
 /* ══════════════════════════════════════════════════════════
    لوحة المتجر.
 
+   الهيكل منقول عن `docs/demo/assets/css/dashboard.css` — شريط
+   جانبي داكن بمجموعات، وشريط علوي لاصق، وبطاقات مؤشرات.
+
    جهازان مستهدفان: حاسوب المالك وجهاز لوحي بجوار الصندوق.
    شاشة الكاشير هي الوحيدة التي قد تُستخدم على جوال، ولذلك
    تنهار إلى عمود واحد قبل البقية.
    ══════════════════════════════════════════════════════════ */
 
-.shell {
-  display: grid;
-  grid-template-columns: 236px 1fr;
-  min-height: 100dvh;
+body {
+  background: var(--canvas);
 }
 
-.content {
-  padding: 26px 28px 60px;
-  max-width: 1180px;
-  width: 100%;
+.shell {
+  display: flex;
+  min-height: 100dvh;
 }
 
 /* ══════════════ الشريط الجانبي ══════════════ */
 
-.sidebar {
+/* داكن لا أبيض: يفصل التنقّل عن المحتوى بلا خط فاصل، ويجعل
+   المنطقة البيضاء كلها «الشغل» — وهو ما يريده من يقضي يومه فيها. */
+.side {
+  width: 252px;
+  flex: none;
+  background: linear-gradient(180deg, var(--violet-800), var(--violet-900));
+  color: #fff;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 20px 14px;
-  background: var(--surface);
-  border-inline-start: 1px solid var(--line);
   position: sticky;
   top: 0;
   height: 100dvh;
 }
 
-.sidebar-brand {
+.side-brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 6px;
+  min-width: 0;
+  padding: 18px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.sidebar-mark {
-  width: 38px;
-  height: 38px;
+.side-brand-name {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.side-brand-sub {
+  font-size: var(--t-xs);
+  color: var(--on-dark-2);
+  font-weight: 600;
+}
+
+/* مبدّل الفرع: قائمة بلا مظهر قائمة. تبدو كعنوان اللوحة لأنها في
+   مكانه، والسهم وحده يقول إنها قابلة للتغيير. */
+.branch-switch {
+  /* العرض المتاح كله ولا شيء أكثر: القائمة لا تعرف الاقتصاص
+     بالنقاط، فالحلّ الوحيد أن تُعطى العرض ثم يُصغَّر الخط قليلًا
+     ليتّسع «علامة — فرع» بلا قطع. */
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+}
+
+.branch-switch option {
+  color: var(--ink);
+}
+
+.branch-switch:focus-visible {
+  outline: 2px solid var(--orange-500);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+.side nav {
+  flex: 1;
+  padding: 10px 11px;
+  overflow-y: auto;
+}
+
+.side nav::-webkit-scrollbar {
+  width: 0;
+}
+
+.grp-t {
+  font-size: 10px;
+  color: var(--on-dark-faint);
+  font-weight: 800;
+  padding: 14px 10px 7px;
+}
+
+.nav-i {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  color: var(--on-dark-2);
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: var(--t);
+  margin-bottom: 2px;
+}
+
+.nav-i:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+
+/* الحدّ البرتقالي الداخلي يميّز النشط عن مجرّد «مؤشّر فوقه»:
+   الخلفية وحدها تتشابه مع حالة التمرير فيتردّد المستخدم. */
+.nav-i.on {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--orange-500);
+}
+
+.side-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--on-dark-2);
+}
+
+.side-foot .av {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.iconbtn-dark {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
-  border-radius: 12px;
-  background: var(--violet-700);
-  color: #fff;
-  font-size: 18px;
+  color: var(--on-dark-2);
+  transition: var(--t);
   flex: none;
 }
 
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
+.iconbtn-dark:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
 }
 
-.sidebar-link {
+/* ══════════════ المنطقة الرئيسية ══════════════ */
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topnav {
+  min-height: 66px;
+  background: var(--veil);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--r);
-  color: var(--ink-2);
-  font-size: 14px;
+  gap: 14px;
+  padding: 10px 26px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.topnav h1 {
+  font-size: 19px;
+}
+
+.crumb {
+  font-size: var(--t-sm);
+  color: var(--muted);
   font-weight: 600;
-  transition: background var(--t), color var(--t);
 }
 
-.sidebar-link:hover {
-  background: var(--line-2);
+.content {
+  padding: 24px 26px 46px;
+  max-width: var(--page);
+  width: 100%;
 }
 
-.sidebar-link.active {
-  background: var(--violet-100);
-  color: var(--violet-700);
-  font-weight: 700;
-}
+/* ══════════════ بطاقة مؤشر ══════════════ */
 
-.sidebar-foot {
-  padding: 12px 10px 0;
-  border-top: 1px solid var(--line-2);
-}
-
-/* ══════════════ الدخول ══════════════ */
-
-.auth {
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-}
-
-.auth-card {
-  width: min(420px, 100%);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 28px 24px;
+.kpi {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--r-xl);
-  box-shadow: var(--sh-2);
-}
-
-.auth-brand {
-  text-align: center;
-  margin-bottom: 4px;
-}
-
-.auth-mark {
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 10px;
-  display: grid;
-  place-items: center;
-  border-radius: 18px;
-  background: var(--violet-700);
-  color: #fff;
-  font-size: 26px;
-  box-shadow: var(--sh-brand);
-}
-
-.auth-brand h1 {
-  font-size: 22px;
-}
-
-/* ══════════════ عام ══════════════ */
-
-.stack {
+  border-radius: var(--r-lg);
+  padding: 16px;
+  box-shadow: var(--sh-1);
+  transition: var(--t);
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
-.stack.gap {
-  gap: 12px;
+.kpi:hover {
+  box-shadow: var(--sh-2);
+  transform: translateY(-2px);
 }
 
-.stack.gap-lg {
-  gap: 24px;
-}
-
-.row.gap {
-  gap: 12px;
-}
-
-.wrap {
-  flex-wrap: wrap;
-}
-
-.mb-sm {
-  margin-bottom: 10px;
-}
-
-.link {
-  color: var(--violet-700);
+.kt {
+  font-size: var(--t-sm);
+  color: var(--muted);
   font-weight: 700;
-  font-size: 13px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  line-height: 1.4;
 }
 
-h1 {
-  font-size: 23px;
+.kv {
+  font-size: 26px;
+  font-weight: 800;
+  margin-top: 5px;
+  line-height: 1.15;
 }
 
-h2 {
-  font-size: 16px;
-}
-
-h3 {
-  font-size: 14px;
-}
-
-.notice {
-  padding: 12px 14px;
-  border-radius: var(--r);
-  background: var(--blue-100);
-  color: var(--blue-600);
-  font-size: 13px;
+.ks {
+  font-size: var(--t-xs);
+  color: var(--faint);
   font-weight: 600;
-  line-height: 1.6;
+  margin-top: 3px;
+}
+
+.spk {
+  width: 100%;
+  height: 40px;
+  margin: 10px -4px 6px;
+  overflow: visible;
+}
+
+/* مؤشّر بلا تاريخ كافٍ للرسم يحجز نفس الارتفاع، وإلا قفزت
+   البطاقات في الشبكة وتفاوتت أطوالها بلا سبب ظاهر */
+.spk-empty {
+  height: 40px;
+  margin: 10px 0 6px;
+}
+
+/* ══════════════ مخطط الأعمدة ══════════════ */
+
+.bars {
+  display: grid;
+  grid-template-columns: repeat(var(--count), 1fr);
+  gap: 3px;
+  align-items: end;
+  height: 190px;
+}
+
+.bar-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  min-width: 0;
+}
+
+.bar-fill {
+  width: 100%;
+  max-width: 34px;
+  border-radius: 6px 6px 3px 3px;
+  background: linear-gradient(180deg, var(--violet-600), var(--violet-700));
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bar-col:hover .bar-fill {
+  background: linear-gradient(180deg, var(--violet-500), var(--violet-600));
+}
+
+.bar-lbl {
+  font-size: 9.5px;
+  color: var(--faint);
+  font-weight: 700;
+  white-space: nowrap;
+  height: 12px;
 }
 
 .alert-strip {
@@ -259,11 +365,6 @@ h3 {
   opacity: 0.75;
 }
 
-.sparkline {
-  width: 100%;
-  height: 90px;
-}
-
 /* ══════════════ شاشة الكاشير ══════════════ */
 
 .cashier {
@@ -281,32 +382,21 @@ h3 {
   top: 26px;
 }
 
-.qr-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 20px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-xl);
-  box-shadow: var(--sh-1);
+/* القماش داخل صندوق أبيض عرضه من محتواه: عرض ١٠٠٪ على أب
+   `inline-block` قيد دائري — العرض يتبع المحتوى والمحتوى يتبع
+   العرض — فيتمدّد الرمز فوق ما تحته. القياس هنا صريح بالبكسل. */
+.pos-qr .qr-canvas {
+  width: 240px;
+  height: 240px;
+  display: block;
+  border-radius: var(--r-sm);
 }
 
-.qr-canvas {
-  width: 100%;
-  max-width: 280px;
-  height: auto;
-  border-radius: var(--r);
-}
-
-/* الرمز نصًّا بحجم كبير: الكاميرا تفشل أحيانًا، والكاشير يُملي
-   الرمز صوتيًا — ولذلك حُذفت الأحرف الملتبسة من مولّده أصلًا */
-.qr-code {
-  font-size: 27px;
-  font-weight: 800;
-  letter-spacing: 5px;
-  color: var(--violet-700);
+@media (max-width: 480px) {
+  .pos-qr .qr-canvas {
+    width: 190px;
+    height: 190px;
+  }
 }
 
 .cashier-actions {
@@ -592,47 +682,394 @@ h3 {
 }
 
 @media (max-width: 860px) {
+  /* الشريط الجانبي يصير صفًّا أفقيًا أعلى الشاشة: عمود بعرض ٢٥٢
+     على جهاز لوحي رأسي يأكل ثلث العرض ولا يبقي للمحتوى شيئًا. */
   .shell {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
-  .sidebar {
-    position: static;
+  .side {
+    width: 100%;
     height: auto;
+    position: static;
     flex-direction: row;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    padding: 8px 12px;
     overflow-x: auto;
-    border-inline-start: none;
-    border-bottom: 1px solid var(--line);
-    padding: 12px;
   }
 
-  .sidebar-nav {
-    flex-direction: row;
+  .side-brand,
+  .side-foot {
+    border: none;
+    padding: 0;
+    flex: none;
+  }
+
+  .side nav {
+    display: flex;
+    gap: 4px;
+    padding: 0;
     flex: 1;
   }
 
-  .sidebar-link span:last-child {
+  .side nav > div {
+    display: flex;
+    gap: 4px;
+  }
+
+  /* عناوين المجموعات تختفي أفقيًا: لا مكان لها ولا معنى في صفّ */
+  .grp-t {
     display: none;
   }
 
-  .sidebar-link {
-    padding: 10px 13px;
-    font-size: 18px;
-  }
-
-  .sidebar-foot {
-    border-top: none;
-    padding: 0;
+  .nav-i {
+    margin-bottom: 0;
     white-space: nowrap;
   }
 
-  .content {
-    padding: 18px 16px 40px;
+  .nav-i span {
+    display: none;
   }
 
-  .detail-list {
+  .nav-i.on span {
+    display: inline;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .g3,
+  .g4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════ شبكة لوحة المعلومات ══════════════ */
+
+/* المخطط أعرض من قائمة المعرّضين للفقدان: الأول يُقرأ بالمسح
+   والثاني بالنظر إلى أربعة أسماء. تساويهما يجعل المخطط ضيقًا
+   بلا أن تستفيد القائمة من العرض. */
+.dash-split {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .dash-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════ جداول اللوحة ══════════════ */
+
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.tbl th {
+  text-align: start;
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  background: var(--canvas-2);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.tbl td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--line-2);
+  vertical-align: middle;
+}
+
+.tbl tbody tr {
+  transition: background var(--t);
+}
+
+.tbl tbody tr:hover {
+  background: var(--violet-50);
+}
+
+.tbl tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+/* ══════════════ لون العلامة ══════════════ */
+
+.brand-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  flex: none;
+}
+
+/* ══════════════ شاشة الكاشير ══════════════ */
+
+.pos {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* لوحة الرمز بنفسجية مصمتة: هي الشيء الوحيد الذي يجب أن تقع عليه
+   عين العميل الواقف أمام الصندوق، والبطاقة البيضاء وسط شاشة بيضاء
+   لا تلفت أحدًا. */
+.pos-qr {
+  background: linear-gradient(
+    160deg,
+    var(--violet-800),
+    var(--violet-700) 60%,
+    var(--violet-900)
+  );
+  border-radius: var(--r-xl);
+  padding: 30px;
+  color: #fff;
+  text-align: center;
+  box-shadow: var(--sh-brand);
+  position: relative;
+  overflow: hidden;
+}
+
+.pos-qr::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -70px;
+  top: -70px;
+  width: 230px;
+  height: 230px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 70%);
+  border-radius: 50%;
+}
+
+.pos-qr .qrbox {
+  background: #fff;
+  border-radius: 20px;
+  padding: 16px;
+  display: inline-block;
+  margin: 18px 0 14px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  position: relative;
+  z-index: 2;
+}
+
+.pos-code {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 5px;
+  direction: ltr;
+  position: relative;
+  z-index: 2;
+}
+
+.pos-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 7px 16px;
+  border-radius: 99px;
+  font-size: var(--t-sm);
+  font-weight: 700;
+  margin-top: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.pos-timer .ring {
+  width: 15px;
+  height: 15px;
+  border: 2.4px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: wl-spin 1s linear infinite;
+}
+
+.pos-ghost {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  position: relative;
+  z-index: 2;
+}
+
+.pos-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.shift-tile {
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: var(--r);
+  background: var(--canvas);
+}
+
+.cashier-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 1080px) {
+  .pos {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════ شجرة الهيكل التنظيمي ══════════════ */
+
+/* شجرة لا جداول: الجدولان (فروع، موظفون) يخفيان السؤال الوحيد
+   المهم هنا — مين شغّال فين؟ — والشجرة تجيب عنه بنظرة. */
+.tree {
+  position: relative;
+  padding-inline-start: 2px;
+}
+
+.tree .node {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 13px 15px;
+  background: var(--surface);
+  margin-bottom: 9px;
+}
+
+.tree .kids {
+  padding-inline-start: 26px;
+  position: relative;
+  margin-top: 9px;
+}
+
+.tree .kids::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 9px;
+  top: -4px;
+  bottom: 16px;
+  width: 1.5px;
+  background: var(--line);
+}
+
+.tree .kids .node {
+  position: relative;
+}
+
+.tree .kids .node::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -17px;
+  top: 50%;
+  width: 15px;
+  height: 1.5px;
+  background: var(--line);
+}
+
+/* ══════════════ الاشتراك ══════════════ */
+
+.billing-split {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+.plans {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.plan {
+  border: 2px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  background: var(--surface);
+  position: relative;
+  transition: var(--t);
+  display: flex;
+  flex-direction: column;
+}
+
+.plan:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sh-2);
+}
+
+/* الباقة الحالية خضراء لا بنفسجية: البنفسجي هنا يعني «مقترحة»،
+   وتلوين الاثنين بلون واحد يجعل التاجر يظن أنه على الباقة الموصى
+   بها وهو ليس عليها. */
+.plan.cur {
+  border-color: var(--green-600);
+  background: var(--green-50);
+}
+
+.plan.pop {
+  border-color: var(--violet-700);
+  box-shadow: var(--sh-2);
+}
+
+.plan .tag {
+  position: absolute;
+  top: -11px;
+  inset-inline-start: 50%;
+  transform: translateX(50%);
+  background: var(--violet-700);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 3px 13px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.plan .pr {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  margin: 10px 0 2px;
+}
+
+.plan ul {
+  flex: 1;
+}
+
+.plan ul li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: var(--t-sm);
+  padding: 5px 0;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.plan ul li .wl-icon {
+  color: var(--green-600);
+  margin-top: 3px;
+}
+
+@media (max-width: 1200px) {
+  .billing-split {
+    grid-template-columns: 1fr;
+  }
+
+  .plans {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .plans {
     grid-template-columns: 1fr;
   }
 }

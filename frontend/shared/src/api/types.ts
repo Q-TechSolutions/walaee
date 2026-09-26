@@ -70,6 +70,19 @@ export interface Transaction {
   confirmed_at: string | null;
 }
 
+export interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+  category: string;
+  tagline: string;
+  primary_color: string;
+  logo: string | null;
+  is_active: boolean;
+  organization_name: string;
+  created_at: string;
+}
+
 export interface Reward {
   id: string;
   title: string;
@@ -82,6 +95,8 @@ export interface Reward {
   unit_label?: string;
   merchant_cost?: string;
   is_active?: boolean;
+  /** مرات الصرف الفعلي — تُرسَل في قائمة مكافآت التاجر وحدها */
+  redeemed_count?: number;
 }
 
 export interface Redemption {

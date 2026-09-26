@@ -11,7 +11,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Button, ErrorBox, Field, fmt, useAction } from "@walaee/shared";
+import { Button, ErrorBox, Field, Icon, fmt, t, useAction } from "@walaee/shared";
 import type { ScanResult } from "@walaee/shared";
 
 import { actions } from "../lib/queries";
@@ -67,7 +67,7 @@ export function Scan() {
 
   return (
     <div className="page">
-      <h1 className="mb">امسح رمز المتجر</h1>
+      <h1 className="mb">{t("امسح رمز المتجر")}</h1>
 
       {stage === "scan" && (
         <>
@@ -85,7 +85,7 @@ export function Scan() {
             className="scan-brand"
             style={{ "--brand": resolved.brand.primary_color } as React.CSSProperties}
           >
-            <p className="t-sm">أنت في</p>
+            <p className="t-sm">{t("أنت في")}</p>
             <h2>{resolved.brand.name}</h2>
             <p className="t-sm">
               {resolved.branch.name} · {resolved.terminal.label}
@@ -93,7 +93,7 @@ export function Scan() {
 
             {resolved.is_member && resolved.balances.length > 0 && (
               <p className="scan-balance">
-                رصيدك الحالي{" "}
+                {t("رصيدك الحالي")}{" "}
                 <span className="num w-8">
                   {fmt.number(resolved.balances[0]!.amount)}
                 </span>{" "}
@@ -101,11 +101,11 @@ export function Scan() {
               </p>
             )}
             {!resolved.is_member && (
-              <p className="scan-balance">أول زيارة لك — أهلًا بك 👋</p>
+              <p className="scan-balance">{t("أول زيارة لك — أهلًا بك")}</p>
             )}
           </div>
 
-          <Field label="قيمة الفاتورة" hint="كما هي على الإيصال، بالجنيه">
+          <Field label={t("قيمة الفاتورة")} hint={t("كما هي على الإيصال، بالجنيه")}>
             <input
               className="input num amount-input"
               type="number"
@@ -120,12 +120,12 @@ export function Scan() {
             />
           </Field>
 
-          <Field label="رقم الفاتورة" hint="اختياري — يساعد التاجر على المطابقة">
+          <Field label={t("رقم الفاتورة")} hint={t("اختياري — يساعد التاجر على المطابقة")}>
             <input
               className="input num"
               type="text"
               inputMode="numeric"
-              placeholder="مثال: 10428"
+              placeholder={t("مثال: 10428")}
               value={invoiceNo}
               onChange={(e) => setInvoiceNo(e.target.value)}
             />
@@ -134,10 +134,10 @@ export function Scan() {
           {create.error != null && <ErrorBox error={create.error} />}
 
           <Button type="submit" size="lg" block loading={create.loading}>
-            إرسال للكاشير
+            {t("إرسال للكاشير")}
           </Button>
           <button type="button" className="link center" onClick={restart}>
-            إلغاء والمسح من جديد
+            {t("إلغاء والمسح من جديد")}
           </button>
         </form>
       )}
@@ -145,21 +145,20 @@ export function Scan() {
       {stage === "waiting" && (
         <div className="waiting">
           <div className="waiting-pulse" aria-hidden="true" />
-          <h2>بانتظار تأكيد الكاشير</h2>
+          <h2>{t("بانتظار تأكيد الكاشير")}</h2>
           <p className="muted">
-            أرسلنا الفاتورة إلى شاشة الكاشير. ستُضاف نقاطك فور تأكيده — لا
-            تغلق التطبيق قبل ذلك.
+            {t("أرسلنا الفاتورة إلى شاشة الكاشير. ستُضاف نقاطك فور تأكيده — لا تغلق التطبيق قبل ذلك.")}
           </p>
           <p className="t-sm faint">
-            المبلغ <span className="num">{fmt.money(amount)}</span>
+            {t("المبلغ")} <span className="num">{fmt.money(amount)}</span>
           </p>
 
           <div className="stack gap w-full">
             <Button size="lg" block onClick={() => navigate("/")}>
-              عودة لبطاقاتي
+              {t("عودة لبطاقاتي")}
             </Button>
             <button type="button" className="link" onClick={restart}>
-              مسح فاتورة أخرى
+              {t("مسح فاتورة أخرى")}
             </button>
           </div>
         </div>
@@ -223,11 +222,11 @@ function QrReader({
       <div id={containerId} className={state === "running" ? "qr-live" : "qr-idle"}>
         {state !== "running" && (
           <div className="qr-placeholder">
-            <span aria-hidden="true">⬚</span>
+            <Icon name="qr" size={34} weight={1.4} />
             <p className="t-sm muted">
               {state === "denied"
-                ? "تعذّر فتح الكاميرا — استخدم الإدخال اليدوي بالأسفل"
-                : "وجّه الكاميرا نحو الرمز على شاشة الكاشير"}
+                ? t("تعذّر فتح الكاميرا — استخدم الإدخال اليدوي بالأسفل")
+                : t("وجّه الكاميرا نحو الرمز على شاشة الكاشير")}
             </p>
           </div>
         )}
@@ -240,7 +239,7 @@ function QrReader({
           loading={state === "starting" || busy}
           onClick={start}
         >
-          فتح الكاميرا
+          {t("فتح الكاميرا")}
         </Button>
       )}
     </div>
@@ -271,7 +270,7 @@ function ManualCode({
         if (value.trim().length >= 6) onSubmit(value);
       }}
     >
-      <p className="t-sm muted center">أو اكتب الرمز الظاهر على الشاشة</p>
+      <p className="t-sm muted center">{t("أو اكتب الرمز الظاهر على الشاشة")}</p>
       <div className="row">
         <input
           className="input num code-input grow"
@@ -282,7 +281,7 @@ function ManualCode({
           onChange={(e) => setValue(e.target.value.toUpperCase())}
         />
         <Button type="submit" loading={busy}>
-          تأكيد
+          {t("تأكيد")}
         </Button>
       </div>
     </form>

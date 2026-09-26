@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "workspaces": [
+    "landing",
     "shared",
     "customer-pwa",
     "merchant-dashboard",
@@ -13,9 +14,10 @@
     "dev:customer": "npm run dev -w @walaee/customer-pwa",
     "dev:merchant": "npm run dev -w @walaee/merchant-dashboard",
     "dev:admin": "npm run dev -w @walaee/admin-panel",
-    "build": "npm run build -w @walaee/customer-pwa && npm run build -w @walaee/merchant-dashboard && npm run build -w @walaee/admin-panel",
+    "build": "npm run build -w @walaee/landing && npm run build -w @walaee/customer-pwa && npm run build -w @walaee/merchant-dashboard && npm run build -w @walaee/admin-panel",
     "lint": "eslint .",
-    "typecheck": "tsc --build --force"
+    "typecheck": "tsc --build --force",
+    "dev:landing": "npm run dev -w @walaee/landing"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",

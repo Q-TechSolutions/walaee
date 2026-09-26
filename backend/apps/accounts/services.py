@@ -213,8 +213,13 @@ def login_staff(*, phone: str, password: str) -> dict:
     if user is None or not user.is_active:
         raise InvalidCredentials()
 
+    # نفس ترتيب `pos.permissions.staff_roles`: الواجهة تُبرز الأول
+    # افتراضيًا، والخادم يختاره حين لا تُرسَل ترويسة الفرع. ترتيبان
+    # مختلفان يعنيان لوحةً تعرض علامة والخادم يجيب عن أخرى.
     roles = list(
-        StaffUser.objects.filter(user=user, is_active=True).select_related("branch__brand")
+        StaffUser.objects.filter(user=user, is_active=True)
+        .select_related("branch__brand")
+        .order_by("branch__brand__name", "branch__name")
     )
 
     # فريق المنصة قد لا يملك دورًا في أي متجر — وهذا طبيعي.

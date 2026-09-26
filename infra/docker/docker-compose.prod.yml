@@ -19,6 +19,28 @@ x-api-base: &api-base
     dockerfile: infra/docker/Dockerfile.backend
   image: walaee-backend:latest
   env_file: [../../.env]
+  # ══════════════════════════════════════════════════════════
+  #  عناوين الخدمات تُثبَّت هنا ولا تُقرأ من .env.
+  #
+  #  الملف الواحد يخدم مستهلكَين بحاجتين متناقضتين: التشغيل
+  #  المحلي (`make run`) يصل إلى قاعدة البيانات من المضيف عبر
+  #  المنفذ المنشور — `127.0.0.1:5433` — بينما الحاوية هنا تصل
+  #  إليها باسم الخدمة على شبكة Docker الداخلية.
+  #
+  #  وراثة قيمة المضيف داخل الحاوية تعني `127.0.0.1` = الحاوية
+  #  نفسها، فتفشل كل محاولة اتصال بلا أن يشير الخطأ إلى السبب.
+  #  والعطل لا يظهر عند تعديل .env بل عند إعادة إنشاء الحاوية
+  #  التالية — قد يكون ذلك بعد أسابيع، في نشر لا علاقة له به.
+  #
+  #  `environment` يعلو على `env_file` في Compose، فالتثبيت هنا
+  #  يجعل الوصلة الداخلية مستقلة عمّا في الملف مهما تغيّر.
+  # ══════════════════════════════════════════════════════════
+  environment:
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: "5432"
+    REDIS_URL: redis://redis:6379/0
+    CELERY_BROKER_URL: redis://redis:6379/1
+    CELERY_RESULT_BACKEND: redis://redis:6379/2
   restart: unless-stopped
   depends_on:
     postgres: { condition: service_healthy }
@@ -132,8 +154,12 @@ services:
     # noeviction مقصود: Redis هنا ليس كاشًا فقط. يحمل رموز نقاط
     # البيع وطوابير Celery، وطرد مفتاح منها يعني مسحًا فاشلًا عند
     # الكاشير أو مهمة ضائعة. الامتلاء يجب أن يُصرَخ به لا أن يُبتلَع.
+    # aof-load-truncated: سجل AOF مبتور بعد إطفاء غير نظيف كان
+    # يمنع الإقلاع نهائيًا — حلقة إعادة تشغيل تُسقط الطوابير كلها.
+    # ما في Redis هنا قصير العمر (رموز بثوانٍ، طوابير)، فخسارة آخر
+    # أوامر قبل الانقطاع أهون بكثير من خدمة لا تقوم أصلًا.
     command: >
-      redis-server --appendonly yes
+      redis-server --appendonly yes --aof-load-truncated yes
       --maxmemory 200mb --maxmemory-policy noeviction
     volumes:
       - redisdata:/data

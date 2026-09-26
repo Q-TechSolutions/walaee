@@ -20,6 +20,7 @@ import {
   Loading,
   Modal,
   fmt,
+  t,
   useAction,
   useApi,
   useDebounced,
@@ -52,15 +53,10 @@ export function Campaigns() {
 
   return (
     <div className="stack gap-lg">
-      <header className="row between wrap">
-        <div>
-          <h1>الحملات</h1>
-          <p className="t-sm muted">
-            راسل عملاءك على أرخص قناة تصل إليهم
-          </p>
-        </div>
-        <Button onClick={() => setComposing(true)}>حملة جديدة</Button>
-      </header>
+      <div className="row between wrap-f">
+        <p className="t-sm muted">{t("راسل عملاءك على أرخص قناة تصل إليهم — الإشعار أولًا، ثم ما يخرج إلى شبكة الاتصالات.")}</p>
+        <Button onClick={() => setComposing(true)}>{t("حملة جديدة")}</Button>
+      </div>
 
       {campaigns.loading && <Loading />}
       {campaigns.error != null && (
@@ -69,10 +65,10 @@ export function Campaigns() {
 
       {campaigns.data?.length === 0 && (
         <Empty
-          icon="✉"
-          title="لا توجد حملات بعد"
-          hint="ابدأ بحملة لعملائك الخاملين — غالبًا أعلى عائد لأول حملة."
-          action={<Button onClick={() => setComposing(true)}>حملة جديدة</Button>}
+          icon="message"
+          title={t("لا توجد حملات بعد")}
+          hint={t("ابدأ بحملة لعملائك الخاملين — غالبًا أعلى عائد لأول حملة.")}
+          action={<Button onClick={() => setComposing(true)}>{t("حملة جديدة")}</Button>}
         />
       )}
 
@@ -113,25 +109,25 @@ function CampaignRow({
         <div className="row" style={{ gap: 8 }}>
           <span className="w-7">{campaign.name}</span>
           <Badge tone={STATUS_TONE[campaign.status] ?? "muted"}>
-            {STATUS_LABEL[campaign.status] ?? campaign.status}
+            {t(STATUS_LABEL[campaign.status] ?? campaign.status)}
           </Badge>
         </div>
         <p className="t-sm muted campaign-preview">{campaign.message_template}</p>
         <p className="t-xs faint">
           <span className="num">{fmt.number(campaign.estimated_recipients)}</span>{" "}
-          مستهدف · تكلفة مقدَّرة{" "}
+          {t("مستهدف · تكلفة مقدَّرة")}{" "}
           <span className="num">{fmt.money(campaign.estimated_cost)}</span>
           {campaign.status === "sent" && (
             <>
-              {" · أُرسلت "}
+              {t(" · أُرسلت ")}
               <span className="num">{fmt.number(campaign.sent_count)}</span>
               {campaign.failed_count > 0 && (
                 <>
-                  {" · فشلت "}
+                  {t(" · فشلت ")}
                   <span className="num">{fmt.number(campaign.failed_count)}</span>
                 </>
               )}
-              {" · التكلفة الفعلية "}
+              {t(" · التكلفة الفعلية ")}
               <span className="num">{fmt.money(campaign.actual_cost)}</span>
             </>
           )}
@@ -150,7 +146,7 @@ function CampaignRow({
               if (done) onChange();
             }}
           >
-            إرسال الآن
+            {t("إرسال الآن")}
           </Button>
           <Button
             variant="ghost"
@@ -160,7 +156,7 @@ function CampaignRow({
               if (done) onChange();
             }}
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
         </div>
       )}
@@ -186,7 +182,7 @@ function Composer({
 }) {
   const [name, setName] = useState("");
   const [template, setTemplate] = useState(
-    "اشتقنا لك يا {name}! رصيدك في {brand} بانتظارك.",
+    t("اشتقنا لك يا {name}! رصيدك في {brand} بانتظارك."),
   );
   const [inactiveDays, setInactiveDays] = useState("30");
   const [minBalance, setMinBalance] = useState("");
@@ -204,7 +200,7 @@ function Composer({
   return (
     <Modal
       open={open}
-      title="حملة جديدة"
+      title={t("حملة جديدة")}
       onClose={onClose}
       footer={
         <>
@@ -223,27 +219,27 @@ function Composer({
               }
             }}
           >
-            إنشاء الحملة
+            {t("إنشاء الحملة")}
           </Button>
           <Button variant="ghost" onClick={onClose}>
-            تراجع
+            {t("تراجع")}
           </Button>
         </>
       }
     >
       <div className="stack gap">
-        <Field label="اسم الحملة" hint="للتمييز في قائمتك فقط — لا يراه العميل">
+        <Field label={t("اسم الحملة")} hint={t("للتمييز في قائمتك فقط — لا يراه العميل")}>
           <input
             className="input"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="مثال: عودة الخاملين — أكتوبر"
+            placeholder={t("مثال: عودة الخاملين — أكتوبر")}
           />
         </Field>
 
         <Field
-          label="نص الرسالة"
-          hint="يمكنك استخدام {name} لاسم العميل و {brand} لاسم متجرك"
+          label={t("نص الرسالة")}
+          hint={t("يمكنك استخدام {name} لاسم العميل و {brand} لاسم متجرك")}
         >
           <textarea
             className="input"
@@ -254,7 +250,7 @@ function Composer({
         </Field>
 
         <div className="row gap wrap">
-          <Field label="لم يشترِ منذ (أيام)" hint="اتركه فارغًا لكل العملاء">
+          <Field label={t("لم يشترِ منذ (أيام)")} hint={t("اتركه فارغًا لكل العملاء")}>
             <input
               className="input num"
               type="number"
@@ -264,7 +260,7 @@ function Composer({
             />
           </Field>
 
-          <Field label="رصيده لا يقل عن" hint="اختياري">
+          <Field label={t("رصيده لا يقل عن")} hint={t("اختياري")}>
             <input
               className="input num"
               type="number"
@@ -276,7 +272,7 @@ function Composer({
         </div>
 
         {estimate.error != null && <ErrorBox error={estimate.error} />}
-        {estimate.loading && <Loading label="جارٍ حساب التكلفة…" />}
+        {estimate.loading && <Loading label={t("جارٍ حساب التكلفة…")} />}
         {estimate.data && <EstimatePanel estimate={estimate.data} />}
 
         {create.error != null && <ErrorBox error={create.error} />}
@@ -307,25 +303,24 @@ function EstimatePanel({ estimate }: { estimate: CampaignEstimate }) {
       <p className="t-sm">{estimate.segment_description}</p>
 
       <div className="row between">
-        <span className="w-7">سيصل إلى</span>
+        <span className="w-7">{t("سيصل إلى")}</span>
         <span className="num w-8">{fmt.number(estimate.reachable)}</span>
       </div>
 
       {estimate.unreachable > 0 && (
         <p className="t-xs faint">
-          <span className="num">{fmt.number(estimate.unreachable)}</span> عميل
-          لا يمكن الوصول إليه — لن تُحتسب عليك تكلفتهم.
+          <span className="num">{fmt.number(estimate.unreachable)}</span> {t("عميل لا يمكن الوصول إليه — لن تُحتسب عليك تكلفتهم.")}
         </p>
       )}
 
       <div className="estimate-channels">
         {Object.entries(estimate.per_channel).map(([channel, info]) => (
           <div key={channel} className="row between t-sm">
-            <span>{info.label}</span>
+            <span>{t(info.label)}</span>
             <span>
               <span className="num">{fmt.number(info.count)}</span>
               {Number(info.unit_cost) === 0 ? (
-                <Badge tone="green">مجاني</Badge>
+                <Badge tone="green">{t("مجاني")}</Badge>
               ) : (
                 <span className="faint num">
                   {" × "}
@@ -338,18 +333,17 @@ function EstimatePanel({ estimate }: { estimate: CampaignEstimate }) {
       </div>
 
       <div className="row between estimate-total">
-        <span className="w-8">التكلفة</span>
+        <span className="w-8">{t("التكلفة")}</span>
         <span className="num w-8">{fmt.money(estimate.cost)}</span>
       </div>
 
       <p className="t-xs">
-        رصيد رسائلك{" "}
-        <span className="num w-7">{fmt.number(estimate.wallet_balance)}</span> ·
-        تحتاج{" "}
+        {t("رصيد رسائلك")}{" "}
+        <span className="num w-7">{fmt.number(estimate.wallet_balance)}</span> {t("· تحتاج")}{" "}
         <span className="num w-7">
           {fmt.number(estimate.billable_messages)}
         </span>
-        {!affordable && " — الرصيد غير كافٍ، اشحن قبل الإرسال."}
+        {!affordable && t(" — الرصيد غير كافٍ، اشحن قبل الإرسال.")}
       </p>
     </div>
   );

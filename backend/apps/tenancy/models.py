@@ -12,6 +12,7 @@ from django.db import models
 
 from apps.common.models import BaseModel
 
+from .geo import GOVERNORATE_CHOICES
 from .managers import BrandScopedQuerySet
 
 
@@ -56,9 +57,24 @@ class Brand(BaseModel):
     slug = models.SlugField("المعرّف", max_length=60, unique=True)
     name = models.CharField("الاسم", max_length=120)
     category = models.CharField("الفئة", max_length=60, blank=True)
+    tagline = models.CharField(
+        "الوصف المختصر",
+        max_length=120,
+        blank=True,
+        help_text="سطر واحد يظهر في الدليل العام وبطاقة العميل.",
+    )
     logo = models.ImageField("الشعار", upload_to="brands/", blank=True, null=True)
     primary_color = models.CharField("اللون الأساسي", max_length=7, default="#1F6F5C")
     is_active = models.BooleanField("نشطة", default=True)
+    # الظهور في الدليل قرار تجاري منفصل عن التشغيل: علامة قد تعمل
+    # على المنصة وهي لا تريد أن تُعلَن قبل افتتاحها، وتعطيلها
+    # لتحقيق ذلك يقطع برنامج ولائها عن عملائه.
+    is_listed = models.BooleanField(
+        "تظهر في الدليل العام",
+        default=True,
+        help_text="إخفاؤها لا يوقف برنامجها — يمنع ظهورها في الخريطة والصفحة العامة فقط.",
+    )
+    joined_on = models.DateField("تاريخ التعاقد", null=True, blank=True)
 
     class Meta:
         verbose_name = "علامة تجارية"
@@ -77,6 +93,13 @@ class Branch(BaseModel):
     )
     name = models.CharField("الاسم", max_length=120)
     address = models.CharField("العنوان", max_length=255, blank=True)
+    city = models.CharField("المدينة", max_length=80, blank=True)
+    # الرمز لا الاسم: اسم المحافظة يُكتب بأربع صيغ مختلفة («القاهره»،
+    # «القاهرة»، «Cairo»…) فيتفتّت التجميع في الخريطة إلى صفوف مكرّرة
+    # لا يجمعها شيء. الرمز يأتي من apps.tenancy.geo وحده.
+    governorate = models.CharField(
+        "المحافظة", max_length=3, choices=GOVERNORATE_CHOICES, blank=True, db_index=True
+    )
     lat = models.DecimalField("خط العرض", max_digits=9, decimal_places=6, null=True, blank=True)
     lng = models.DecimalField("خط الطول", max_digits=9, decimal_places=6, null=True, blank=True)
     opening_hours = models.JSONField("مواعيد العمل", null=True, blank=True)

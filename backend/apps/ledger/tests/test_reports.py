@@ -6,6 +6,7 @@
 أخطر: يعيش شهورًا بلا أن يلاحظه أحد.
 """
 
+from datetime import date
 from decimal import Decimal
 
 import pytest
@@ -67,6 +68,13 @@ def _purchase(terminal, cashier, customer, amount, invoice_no):
 
 
 class TestDailySeries:
+    """
+    السلسلة تُرجع يومًا لكل يوم في المدى، والفارغ صفر لا محذوف.
+
+    الحذف كان يزوّر شكل الرسم: أربع عمليات متفرّقة على الشهر تُرسَم
+    كخطّ صاعد متّصل لا يُفرَّق عن أربع عمليات في أربعة أيام متتالية.
+    """
+
     def test_groups_by_day(self, brand, terminal, cashier, program):
         customer = factories.CustomerFactory()
         _purchase(terminal, cashier, customer, "100", "S-1")
@@ -74,12 +82,54 @@ class TestDailySeries:
 
         series = reports.daily_series(brand)
 
-        assert len(series) == 1
-        assert series[0]["transactions"] == 2
-        assert series[0]["revenue"] == "150.00"
+        today = timezone.localdate().isoformat()
+        day = next(row for row in series if row["date"] == today)
+        assert day["transactions"] == 2
+        assert day["revenue"] == "150.00"
 
-    def test_empty_brand_returns_empty_list(self, brand):
-        assert reports.daily_series(brand) == []
+    def test_length_matches_the_requested_range(self, brand, terminal, cashier, program):
+        _purchase(terminal, cashier, factories.CustomerFactory(), "100", "S-1")
+
+        assert len(reports.daily_series(brand, days=30)) == 30
+        assert len(reports.daily_series(brand, days=7)) == 7
+
+    def test_empty_brand_still_returns_the_full_range(self, brand):
+        """
+        متجر بلا عمليات يعطي سلسلة أصفار لا قائمة فارغة: القائمة
+        الفارغة كانت تُخفي محور الزمن كله فتبدو اللوحة معطّلة بدل
+        أن تقول «لا عمليات».
+        """
+        series = reports.daily_series(brand, days=30)
+
+        assert len(series) == 30
+        assert all(row["transactions"] == 0 for row in series)
+        assert all(row["revenue"] == "0" for row in series)
+
+    def test_days_are_consecutive_and_ascending(self, brand):
+        series = reports.daily_series(brand, days=10)
+
+        dates = [date.fromisoformat(row["date"]) for row in series]
+        assert dates == sorted(dates)
+        assert dates[-1] == timezone.localdate()
+        assert all((dates[i + 1] - dates[i]).days == 1 for i in range(len(dates) - 1))
+
+    def test_one_active_day_among_many(self, brand, terminal, cashier, program):
+        """الحالة التي كشفت العطل: يوم واحد فيه نشاط وسط شهر فارغ."""
+        _purchase(terminal, cashier, factories.CustomerFactory(), "100", "S-1")
+
+        series = reports.daily_series(brand, days=30)
+
+        active = [row for row in series if row["transactions"]]
+        assert len(active) == 1
+        assert len(series) == 30
+
+    def test_another_brand_is_not_counted(self, brand, terminal, cashier, program):
+        """العزل بين العلامات يسري على التقارير كما يسري على الأرصدة."""
+        _purchase(terminal, cashier, factories.CustomerFactory(), "100", "S-1")
+
+        other = factories.BrandFactory()
+
+        assert all(row["transactions"] == 0 for row in reports.daily_series(other))
 
 
 class TestCustomerSegments:
@@ -230,7 +280,9 @@ class TestReportEndpoints:
 
         body = owner_api.get(reverse("ledger:series")).json()
 
-        assert body["series"][0]["revenue"] == "90.00"
+        today = timezone.localdate().isoformat()
+        day = next(row for row in body["series"] if row["date"] == today)
+        assert day["revenue"] == "90.00"
 
     def test_segments_endpoint(self, owner_api, brand):
         factories.MembershipFactory(brand=brand)

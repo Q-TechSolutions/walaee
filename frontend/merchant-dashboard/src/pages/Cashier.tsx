@@ -20,8 +20,10 @@ import {
   Empty,
   ErrorBox,
   Field,
+  Icon,
   Modal,
   fmt,
+  t,
   useAction,
   useApi,
   useInterval,
@@ -46,52 +48,82 @@ export function Cashier() {
   useInterval(() => code.reload(), ROTATE_MS);
 
   return (
-    <div className="cashier">
-      <section className="cashier-code">
-        {code.data ? (
-          <QrPanel data={code.data} onRotate={code.reload} />
-        ) : code.error != null ? (
-          <ErrorBox error={code.error} onRetry={code.reload} />
-        ) : (
-          <div className="qr-box skeleton" style={{ aspectRatio: "1" }} />
-        )}
-
-        <div className="cashier-actions">
-          <Button variant="ghost" block onClick={() => setManualOpen(true)}>
-            تسجيل يدوي
-          </Button>
-          <Button variant="ghost" block onClick={() => setRedeemOpen(true)}>
-            صرف كود مكافأة
-          </Button>
+    <>
+      <section className="card card-p tint-v mb-3">
+        <div className="row-t">
+          <span className="ibox v" style={{ background: "#fff" }}>
+            <Icon name="bolt" size={20} />
+          </span>
+          <div className="grow">
+            <b>{t("هذه هي الإجابة على سؤال «كيف تُثبَت عملية الشراء؟»")}</b>
+            <p className="t-sm muted mt-1">
+              {t("رمز متغيّر كل ٣٠ ثانية على شاشتك — العميل يمسحه ويُدخل قيمة الفاتورة، وأنت تؤكّد. لا أجهزة إضافية، ولا يمكن إعادة استخدام الرمز.")}
+            </p>
+          </div>
         </div>
       </section>
 
-      <section className="cashier-queue">
-        <header className="row between">
-          <h2>بانتظار التأكيد</h2>
-          {pending.data && pending.data.length > 0 && (
-            <Badge tone="orange">{fmt.number(pending.data.length)}</Badge>
+      <div className="pos">
+        <section>
+          {code.data ? (
+            <QrPanel data={code.data} onRotate={code.reload} />
+          ) : code.error != null ? (
+            <ErrorBox error={code.error} onRetry={code.reload} />
+          ) : (
+            <div className="pos-qr skeleton" style={{ minHeight: 420 }} />
           )}
-        </header>
 
-        {pending.error != null && (
-          <ErrorBox error={pending.error} onRetry={pending.reload} />
-        )}
-
-        {pending.data?.length === 0 && (
-          <Empty
-            icon="✓"
-            title="لا توجد عمليات معلّقة"
-            hint="اطلب من العميل مسح الرمز وإدخال قيمة الفاتورة."
-          />
-        )}
+          <div className="cashier-actions mt-3">
+            <Button variant="ghost" block onClick={() => setManualOpen(true)}>
+              <Icon name="phone" size={16} />
+              {t("تسجيل يدوي")}
+            </Button>
+            <Button variant="ghost" block onClick={() => setRedeemOpen(true)}>
+              <Icon name="gift" size={16} />
+              {t("صرف كود مكافأة")}
+            </Button>
+          </div>
+        </section>
 
         <div className="stack gap">
-          {pending.data?.map((txn) => (
-            <PendingRow key={txn.id} txn={txn} onDone={pending.reload} />
-          ))}
+          <ShiftCard />
+
+          <section className="card grow">
+            <div className="card-hd">
+              <div className="row">
+                <h3>{t("بانتظار التأكيد")}</h3>
+                <span className="live">
+                  <i />
+                  {t("مباشر")}
+                </span>
+              </div>
+              {pending.data && pending.data.length > 0 && (
+                <Badge tone="orange">{fmt.number(pending.data.length)}</Badge>
+              )}
+            </div>
+
+            <div className="card-p">
+              {pending.error != null && (
+                <ErrorBox error={pending.error} onRetry={pending.reload} />
+              )}
+
+              {pending.data?.length === 0 && (
+                <Empty
+                  icon="checkCircle"
+                  title={t("لا توجد عمليات معلّقة")}
+                  hint={t("اطلب من العميل مسح الرمز وإدخال قيمة الفاتورة.")}
+                />
+              )}
+
+              <div className="stack gap">
+                {pending.data?.map((txn) => (
+                  <PendingRow key={txn.id} txn={txn} onDone={pending.reload} />
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
+      </div>
 
       <ManualModal
         open={manualOpen}
@@ -99,7 +131,60 @@ export function Cashier() {
         onDone={pending.reload}
       />
       <RedeemModal open={redeemOpen} onClose={() => setRedeemOpen(false)} />
-    </div>
+    </>
+  );
+}
+
+/**
+ * مناوبة اليوم.
+ *
+ * أرقام الكاشير نفسه لا أرقام الفرع: من يقف خلف الصندوق ثماني
+ * ساعات يحتاج أن يرى أثره هو. الرقم يأتي من `/merchant/shift`
+ * محسوبًا بالتقويم المحلي — «اليوم» يعني ورديته لا آخر ٢٤ ساعة.
+ */
+function ShiftCard() {
+  const shift = useApi((signal) => queries.shift(signal), []);
+
+  if (shift.error != null || !shift.data) return null;
+  const data = shift.data;
+
+  return (
+    <section className="card card-p">
+      <div className="row between mb-2">
+        <b className="t-md">{t("مناوبة اليوم")}</b>
+        <span className="badge bg-g">
+          <span className="dot" style={{ background: "currentColor" }} />
+          {t("نشطة")}
+        </span>
+      </div>
+
+      <div className="row">
+        <span className="av g" aria-hidden="true">
+          {(data.staff_name || t("؟")).trim().charAt(0)}
+        </span>
+        <div className="grow">
+          <b className="t-sm">{data.staff_name}</b>
+          <p className="t-xs muted">
+            {t(data.role_label)} · {data.branch_name}
+          </p>
+        </div>
+      </div>
+
+      <div className="grid g3 mt-3">
+        <div className="shift-tile">
+          <p className="t-xl w-8 num">{fmt.number(data.transactions)}</p>
+          <p className="t-xs muted">{t("عملية اليوم")}</p>
+        </div>
+        <div className="shift-tile">
+          <p className="t-xl w-8 num">{fmt.number(data.customers)}</p>
+          <p className="t-xs muted">{t("عميل")}</p>
+        </div>
+        <div className="shift-tile">
+          <p className="t-xl w-8 num">{fmt.money(data.revenue)}</p>
+          <p className="t-xs muted">{t("إجمالي")}</p>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -126,7 +211,7 @@ function QrPanel({
     import("qrcode").then((QR) => {
       if (cancelled || !canvasRef.current) return;
       QR.toCanvas(canvasRef.current, data.code, {
-        width: 280,
+        width: 240,
         margin: 1,
         color: { dark: "#14142b", light: "#ffffff" },
       }).catch(() => undefined);
@@ -138,21 +223,36 @@ function QrPanel({
   }, [data.code]);
 
   return (
-    <div className="qr-box">
-      <p className="t-sm muted">{data.label}</p>
-      <canvas ref={canvasRef} className="qr-canvas" />
-      <p className="qr-code num">{data.code}</p>
-      <p className="t-xs faint">يتغيّر الرمز تلقائيًا كل ٣٠ ثانية</p>
-      <Button
-        variant="ghost"
-        loading={rotate.loading}
-        onClick={async () => {
-          await rotate.run();
-          onRotate();
-        }}
-      >
-        تجديد الآن
-      </Button>
+    <div className="pos-qr">
+      <p className="t-sm w-7" style={{ opacity: 0.75 }}>
+        {t("اعرض هذا الرمز للعميل —")} {data.label}
+      </p>
+
+      <div className="qrbox">
+        <canvas ref={canvasRef} className="qr-canvas" />
+      </div>
+
+      <p className="pos-code num">{data.code}</p>
+
+      <p className="pos-timer">
+        <span className="ring" aria-hidden="true" />
+        {t("يتجدّد تلقائيًا كل")} <span className="num">{t("٣٠")}</span> {t("ثانية")}
+      </p>
+
+      <div className="row gap-sm mt-3" style={{ justifyContent: "center" }}>
+        <button
+          type="button"
+          className="btn btn-sm pos-ghost"
+          disabled={rotate.loading}
+          onClick={async () => {
+            await rotate.run();
+            onRotate();
+          }}
+        >
+          <Icon name="refresh" size={14} />
+          {t("تجديد فوري")}
+        </button>
+      </div>
     </div>
   );
 }
@@ -165,11 +265,11 @@ function PendingRow({ txn, onDone }: { txn: Transaction; onDone: () => void }) {
       <div className="grow">
         <p className="pending-amount num">{fmt.money(txn.invoice_amount)}</p>
         <p className="t-sm muted">
-          {txn.customer_name || "عميل"} ·{" "}
+          {txn.customer_name || t("عميل")} ·{" "}
           <span className="num">{fmt.phone(txn.customer_phone)}</span>
         </p>
         <p className="t-xs faint">
-          فاتورة <span className="num">{txn.invoice_no}</span> ·{" "}
+          {t("فاتورة")} <span className="num">{txn.invoice_no}</span> ·{" "}
           {fmt.relativeTime(txn.created_at)}
         </p>
       </div>
@@ -185,7 +285,7 @@ function PendingRow({ txn, onDone }: { txn: Transaction; onDone: () => void }) {
               if (done) onDone();
             }}
           >
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </Button>
         </div>
       ) : (
@@ -197,7 +297,7 @@ function PendingRow({ txn, onDone }: { txn: Transaction; onDone: () => void }) {
             if (done) onDone();
           }}
         >
-          تأكيد ومنح النقاط
+          {t("تأكيد ومنح النقاط")}
         </Button>
       )}
     </div>
@@ -238,7 +338,7 @@ function ManualModal({
   return (
     <Modal
       open={open}
-      title="تسجيل عملية يدويًا"
+      title={t("تسجيل عملية يدويًا")}
       onClose={() => {
         reset();
         onClose();
@@ -246,10 +346,10 @@ function ManualModal({
     >
       {result ? (
         <div className="manual-done">
-          <p className="manual-done-icon" aria-hidden="true">
-            ✓
+          <p className="manual-done-icon">
+            <Icon name="check" size={28} weight={2.4} />
           </p>
-          <p className="w-7">تمّت العملية ومُنحت النقاط</p>
+          <p className="w-7">{t("تمّت العملية ومُنحت النقاط")}</p>
           <p className="t-sm muted num">{fmt.money(result.invoice_amount)}</p>
           <Button
             block
@@ -258,7 +358,7 @@ function ManualModal({
               onDone();
             }}
           >
-            تسجيل عملية أخرى
+            {t("تسجيل عملية أخرى")}
           </Button>
         </div>
       ) : (
@@ -277,7 +377,7 @@ function ManualModal({
             }
           }}
         >
-          <Field label="رقم هاتف العميل" hint="سيُنشأ حساب تلقائيًا إن لم يكن موجودًا">
+          <Field label={t("رقم هاتف العميل")} hint={t("سيُنشأ حساب تلقائيًا إن لم يكن موجودًا")}>
             <input
               className="input num"
               type="tel"
@@ -290,7 +390,7 @@ function ManualModal({
             />
           </Field>
 
-          <Field label="قيمة الفاتورة">
+          <Field label={t("قيمة الفاتورة")}>
             <input
               className="input num"
               type="number"
@@ -303,7 +403,7 @@ function ManualModal({
             />
           </Field>
 
-          <Field label="رقم الفاتورة" hint="اختياري">
+          <Field label={t("رقم الفاتورة")} hint={t("اختياري")}>
             <input
               className="input num"
               value={invoiceNo}
@@ -314,7 +414,7 @@ function ManualModal({
           {submit.error != null && <ErrorBox error={submit.error} />}
 
           <Button type="submit" size="lg" block loading={submit.loading}>
-            تسجيل ومنح النقاط
+            {t("تسجيل ومنح النقاط")}
           </Button>
         </form>
       )}
@@ -337,7 +437,7 @@ function RedeemModal({
   return (
     <Modal
       open={open}
-      title="صرف كود مكافأة"
+      title={t("صرف كود مكافأة")}
       onClose={() => {
         setCode("");
         setDone(null);
@@ -347,10 +447,10 @@ function RedeemModal({
     >
       {done ? (
         <div className="manual-done">
-          <p className="manual-done-icon" aria-hidden="true">
-            ✓
+          <p className="manual-done-icon">
+            <Icon name="check" size={28} weight={2.4} />
           </p>
-          <p className="w-7">صُرفت المكافأة</p>
+          <p className="w-7">{t("صُرفت المكافأة")}</p>
           <p className="t-sm muted">{done}</p>
           <Button
             block
@@ -359,7 +459,7 @@ function RedeemModal({
               setDone(null);
             }}
           >
-            صرف كود آخر
+            {t("صرف كود آخر")}
           </Button>
         </div>
       ) : (
@@ -371,7 +471,7 @@ function RedeemModal({
             if (result) setDone(result.reward_title);
           }}
         >
-          <Field label="الكود" hint="ثمانية محارف يعرضها العميل على شاشته">
+          <Field label={t("الكود")} hint={t("ثمانية محارف يعرضها العميل على شاشته")}>
             <input
               className="input num code-input"
               maxLength={10}
@@ -386,7 +486,7 @@ function RedeemModal({
           {use.error != null && <ErrorBox error={use.error} />}
 
           <Button type="submit" size="lg" block loading={use.loading}>
-            صرف المكافأة
+            {t("صرف المكافأة")}
           </Button>
         </form>
       )}

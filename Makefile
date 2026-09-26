@@ -89,6 +89,9 @@ beat:            ## مجدول المهام — نسخة واحدة فقط
 web-install:     ## تثبيت اعتماديات الواجهات
 	cd frontend && npm install
 
+web-landing:     ## الصفحة العامة — 5172
+	cd frontend && npm run dev:landing
+
 web-customer:    ## تطبيق العميل — 5173
 	cd frontend && npm run dev:customer
 
@@ -98,7 +101,7 @@ web-merchant:    ## لوحة المتجر — 5174
 web-admin:       ## لوحة إدارة المنصة — 5175
 	cd frontend && npm run dev:admin
 
-web-build:       ## بناء التطبيقات الثلاثة للإنتاج
+web-build:       ## بناء الواجهات الأربع للإنتاج
 	cd frontend && npm run build
 
 # ══════════════ الجودة ══════════════

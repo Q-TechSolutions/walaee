@@ -1,0 +1,1111 @@
+/**
+ * القاموس الإنجليزي. المفتاح هو النصّ العربي كما هو في الشاشة.
+ *
+ * مبدأ الترجمة هنا: **الوظيفة لا الحرف**. الأصل عربي مصري مكتوب
+ * لتاجر وعميل مصريين، وترجمته حرفيًا تنتج إنجليزية سليمة نحويًا
+ * لا يقولها أحد. «قول رقمك عند الصندوق» ليست "Say your number at
+ * the box" بل "Give your number at the till".
+ *
+ * ما لا يُترجَم:
+ *   • أسماء العلامات والفروع والمكافآت والحملات — محتوى التاجر،
+ *     وترجمته اختراع. متجر اسمه «سوبر ماركت الحي» اسمه كذلك في
+ *     الشاشة الإنجليزية أيضًا.
+ *   • «ولائي» — اسم المنتج. يُكتب Walaee لا Loyalty.
+ *
+ * النصّ المفقود من هذا الجدول يظهر بالعربية لا بمفتاح مكشوف —
+ * راجع `t()` في `locale.ts`.
+ */
+
+export const EN: Record<string, string> = {
+  /* ══════════════ لوحة إدارة المنصة ══════════════ */
+  "المنصة": "Platform",
+  "نظرة عامة": "Overview",
+  "أداء المنصة بالكامل": "How the whole platform is doing",
+  "الإدارة": "Administration",
+  "المتاجر": "Merchants",
+  "المؤسسات المشتركة وآخر نشاط لكل واحدة": "Subscribed organisations and when each was last active",
+  "الاشتراكات والفواتير": "Subscriptions and invoices",
+  "ما لم يُسدَّد بعد": "What is still unpaid",
+  "ولائي": "Walaee",
+  "لوحة إدارة المنصة": "Platform admin console",
+  "فريق ولائي": "Walaee team",
+  "إدارة المنصة": "Platform administration",
+  "تسجيل الخروج": "Sign out",
+  "حالة الشبكة في لوحة واحدة": "The whole network on one screen",
+  "الإيراد المتكرّر، والمتاجر المتوقّفة عن النشاط، والفواتير المتأخرة — قبل أن تتحوّل إلى إلغاءات.":
+    "Recurring revenue, merchants who have gone quiet, and overdue invoices — before any of it turns into a cancellation.",
+  "الشبكة الآن": "The network right now",
+  "الأرقام تُحمَّل من الدليل العام.": "Figures are loading from the public directory.",
+  "آخر نشاط لكل مؤسسة": "Last activity per organisation",
+  "بيانات أعمال لا بيانات عملاء": "Business data, not customer data",
+  "دخول الفريق": "Team sign-in",
+  "هذه الشاشة لفريق ولائي وحده. حسابات التجّار والعملاء لا تعمل هنا.":
+    "This screen is for the Walaee team only. Merchant and customer accounts will not work here.",
+  "متجر توقّف أسبوعين هو متجر على وشك الإلغاء — واستدراكه أرخص من استعادته.":
+    "A merchant who has been quiet for two weeks is about to cancel — reaching them now costs less than winning them back.",
+  "هذه اللوحة لا ترى أرصدة العملاء ولا عملياتهم.":
+    "This console cannot see any customer balance or transaction.",
+  "رقم الهاتف": "Phone number",
+  "كلمة المرور": "Password",
+  "الإيراد الشهري المتكرّر": "Monthly recurring revenue",
+  "العلامات المفعّلة": "Active brands",
+  "عملاء نهائيون": "End customers",
+  "العضويات": "Memberships",
+  "بطاقة نشطة عبر كل العلامات": "Active cards across every brand",
+  "العمليات — ٣٠ يومًا": "Transactions — 30 days",
+  "قيمة المبيعات — ٣٠ يومًا": "Sales value — 30 days",
+  "إجمالي فواتير المتاجر لا إيراد المنصة": "Merchant invoice totals, not platform revenue",
+  "فواتير غير مسدّدة": "Unpaid invoices",
+  "تحتاج متابعة": "Needs following up",
+  "لا شيء متأخر": "Nothing overdue",
+  "التوزيع على الباقات": "Split by plan",
+  "لا تعرض هذه اللوحة بيانات شراء أي فرد. بيانات العملاء ملك التاجر وعميله، والمنصة وسيط — راجع مصفوفة الأدوار في التوثيق.":
+    "This console shows no individual's purchase data. Customer data belongs to the merchant and their customer; the platform is a processor — see the role matrix in the documentation.",
+  "لا توجد مؤسسات بعد": "No organisations yet",
+  "«آخر نشاط» هو مؤشر الخطر الأول: مؤسسة بلا عملية منذ أسبوعين على وشك الإلغاء، والتدخل قبل ذلك أرخص من استعادتها.":
+    "“Last activity” is the earliest warning sign: an organisation with no transaction for two weeks is about to cancel, and stepping in now costs less than winning them back.",
+  "المؤسسة": "Organisation",
+  "الباقة": "Plan",
+  "الإيراد": "Revenue",
+  "عمليات ٣٠ يومًا": "Transactions, 30 days",
+  "آخر نشاط": "Last activity",
+  "،": ", ",
+  "بلا علامات": "No brands",
+  "متأخرة": "Overdue",
+  "لا نشاط إطلاقًا": "Never active",
+  "كل الفواتير مسدّدة": "Every invoice is paid",
+  "لا شيء يحتاج متابعة.": "Nothing needs following up.",
+  "السداد بالتحويل البنكي يُعلَّم يدويًا بعد مطابقة كشف الحساب — وهذا ما يستخدمه عملاء المنصة الأوائل فعلًا.":
+    "Bank transfers are marked paid by hand once the statement is reconciled — which is what the platform's first customers actually use.",
+  "الفاتورة": "Invoice",
+  "المبلغ": "Amount",
+  "صدرت": "Issued",
+  "تعليم كمسدّدة": "Mark as paid",
+  "تأكيد السداد": "Confirm payment",
+  "تراجع": "Cancel",
+  "مرجع التحويل": "Transfer reference",
+  "رقم العملية في كشف الحساب — يُحفظ للمراجعة":
+    "The transaction number on the statement — kept for audit",
+
+  /* ══════════════ تطبيق العميل ══════════════ */
+  "الرئيسية": "Home",
+  "امسح": "Scan",
+  "المكافآت": "Rewards",
+  "حسابي": "Account",
+  "التنقّل الرئيسي": "Main navigation",
+  "رجوع إلى بطاقاتي": "Back to my cards",
+  "سجل النشاط": "Activity log",
+  "لا يوجد نشاط بعد": "Nothing here yet",
+  "أول عملية تتسجّل هنا فور تأكيد الكاشير لها.":
+    "Your first transaction appears here the moment the cashier confirms it.",
+  "السابق": "Previous",
+  "التالي": "Next",
+  "نقطة": "point",
+  "مكافآت هذا المتجر": "Rewards at this shop",
+  "لا توجد مكافآت بعد": "No rewards yet",
+  "هذا المتجر لم يضف مكافآت حتى الآن.": "This shop has not added any rewards yet.",
+  "· باقي": "· still need",
+  "نفدت": "Out of stock",
+  "استبدال": "Redeem",
+  "قريبًا": "Almost there",
+  "آخر النشاط": "Recent activity",
+  "كود الاستبدال": "Redemption code",
+  "اعرض هذا الكود على الكاشير": "Show this code to the cashier",
+  "صالح لمدة ١٥ دقيقة ومرة واحدة فقط. تجده أيضًا في صفحة المكافآت.":
+    "Valid for 15 minutes, once only. You will also find it on the Rewards page.",
+  "تقدّمك": "Your progress",
+  "جاهزة للاستبدال": "Ready to redeem",
+  "متبقية": "to go",
+  "كل زيارة = ختم.": "One stamp per visit.",
+  "إجمالي إنفاقك": "Total you have spent",
+  "عضو منذ": "Member since",
+  "أهلًا بك": "Welcome",
+  "لا مكافآت جاهزة": "no rewards ready yet",
+  "مكافأة جاهزة للاستبدال": "reward ready to redeem",
+  "مكافأتان جاهزتان للاستبدال": "rewards ready to redeem",
+  "مكافآت جاهزة للاستبدال": "rewards ready to redeem",
+  "كل بطاقاتك في مكان واحد": "All your cards in one place",
+  "بطاقاتي": "My cards",
+  "كل المتاجر": "All shops",
+  "محفظتك فاضية لسه": "Your wallet is still empty",
+  "امسح كود المتجر عند الكاشير وابدأ تجمّع من أول زيارة.":
+    "Scan the shop's code at the till and start earning from your first visit.",
+  "من الهدف": "of the target",
+  "تنتهي": "expires",
+  "زياراتك هذا الأسبوع": "Your visits this week",
+  "٧": "7",
+  "مفيش زيارات الأسبوع ده. أقرب متجر مستنيك.":
+    "No visits this week. The nearest shop is waiting for you.",
+  "كل زيارة بتتسجّل أول ما الكاشير يأكّد العملية.":
+    "Every visit is recorded the moment the cashier confirms it.",
+  "ثبّت ولائي على شاشتك": "Add Walaee to your home screen",
+  "يفتح زي أي تطبيق، ويوصلك إشعار أول ما تجهز مكافأة.":
+    "It opens like any app, and tells you the moment a reward is ready.",
+  "تثبيت": "Install",
+  "حساب تجربة — الكود مُدخَل تلقائيًا.": "Demo account — the code is filled in for you.",
+  "بطاقات ولائك كلها في محفظة واحدة": "Every loyalty card in one wallet",
+  "لا كروت ورق تضيع ولا تطبيق لكل متجر. رقم هاتفك هو بطاقتك في كل متجر متعاقد.":
+    "No paper cards to lose, no app per shop. Your phone number is your card at every partner shop.",
+  "اجمع من غير ما تعمل حاجة": "Earn without doing a thing",
+  "قول رقمك عند الكاشير، والنقاط تتسجّل في ثانية.":
+    "Give your number at the till and the points land in a second.",
+  "رصيدك واضح دايمًا": "Your balance is always clear",
+  "تعرف كام باقي على المكافأة القادمة، ومتى ينتهي رصيدك.":
+    "You know how far the next reward is, and when your balance expires.",
+  "متاجر في كل محافظة": "Shops in every governorate",
+  "شبكة تكبر كل شهر بمتاجر جديدة قريبة منك.":
+    "A network that grows every month with new shops near you.",
+  "سجّل دخولك": "Sign in",
+  "أدخل رقم هاتفك وسنرسل لك كود تحقق من أربعة إلى ستة أرقام.":
+    "Enter your phone number and we will send you a four to six digit code.",
+  "إرسال الكود": "Send the code",
+  "أدخل الكود": "Enter the code",
+  "أرسلنا كودًا إلى": "We sent a code to",
+  "كود التحقق": "Verification code",
+  "دخول": "Sign in",
+  "تغيير الرقم": "Change the number",
+  "كود جديد بعد": "New code in",
+  "ثانية": "seconds",
+  "إرسال كود جديد": "Send a new code",
+  "بياناتك وخصوصيتك": "Your data and privacy",
+  "؟": "?",
+  "بلا اسم": "No name",
+  "بياناتي": "My details",
+  "الاسم": "Name",
+  "يظهر للمتاجر التي تنضم إليها": "Shown to the shops you join",
+  "اكتب اسمك": "Type your name",
+  "حفظ": "Save",
+  "الخصوصية": "Privacy",
+  "تحميل نسخة من بياناتي": "Download a copy of my data",
+  "كل ما تحتفظ به المنصة عنك في ملف واحد.": "Everything the platform holds about you, in one file.",
+  "تحميل": "Download",
+  "حذف حسابي": "Delete my account",
+  "حذف": "Delete",
+  "حذف الحساب": "Delete account",
+  "نقاطك في كل المتاجر ستُفقد، وسجلات المعاملات تبقى بمعرّف مجهول.":
+    "Your points at every shop will be lost. Transaction records stay, under an anonymous identifier.",
+  "أرسل كود التأكيد": "Send the confirmation code",
+  "كود التأكيد": "Confirmation code",
+  "تأكيد الحذف نهائيًا": "Delete permanently",
+  "عندك كود جاهز — اعرضه على الكاشير": "You have a code ready — show it to the cashier",
+  "اللي تقدر تستبدله دلوقتي وقريبًا": "What you can redeem now, and what is close",
+  "أكواد بانتظار الصرف": "Codes waiting to be used",
+  "متاح لك": "Available to you",
+  "لا توجد مكافآت": "No rewards",
+  "انضم لمتجر وابدأ تجميع نقاطك.": "Join a shop and start collecting.",
+  "ختم": "stamp",
+  "باقي": "still need",
+  "امسح رمز المتجر": "Scan the shop's code",
+  "أنت في": "You are at",
+  "أول زيارة لك — أهلًا بك": "Your first visit — welcome",
+  "قيمة الفاتورة": "Invoice amount",
+  "كما هي على الإيصال، بالجنيه": "Exactly as printed on the receipt, in EGP",
+  "رقم الفاتورة": "Invoice number",
+  "اختياري — يساعد التاجر على المطابقة": "Optional — it helps the merchant reconcile",
+  "مثال: 10428": "e.g. 10428",
+  "إرسال للكاشير": "Send to the cashier",
+  "إلغاء والمسح من جديد": "Cancel and scan again",
+  "بانتظار تأكيد الكاشير": "Waiting for the cashier to confirm",
+  "عودة لبطاقاتي": "Back to my cards",
+  "مسح فاتورة أخرى": "Scan another receipt",
+  "تعذّر فتح الكاميرا — استخدم الإدخال اليدوي بالأسفل":
+    "The camera would not open — use the manual entry below",
+  "وجّه الكاميرا نحو الرمز على شاشة الكاشير": "Point the camera at the code on the cashier's screen",
+  "فتح الكاميرا": "Open the camera",
+  "أو اكتب الرمز الظاهر على الشاشة": "Or type the code shown on the screen",
+  "تأكيد": "Confirm",
+  "متصفحك لا يدعم تحديد الموقع.": "Your browser does not support location.",
+  "تعذّر تحديد موقعك. فعّل إذن الموقع من إعدادات المتصفح ثم حاول مجددًا.":
+    "We could not find your location. Allow location access in your browser settings and try again.",
+  "متاجر تقبل ولائي في كل محافظة": "Shops that accept Walaee in every governorate",
+  "اعرف الأقرب لك": "Find the nearest",
+  "— نستخدم موقعك ولا نحتفظ به": "— we use your location and never store it",
+  "جارٍ تحديد موقعك…": "Finding your location…",
+  "الأقرب إليك": "Nearest to you",
+  "لا توجد فروع قريبة. تصفّح الخريطة بالأسفل.":
+    "No branches nearby. Browse the map below.",
+  "كم": "km",
+  "عضو": "Member",
+  "جديد": "New",
+  "جارٍ تحميل الشبكة…": "Loading the network…",
+  "شبكة ولائي": "The Walaee network",
+  "محافظة. اضغط على محافظة لعرض متاجرها.":
+    "governorates. Tap a governorate to see its shops.",
+  "كل المحافظات": "All governorates",
+  "متجر": "shop",
+  "عرض الكل": "Show all",
+  "بطاقات الولاء كلها في مكان واحد": "Every loyalty card in one place",
+
+  /* ══════════════ الصفحة الرئيسية ══════════════ */
+  "تخطَّ إلى المحتوى": "Skip to content",
+  "جارٍ تحميل خريطة التغطية…": "Loading the coverage map…",
+  "تعذّر تحميل خريطة التغطية": "The coverage map could not be loaded",
+  "إعادة المحاولة": "Try again",
+  "التغطية": "Coverage",
+  "كيف تعمل": "How it works",
+  "للتجّار": "For merchants",
+  "الأسعار": "Pricing",
+  "أسئلة": "FAQ",
+  "نقاط": "Points",
+  "أختام": "Stamps",
+  "زيارات": "Visits",
+  "استرداد نقدي": "Cashback",
+  "مكافآت": "Rewards",
+  "هدايا": "Gifts",
+  "فين تلاقينا؟": "Where to find us",
+  "فرعًا": "branches",
+  "مدينة": "cities",
+  "أكثر المحافظات تغطية": "Best covered governorates",
+  "المتاجر المتعاقدة": "Partner shops",
+  "تصفية حسب الفئة": "Filter by category",
+  "الكل": "All",
+  "محتاج أجهزة أو نظام كاشير معيّن؟": "Do I need special hardware or a particular POS?",
+  "لأ. شاشة الكاشير صفحة ويب تفتح على أي موبايل أو تابلت أو كمبيوتر فيه متصفّح. لو عندك نظام نقاط بيع بالفعل، يفضل شغّال زي ما هو — ولائي بيشتغل جنبه.":
+    "No. The cashier screen is a web page that opens on any phone, tablet or computer with a browser. If you already run a POS, keep it exactly as it is — Walaee runs alongside it.",
+  "العميل لازم يحمّل تطبيق؟": "Does the customer have to install an app?",
+  "لأ. رقم تليفونه كفاية عشان يجمع. التطبيق مفيد لو حب يتابع رصيده ويصرف مكافآته بنفسه، لكنه مش شرط عشان ياخد نقاطه.":
+    "No. Their phone number is enough to earn. The app is useful if they want to follow their balance and redeem on their own, but it is not required to collect points.",
+  "مين بيشوف بيانات عملائي؟": "Who can see my customer data?",
+  "إنت بس. كل علامة تجارية معزولة عن غيرها تمامًا — تاجر تاني على نفس المنصة ما يقدرش يشوف عميل واحد من عملائك ولا رصيده. وفريق ولائي نفسه بيشوف أرقام أعمال مجمّعة، مش بيانات عملاء.":
+    "Only you. Every brand is fully isolated — another merchant on the same platform cannot see a single one of your customers or their balance. The Walaee team itself sees aggregate business figures, not customer data.",
+  "لو العميل اشتكى إن نقاطه ناقصة؟": "What if a customer says points are missing?",
+  "تفتح كشف حسابه وتشوف كل عملية بتاريخها والفرع والكاشير اللي عملها. القيود ما بتتعدّلش وما بتتحذفش، فاللي مكتوب هو اللي حصل. العكس بيتسجّل كقيد جديد مش بمسح القديم.":
+    "You open their statement and see every transaction with its date, branch and cashier. Entries are never edited or deleted, so what is written is what happened. A reversal is recorded as a new entry, never by erasing the old one.",
+  "النقاط دي هتكلّفني كام؟": "What will these points cost me?",
+  "التكلفة الحقيقية هي المكافآت اللي بتتصرف فعلًا، وإنت اللي بتحدّد سعرها. اللوحة بتوريك «الالتزام القائم» — يعني قيمة المكافآت اللي عملاؤك يقدروا يصرفوها دلوقتي بالجنيه، مش بعدد النقاط.":
+    "The real cost is the rewards that actually get redeemed, and you set their price. The dashboard shows your “outstanding liability” — the value in pounds of what your customers could redeem right now, not a count of points.",
+  "أقدر أوقف الاشتراك؟ وبياناتي؟": "Can I cancel? And what about my data?",
+  "تقدر توقف في أي وقت بلا مدة إلزام. بياناتك بتفضل متاحة للتصدير، وعملاؤك بيفضلوا يشوفوا أرصدتهم لحد ما تقرّر إنهاء البرنامج رسميًا.":
+    "You can stop any time, with no lock-in. Your data stays available to export, and your customers keep seeing their balances until you formally end the programme.",
+  "بتدعموا كام نموذج ولاء؟": "How many loyalty models do you support?",
+  "ستة: نقاط على قيمة الفاتورة، أختام على الزيارة، عدّ زيارات، استرداد نقدي بنسبة، مكافآت مباشرة، وهدايا. وتقدر تشغّل أكتر من نموذج مع بعض — نقاط على كل فاتورة وأختام على صنف معيّن مثلًا.":
+    "Six: points on invoice value, a stamp per visit, visit counts, percentage cashback, direct rewards, and gifts. You can run more than one at once — points on every invoice and stamps on one product line, for instance.",
+  "هل فيه فترة تجربة؟": "Is there a trial?",
+  "الباقة المجانية مفتوحة بلا مدة على فرع واحد و200 عميل. أغلب المتاجر بتجرّب بيها أسبوعين قبل ما تكبّر.":
+    "The free plan is open-ended for one branch and 200 customers. Most shops try it for a couple of weeks before moving up.",
+  "اللي بيتسأل قبل ما حد يبدأ": "What people ask before they start",
+  "ابدأ النهارده. مش محتاج أكتر من ربع ساعة.": "Start today. It takes about fifteen minutes.",
+  "برنامج ولاء كامل، من غير أجهزة ولا عقود.":
+    "A complete loyalty programme — no hardware, no contracts.",
+  "روابط الصفحة": "Page links",
+  "الصفحة": "This page",
+  "تطبيقات المنصة": "Platform apps",
+  "الدخول": "Sign in",
+  "تطبيق العملاء": "Customer app",
+  "لوحة المتجر": "Merchant dashboard",
+  "كلنا كسبانين": "Everybody wins",
+  "كل نقطة ليها قيد": "Every point has an entry",
+  "الأرصدة مش رقم في خانة يتعدّل. كل منح وكل صرف وكل عكس له قيد ثابت لا يتغيّر ولا يُحذَف، ورصيد العميل مجموعها. يعني أي خلاف مع عميل يتحسم في دقيقة، وأي رقم في تقاريرك يقدر يتراجع لمصدره.":
+    "Balances are not a number in a field that gets edited. Every grant, every redemption and every reversal has a fixed entry that is never changed or deleted, and the customer's balance is their sum. So any dispute is settled in a minute, and any figure in your reports can be traced back to its source.",
+  "حماية من الاحتيال الداخلي": "Protection against internal fraud",
+  "سقف يومي لكل عميل، وحساب مستقل لكل كاشير، ومراجعة تلقائية للأنماط الغريبة — زي منح متكرّر لنفس الرقم في نفس الوردية.":
+    "A daily cap per customer, a separate account per cashier, and automatic review of odd patterns — such as repeated grants to the same number in one shift.",
+  "تعرف التزامك بالجنيه": "Know what you owe, in pounds",
+  "النقاط اللي لسه في جيب عملائك ليها تكلفة عليك. اللوحة بتحسبها بسعر المكافأة الحقيقي، مش بعدد النقاط.":
+    "The points still in your customers' pockets cost you something. The dashboard prices them at the real reward cost, not as a count of points.",
+  "فروع وصلاحيات": "Branches and permissions",
+  "كل فرع بنقاط بيعه وموظفيه. المالك يشوف الكل، المدير يشوف فرعه، والكاشير يشوف شاشته بس.":
+    "Each branch with its own tills and staff. The owner sees everything, the manager sees their branch, and the cashier sees only their own screen.",
+  "صلاحية للرصيد": "Balance expiry",
+  "تحدّد مدة صلاحية النقاط، والمنصة بتنبّه العميل قبل ما تنتهي — فبيرجع يصرفها عندك بدل ما تتبخّر وهو زعلان.":
+    "You set how long points last, and the platform warns the customer before they expire — so they come back and spend them instead of losing them and resenting it.",
+  "حملات موجّهة": "Targeted campaigns",
+  "ابعت لعملاء غابوا ٣٠ يوم، أو لأصحاب رصيد قارب ينتهي. مش رسائل جماعية — شرائح محدّدة برصيدها وسلوكها.":
+    "Message customers who have been away 30 days, or whose balance is about to expire. Not a mass blast — segments defined by balance and behaviour.",
+  "برنامج ولاء تقدر تدافع عن أرقامه": "A loyalty programme whose numbers you can defend",
+  "ولائي — الصفحة الرئيسية": "Walaee — home",
+  "إغلاق القائمة": "Close menu",
+  "فتح القائمة": "Open menu",
+  "١٠ أختام": "10 stamps",
+  "قهوة مجانية": "Free coffee",
+  "٨٢٠": "820",
+  "١٬٠٠٠ نقطة": "1,000 points",
+  "خصم ٥٠ ج": "EGP 50 off",
+  "٣": "3",
+  "٦ زيارات": "6 visits",
+  "طبق جانبي": "A side dish",
+  "متجر متعاقد": "partner shops",
+  "فرع": "branches",
+  "محافظة": "governorates",
+  "قول رقمك عند الصندوق": "Give your number at the till",
+  "من غير كارت ولا كود ولا تطبيق. رقم تليفونك هو بطاقتك في كل متجر متعاقد.":
+    "No card, no code, no app. Your phone number is your card at every partner shop.",
+  "رصيدك يتسجّل في ثانية": "Your balance updates in a second",
+  "نقاط أو أختام أو زيارة، حسب برنامج المتجر. يوصلك تأكيد ويتحدّث رصيدك فورًا.":
+    "Points, a stamp or a visit, depending on the shop's programme. You get a confirmation and your balance updates at once.",
+  "اصرف مكافأتك وانت واقف": "Redeem while you are still at the counter",
+  "تختار المكافأة من التطبيق، يطلع كود قصير يقوله الكاشير، وخلاص.":
+    "Pick the reward in the app, a short code appears, you read it to the cashier, done.",
+  "اختر برنامجك": "Choose your programme",
+  "نقاط على الفاتورة، ختم على كل زيارة، استرداد نقدي… وحدّد الشروط: أقل فاتورة، سقف يومي، مدة صلاحية.":
+    "Points on the invoice, a stamp per visit, cashback… then set the terms: minimum invoice, daily cap, expiry.",
+  "شغّل الصندوق": "Turn on the till",
+  "شاشة الكاشير تفتح على أي متصفّح. رقم العميل، قيمة الفاتورة، تأكيد. ولا جهاز جديد ولا تدريب.":
+    "The cashier screen opens in any browser. Customer number, invoice amount, confirm. No new hardware, no training.",
+  "اقرأ الأرقام واتصرّف": "Read the numbers and act",
+  "مين رجع ومين غاب، وكام مكافأة اتصرفت فعلًا، وكام الالتزام اللي عليك دلوقتي.":
+    "Who came back and who went quiet, how many rewards were actually redeemed, and what you owe right now.",
+  "نفس العملية، من الناحيتين": "The same transaction, from both sides",
+  "للعميل": "For the customer",
+  "من غير ما تعمل أي حاجة": "without doing a thing",
+  "للتاجر": "For the merchant",
+  "من غير ما تغيّر نظامك": "without changing your system",
+
+  /* ══════════════ الباقات ══════════════ */
+  "تجرّب بيها على فرع واحد": "Try it on one branch",
+  "فرع واحد · نقطة بيع واحدة": "1 branch · 1 till",
+  "برنامج ولاء واحد": "1 loyalty programme",
+  "حتى 200 عميل": "Up to 200 customers",
+  "موظفان": "2 staff",
+  "بدون حملات رسائل": "No messaging campaigns",
+  "لمتجر واحد شغّال": "For a single working shop",
+  "فرع واحد · 3 نقاط بيع": "1 branch · 3 tills",
+  "برنامجا ولاء": "2 loyalty programmes",
+  "حتى 2,000 عميل": "Up to 2,000 customers",
+  "5 موظفين": "5 staff",
+  "500 رسالة شهريًا": "500 messages a month",
+  "تصدير التقارير": "Report export",
+  "لما تبقى أكتر من فرع": "When you have more than one branch",
+  "5 فروع · 15 نقطة بيع": "5 branches · 15 tills",
+  "4 برامج ولاء": "4 loyalty programmes",
+  "حتى 20,000 عميل": "Up to 20,000 customers",
+  "25 موظفًا": "25 staff",
+  "3,000 رسالة شهريًا": "3,000 messages a month",
+  "للسلاسل والمجموعات": "For chains and groups",
+  "فروع ونقاط بيع بلا حد": "Unlimited branches and tills",
+  "برامج ولاء بلا حد": "Unlimited loyalty programmes",
+  "عملاء بلا حد": "Unlimited customers",
+  "موظفون بلا حد": "Unlimited staff",
+  "10,000 رسالة شهريًا": "10,000 messages a month",
+  "دعم مخصّص": "Dedicated support",
+  "ادفع على حجمك، مش على وعد": "Pay for your size, not for a promise",
+  "الأكثر اختيارًا": "Most chosen",
+  "مجانًا": "Free",
+  "جنيه / شهر": "EGP / month",
+  "ابدأ مجانًا": "Start free",
+  "اختر الباقة": "Choose this plan",
+  "مجانية": "Free",
+  "أساسية": "Starter",
+  "نمو": "Growth",
+  "سلاسل": "Chain",
+  "للأبد": "forever",
+  "حتى ٢٠٠ عميل": "Up to 200 customers",
+  "شهريًا": "a month",
+  "فرع واحد · ٣ نقاط بيع": "1 branch · 3 tills",
+  "حتى ٢٬٠٠٠ عميل": "Up to 2,000 customers",
+  "٥٠٠ رسالة شهريًا": "500 messages a month",
+  "٥ فروع · ١٥ نقطة بيع": "5 branches · 15 tills",
+  "٤ برامج ولاء": "4 loyalty programmes",
+  "حتى ٢٠٬٠٠٠ عميل": "Up to 20,000 customers",
+  "٣٬٠٠٠ رسالة شهريًا": "3,000 messages a month",
+  "برامج وعملاء بلا حد": "Unlimited programmes and customers",
+  "١٠٬٠٠٠ رسالة شهريًا": "10,000 messages a month",
+
+  /* ══════════════ لوحة التاجر — التنقّل ══════════════ */
+  "التشغيل اليومي": "Day to day",
+  "لوحة المعلومات": "Dashboard",
+  "نظرة سريعة على أداء برنامج الولاء": "A quick read on how the programme is doing",
+  "وضع الكاشير": "Cashier mode",
+  "الشاشة التي تعمل عند نقطة البيع": "The screen that runs at the till",
+  "العملاء": "Customers",
+  "قاعدة عملائك وشرائحهم": "Your customer base and its segments",
+  "برنامج الولاء": "Loyalty programme",
+  "إعداد البرنامج": "Programme setup",
+  "إعداد برنامج الولاء": "Set up the loyalty programme",
+  "اختر النموذج واضبط قواعده": "Pick the model and set its rules",
+  "ما الذي يحصل عليه عميلك": "What your customer gets",
+  "الحملات": "Campaigns",
+  "تواصل مع شرائح محدّدة بتكلفة واضحة": "Reach defined segments at a cost you can see",
+  "التحليل والحوكمة": "Analysis and governance",
+  "التقارير": "Reports",
+  "أثر برنامج الولاء على نشاطك": "What the programme did to your business",
+  "المراجعة والاحتيال": "Review and fraud",
+  "ضوابط تحمي بياناتك وثقتك": "Controls that protect your data and your trust",
+  "الفروع والكاشيرين": "Branches and cashiers",
+  "مؤسسة ← علامة ← فرع ← كاشير": "Organisation → brand → branch → cashier",
+  "الحساب": "Account",
+  "الاشتراك والفواتير": "Subscription and invoices",
+  "باقتك واستهلاكك": "Your plan and your usage",
+  "الإعدادات": "Settings",
+  "بيانات المتجر والخصوصية": "Shop details and privacy",
+
+  /* ══════════════ الاشتراك ══════════════ */
+  "الفروع": "Branches",
+  "نقاط البيع": "Tills",
+  "الموظفون": "Staff",
+  "البرامج": "Programmes",
+  "الباقات": "Plans",
+  "باقتك": "Your plan",
+  "باقتك الحالية": "Your current plan",
+  "تواصل للترقية": "Contact us to upgrade",
+  "تغيير الباقة يمرّ بفريق ولائي": "Plan changes go through the Walaee team",
+  "الترقية فورية، أما التخفيض فيحتاج مراجعة: باقة أصغر قد لا تتّسع لفروعك أو موظفيك الحاليين، وتنفيذه آليًا كان سيعطّل نقاط بيع تعمل الآن.":
+    "Upgrades are immediate; downgrades need a review, because a smaller plan may not fit the branches or staff you already have, and doing it automatically would take working tills offline.",
+  "الفواتير": "Invoices",
+  "لا توجد فواتير بعد": "No invoices yet",
+  "استهلاكك الحالي": "Your current usage",
+  "/ بلا حد": " / unlimited",
+  "رصيد الرسائل": "Message balance",
+  "الإشعارات داخل التطبيق لا تُخصَم من الرصيد — يُخصَم منه ما يخرج إلى شبكة الاتصالات وحده.":
+    "In-app notifications are not charged — only what leaves for the mobile network is.",
+
+  /* ══════════════ الفروع والموظفون ══════════════ */
+  "مالك": "Owner",
+  "مدير": "Manager",
+  "كاشير": "Cashier",
+  "تسلسل هرمي من اليوم الأول": "A hierarchy from day one",
+  "الهيكل التنظيمي": "Org structure",
+  "لا توجد فروع": "No branches",
+  "أضف فرعك الأول لتبدأ تسجيل العمليات.": "Add your first branch to start recording transactions.",
+  "مؤسستك": "Your organisation",
+  "مؤسسة": "Organisation",
+  "بلا عنوان": "No address",
+  "نشط": "Active",
+  "غير مفعّل": "Inactive",
+  "نقطة بيع": "Till",
+  "نشطة": "Active",
+  "موقوفة": "Suspended",
+  "فرع جديد": "New branch",
+  "اسم الفرع": "Branch name",
+  "العنوان": "Address",
+  "اختياري": "Optional",
+  "نقطة بيع جديدة": "New till",
+  "الفرع": "Branch",
+  "التسمية": "Label",
+  "مثال: كاشير ١": "e.g. Till 1",
+  "موظف جديد": "New staff member",
+  "يُستخدم للدخول": "Used to sign in",
+  "الدور": "Role",
+  "كاشير — يؤكّد العمليات فقط": "Cashier — confirms transactions only",
+  "مدير — يرى التقارير والحملات": "Manager — sees reports and campaigns",
+  "مالك — صلاحيات كاملة": "Owner — full permissions",
+  "كلمة المرور المبدئية": "Initial password",
+
+  /* ══════════════ الحملات ══════════════ */
+  "مسودة": "Draft",
+  "مجدولة": "Scheduled",
+  "قيد الإرسال": "Sending",
+  "أُرسلت": "Sent",
+  "ملغاة": "Cancelled",
+  "فشلت": "Failed",
+  "راسل عملاءك على أرخص قناة تصل إليهم — الإشعار أولًا، ثم ما يخرج إلى شبكة الاتصالات.":
+    "Reach your customers on the cheapest channel that gets through — the in-app notification first, then what goes out over the mobile network.",
+  "حملة جديدة": "New campaign",
+  "لا توجد حملات بعد": "No campaigns yet",
+  "ابدأ بحملة لعملائك الخاملين — غالبًا أعلى عائد لأول حملة.":
+    "Start with your dormant customers — usually the best return on a first campaign.",
+  "· أُرسلت": "· sent",
+  "· فشلت": "· failed",
+  "· التكلفة الفعلية": "· actual cost",
+  "اشتقنا لك يا {name}! رصيدك في {brand} بانتظارك.":
+    "We have missed you, {name}! Your balance at {brand} is waiting.",
+  "اسم الحملة": "Campaign name",
+  "للتمييز في قائمتك فقط — لا يراه العميل": "For your own list only — the customer never sees it",
+  "مثال: عودة الخاملين — أكتوبر": "e.g. Win-back — October",
+  "نص الرسالة": "Message text",
+  "يمكنك استخدام {name} لاسم العميل و {brand} لاسم متجرك":
+    "Use {name} for the customer's name and {brand} for your shop's",
+  "لم يشترِ منذ (أيام)": "Has not bought in (days)",
+  "اتركه فارغًا لكل العملاء": "Leave empty to reach everyone",
+  "رصيده لا يقل عن": "Balance at least",
+  "جارٍ حساب التكلفة…": "Working out the cost…",
+  "سيصل إلى": "Will reach",
+  "مجاني": "Free",
+  "التكلفة": "Cost",
+  "— الرصيد غير كافٍ، اشحن قبل الإرسال.": "— not enough credit, top up before sending.",
+  "إرسال": "Send",
+
+  /* ══════════════ الكاشير ══════════════ */
+  "هذه هي الإجابة على سؤال «كيف تُثبَت عملية الشراء؟»":
+    "This is the answer to “how is a purchase proven?”",
+  "بانتظار التأكيد": "Waiting for confirmation",
+  "لا توجد عمليات معلّقة": "Nothing pending",
+  "اطلب من العميل مسح الرمز وإدخال قيمة الفاتورة.":
+    "Ask the customer to scan the code and enter the invoice amount.",
+  "مناوبة اليوم": "Today's shift",
+  "عملية اليوم": "transactions today",
+  "عميل": "customer",
+  "إجمالي": "total",
+  "٣٠": "30",
+  "تسجيل عملية يدويًا": "Record a transaction by hand",
+  "تمّت العملية ومُنحت النقاط": "Done — the points were granted",
+  "رقم هاتف العميل": "Customer's phone number",
+  "سيُنشأ حساب تلقائيًا إن لم يكن موجودًا":
+    "An account is created automatically if there is not one already",
+  "صرف كود مكافأة": "Redeem a reward code",
+  "صُرفت المكافأة": "Reward redeemed",
+  "الكود": "Code",
+  "ثمانية محارف يعرضها العميل على شاشته":
+    "Eight characters the customer shows on their screen",
+
+  /* ══════════════ العملاء ══════════════ */
+  "نشطون": "Active",
+  "خاملون": "Dormant",
+  "جدد": "New",
+  "ابحث بالاسم أو رقم الهاتف": "Search by name or phone number",
+  "الشريحة": "Segment",
+  "لا يوجد عملاء": "No customers",
+  "لا نتائج مطابقة لبحثك.": "Nothing matches your search.",
+  "سيظهر العملاء هنا بعد أول عملية.": "Customers appear here after their first transaction.",
+  "العميل": "Customer",
+  "الهاتف": "Phone",
+  "الرصيد": "Balance",
+  "ملف العميل": "Customer profile",
+  "الأرصدة": "Balances",
+  "لا يوجد رصيد.": "No balance.",
+  "لا يوجد نشاط.": "No activity.",
+  "إجمالي العملاء": "Total customers",
+  "مسجّلون في برنامجك": "Enrolled in your programme",
+  "نشطون خلال ٣٠ يومًا": "Active in the last 30 days",
+  "سجّلوا حركة واحدة على الأقل": "At least one movement recorded",
+  "خاملون ٩٠ يومًا": "Dormant for 90 days",
+  "يحتاجون حملة استرجاع": "They need a win-back campaign",
+  "جدد هذا الأسبوع": "New this week",
+  "انضمّوا خلال سبعة أيام": "Joined in the last seven days",
+
+  /* ══════════════ لوحة المعلومات والتقارير ══════════════ */
+  "٧ أيام": "7 days",
+  "٣٠ يومًا": "30 days",
+  "٩٠ يومًا": "90 days",
+  "سنة": "a year",
+  "الفترة": "Period",
+  "عملاء جدد": "New customers",
+  "عملاء جدد في الفترة": "New customers in the period",
+  "العملاء العائدون": "Returning customers",
+  "معدل تكرار الشراء": "Purchase frequency",
+  "عملية لكل عميل نشط في الفترة": "transactions per active customer in the period",
+  "مكافآت مُستبدلة": "Rewards redeemed",
+  "ما صرفه عملاؤك فعلًا": "What your customers actually took",
+  "الالتزام القائم": "Outstanding liability",
+  "الإيراد المسجّل": "Recorded revenue",
+  "فواتير مرّت على برنامج الولاء": "Invoices that went through the programme",
+  "عمليات تحتاج مراجعة": "Transactions to review",
+  "كشف شذوذ آلي": "Automatic anomaly detection",
+  "حركة العمليات": "Transaction volume",
+  "عملاء معرّضون للفقدان": "Customers at risk of leaving",
+  "لا أحد في هذه الشريحة الآن — خبر جيّد.": "Nobody is in this segment right now — good news.",
+  "مؤكدة": "Confirmed",
+  "مرفوضة": "Rejected",
+  "معكوسة": "Reversed",
+  "أحدث العمليات": "Latest transactions",
+  "لا توجد عمليات بعد.": "No transactions yet.",
+  "الوقت": "Time",
+  "الكاشير": "Cashier",
+  "الأثر": "Effect",
+  "الحالة": "Status",
+  "لا مقارنة متاحة": "No comparison available",
+  "العمليات": "Transactions",
+  "لا توجد عمليات في هذه الفترة.": "No transactions in this period.",
+  "إجمالي العمليات": "Total transactions",
+  "إجمالي الإيراد": "Total revenue",
+  "أعلى يوم": "Best day",
+  "معدل تفعيل العميل": "Customer activation rate",
+  "انضموا وأتمّوا عملية واحدة على الأقل": "Joined and completed at least one transaction",
+  "متوسط الفاتورة": "Average invoice",
+  "على": "across",
+  "فاتورة": "invoices",
+  "خلال": "over",
+  "تفصيل حسب الفرع": "Branch by branch",
+  "الفرع الذي لا يطبّق البرنامج يظهر هنا قبل أي مكان آخر":
+    "A branch that is not running the programme shows up here before anywhere else",
+  "لا توجد عمليات مسجّلة بعد.": "No transactions recorded yet.",
+  "الحصة": "Share",
+  "أداء البرامج": "Programme performance",
+  "لا توجد برامج نشطة.": "No active programmes.",
+  "نسبة ما استُبدل إلى ما مُنح. المنخفض جدًا يعني مكافآت بعيدة المنال، والمرتفع جدًا يعني منحًا أكثر من اللازم.":
+    "Redeemed against granted. Very low means the rewards are out of reach; very high means you are granting more than you need to.",
+  "أكثر العملاء إنفاقًا": "Biggest spenders",
+  "لا توجد بيانات كافية بعد.": "Not enough data yet.",
+  "زيارة": "visits",
+
+  /* ══════════════ المراجعة والاحتيال ══════════════ */
+  "خطورة عالية": "High severity",
+  "متوسطة": "Medium",
+  "منخفضة": "Low",
+  "بانتظار المراجعة": "Awaiting review",
+  "لا شيء يحتاج مراجعتك": "Nothing needs your review",
+  "كل العمليات ضمن الأنماط المعتادة لمتجرك.":
+    "Every transaction fits your shop's usual patterns.",
+  "قُبلت": "Accepted",
+  "عُكست": "Reversed",
+  "سقف يومي لكل عميل": "A daily cap per customer",
+  "يضبطه كل برنامج في قواعده": "Each programme sets it in its own rules",
+  "ربط المنح برقم الفاتورة وقيمتها": "Grants tied to an invoice number and amount",
+  "إلزامي — لا منح بلا فاتورة": "Mandatory — no grant without an invoice",
+  "رفض إعادة استخدام نفس الرمز": "The same code cannot be used twice",
+  "الرمز صالح لمرة واحدة وثوانٍ معدودة": "A code is valid once, for seconds",
+  "حساب مستقل لكل كاشير": "A separate account per cashier",
+  "شرط نسبة أي نمط إلى شخص بعينه": "Required to trace any pattern to a person",
+  "سجل تدقيق غير قابل للحذف": "An audit log that cannot be deleted",
+  "العكس يُسجَّل قيدًا جديدًا ولا يمحو القديم":
+    "A reversal is a new entry; it never erases the old one",
+  "الضوابط المفعّلة": "Controls in force",
+
+  /* ══════════════ شاشة دخول التاجر ══════════════ */
+  "برنامج ولائك، تحت سيطرتك": "Your loyalty programme, under your control",
+  "امنح النقاط، اصرف المكافآت، واعرف مَن عاد ومَن غاب — من شاشة واحدة.":
+    "Grant points, redeem rewards, and see who came back and who went quiet — from one screen.",
+  "شاشة كاشير في خطوتين": "A two-step cashier screen",
+  "تقارير تقول ما الذي نجح": "Reports that say what worked",
+  "صلاحيات لكل دور": "Permissions per role",
+  "دخول الموظفين": "Staff sign-in",
+
+  /* ══════════════ البرنامج والمكافآت ══════════════ */
+  "ستة نماذج ولاء داخل نظام واحد": "Six loyalty models in one system",
+  "برامجك": "Your programmes",
+  "متوقف": "Paused",
+  "· أقل فاتورة": "· minimum invoice",
+  "· صلاحية": "· expiry",
+  "· ترحيب": "· welcome",
+  "الالتزام القائم الآن": "Outstanding liability right now",
+  "معاينة البطاقة عند العميل": "How the card looks to the customer",
+  "هكذا يراها عميلك داخل التطبيق مباشرةً.": "This is exactly what your customer sees in the app.",
+  "أضف مكافأة ليظهر للعميل هدف يسعى إليه.":
+    "Add a reward so the customer has something to aim for.",
+  "المنح الجديدة فقط": "New grants only",
+  "معدل المنح": "Earn rate",
+  "أقل فاتورة مؤهّلة": "Minimum qualifying invoice",
+  "يمنع تفتيت الفواتير للحصول على منح متكررة":
+    "Stops invoices being split to farm repeated grants",
+  "السقف اليومي للعميل": "Daily cap per customer",
+  "اتركه فارغًا لبلا سقف — السقف يغلق باب الاحتيال الداخلي":
+    "Leave empty for no cap — a cap closes the door on internal fraud",
+  "صلاحية الرصيد بالأشهر": "Balance expiry, in months",
+  "تُجدَّد مع كل عملية — العميل المنتظم لا يفقد رصيده":
+    "Renewed with every transaction — a regular customer never loses their balance",
+  "مكافأة الانضمام": "Joining bonus",
+  "تُمنح مرة واحدة عند أول عملية": "Granted once, on the first transaction",
+  "برنامج جديد": "New programme",
+  "يظهر للعميل في بطاقته": "Shown to the customer on their card",
+  "مثال: نقاط الذهب": "e.g. Gold Points",
+  "النموذج": "Model",
+  "مكافآت متجرك": "Your shop's rewards",
+  "بلا مكافأة قريبة المنال لا يجد العميل سببًا ليعود.":
+    "With no reward within reach, a customer has no reason to come back.",
+  "المكافأة": "Reward",
+  "التكلفة على العميل": "Cost to the customer",
+  "مرات الاستبدال": "Times redeemed",
+  "تكلفتها عليك": "What it costs you",
+  "المخزون": "Stock",
+  "لم تُصرف بعد": "Not redeemed yet",
+  "بلا حد": "Unlimited",
+  "مفعّلة": "Active",
+  "إيقاف": "Pause",
+  "تفعيل": "Activate",
+  "لا استبدالات بعد": "No redemptions yet",
+  "أقل من النطاق الصحي — المكافآت بعيدة المنال فلا تحفّز أحدًا.":
+    "Below the healthy range — the rewards are out of reach, so they motivate nobody.",
+  "أعلى من النطاق الصحي — أنت تمنح أكثر مما يلزم لإعادة العميل.":
+    "Above the healthy range — you are giving away more than it takes to bring a customer back.",
+  "قيمة المكافأة": "Reward value",
+  "قيمة المكافأة المقترحة": "Suggested reward value",
+  "مكافأة جديدة": "New reward",
+  "البرنامج": "Programme",
+  "عنوان المكافأة": "Reward title",
+  "مثال: قهوة مجانية": "e.g. Free coffee",
+  "التكلفة بالوحدات": "Cost in units",
+  "كم يدفع العميل من رصيده": "How much of their balance the customer pays",
+  "تكلفتها عليك بالجنيه": "What it costs you, in EGP",
+  "يُحسب بها الالتزام القائم — رقم خاطئ هنا يعطيك التزامًا خاطئًا":
+    "Your outstanding liability is computed from this — a wrong number here gives you a wrong liability",
+
+  /* ══════════════ الإعدادات والخصوصية ══════════════ */
+  "موافقة صريحة عند التسجيل": "Explicit consent at sign-up",
+  "مسجّلة بالتاريخ والوقت ورقم النسخة": "Recorded with date, time and version number",
+  "عزل بيانات كل علامة": "Every brand's data is isolated",
+  "لا يرى متجر آخر عميلًا واحدًا من عملائك": "No other shop sees a single one of your customers",
+  "تشفير عند النقل والتخزين": "Encrypted in transit and at rest",
+  "مفعّل دائمًا": "Always on",
+  "حق العميل في التصدير والحذف": "The customer's right to export and delete",
+  "ذاتي من التطبيق بلا وسيط": "Self-service in the app, with nobody in between",
+  "كل قيد يبقى، والعكس يُسجَّل قيدًا جديدًا":
+    "Every entry stays; a reversal is recorded as a new entry",
+  "بيانات المتجر": "Shop details",
+  "اسم المتجر": "Shop name",
+  "يظهر للعميل على بطاقته وفي الدليل العام":
+    "Shown to the customer on their card and in the public directory",
+  "النشاط": "Category",
+  "يحدّد أيقونة متجرك في الدليل": "Sets your shop's icon in the directory",
+  "مثال: مقاهٍ ومشروبات": "e.g. Cafés and drinks",
+  "لون العلامة": "Brand colour",
+  "أنت «المتحكّم» وولائي «المعالِج»": "You are the controller, Walaee is the processor",
+  "الخصوصية وحماية البيانات": "Privacy and data protection",
+
+  /* ══════════════ مشترك ══════════════ */
+  "تعذّر الوصول إلى الخادم. تأكد من اتصالك، ومن أن الخادم يعمل على نفس العنوان.":
+    "Could not reach the server. Check your connection, and that the server is running at the same address.",
+  "جارٍ التحميل": "Loading",
+  "جارٍ التحميل…": "Loading…",
+  "تعذّر إتمام العملية.": "That could not be completed.",
+  "إغلاق": "Close",
+  "إلغاء": "Cancel",
+  "تطبيق العميل": "Customer app",
+  "هنا": "here",
+  "خريطة المتاجر المتعاقدة في مصر": "Map of partner shops across Egypt",
+  "المحافظة": "Governorate",
+  "عدد الفروع": "Branches",
+  "عدد المتاجر": "Shops",
+
+  /* ══════════════ الفئات ══════════════ */
+  "مقاهٍ ومشروبات": "Cafés and drinks",
+  "مأكولات بحرية": "Seafood",
+  "مخبوزات وحلويات": "Bakery and sweets",
+  "مطاعم": "Restaurants",
+  "مشويات": "Grills",
+  "صيدليات": "Pharmacies",
+  "بقالة وسوبر ماركت": "Grocery and supermarket",
+  "تجميل وعناية": "Beauty and care",
+  "رياضة ولياقة": "Sport and fitness",
+  "ملابس وأحذية": "Clothing and shoes",
+  "إلكترونيات": "Electronics",
+  "مكتبات وقرطاسية": "Books and stationery",
+  "هدايا وزهور": "Gifts and flowers",
+
+  /* ══════════════ أفعال وأزرار ══════════════ */
+  "إضافة": "Add",
+  "إنشاء": "Create",
+  "التفاصيل": "Details",
+  "انتقل إليه ›": "Go there ›",
+  "موظف": "Staff member",
+  "مباشر": "Live",
+  "الفرع الحالي": "Current branch",
+  "حسابات تجربة": "Demo accounts",
+  "تسجيل يدوي": "Manual entry",
+  "تسجيل ومنح النقاط": "Record and grant points",
+  "تسجيل عملية أخرى": "Record another",
+  "تأكيد ومنح النقاط": "Confirm and grant points",
+  "صرف المكافأة": "Redeem the reward",
+  "صرف كود آخر": "Redeem another code",
+  "تعديل القواعد": "Edit the rules",
+  "إرسال الآن": "Send now",
+  "إنشاء الحملة": "Create the campaign",
+  "أطلق حملة استرجاع": "Launch a win-back campaign",
+  "إزالة التصفية": "Clear the filter",
+  "التعديل يسري على": "The change applies to",
+  "العملية سليمة": "Transaction is fine",
+  "مخالفة — اعكس النقاط": "Not legitimate — reverse the points",
+  "معدل الاستبدال": "Redemption rate",
+  "متوسط فاتورتك": "Your average invoice",
+  "أنفق": "spent",
+  "كود استبدال بانتظار الصرف": "redemption code waiting to be used",
+  "فتح وضع الكاشير": "Open cashier mode",
+  "افتح شاشة الكاشير": "Open the cashier screen",
+  "افتح لوحة المتجر": "Open the merchant dashboard",
+  "دخول العملاء": "Customer sign-in",
+  "ابدأ كتاجر": "Start as a merchant",
+  "ادخل كعميل": "Sign in as a customer",
+  "أنا عميل — افتح محفظتي": "I am a customer — open my wallet",
+  "بلا أجهزة": "No hardware",
+  "بلا عقد سنوي": "No annual contract",
+  "تجديد فوري": "Instant renewal",
+  "تشغيل في نفس اليوم": "Live the same day",
+  "فرعًا ·": "branches ·",
+  "محافظة من": "governorates of",
+  "يتجدّد تلقائيًا كل": "Renews automatically every",
+
+  /* ══════════════ جُمل وشروح ══════════════ */
+  "رمز متغيّر كل ٣٠ ثانية على شاشتك — العميل يمسحه ويُدخل قيمة الفاتورة، وأنت تؤكّد. لا أجهزة إضافية، ولا يمكن إعادة استخدام الرمز.":
+    "A code that changes every 30 seconds on your screen — the customer scans it and enters the invoice amount, and you confirm. No extra hardware, and the code cannot be reused.",
+  "رقم العميل ثم قيمة الفاتورة. لا تدريب ولا جهاز إضافي.":
+    "The customer's number, then the invoice amount. No training, no extra device.",
+  "الكاشير يعمل خطوة واحدة، والعميل يشوف نتيجتها على طول. مفيش وسيط ولا انتظار ولا «هيتحدّث بعدين».":
+    "The cashier does one step and the customer sees the result immediately. No middleman, no waiting, no “it will update later”.",
+  "أي حد يقدر يوزّع نقاط. الصعب إنك تعرف إن النقاط دي رجّعت عميل فعلًا، وإن محدش بيلعب فيها.":
+    "Anyone can hand out points. The hard part is knowing they actually brought a customer back, and that nobody is gaming them.",
+  "خلّي عميلك يرجع تاني،": "Bring your customer back —",
+  "وبرهن إن ده بيحصل.": "and prove that it is working.",
+  "أي مكافأة تُصرف فعلًا، وكم يكلّفك الالتزام القائم.":
+    "Which rewards actually get redeemed, and what your outstanding liability costs you.",
+  "اختر النموذج المناسب لنشاطك — المقهى يفضّل الأختام، والصيدلية النقاط، وغسيل السيارات الاسترداد النقدي. ويمكنك تشغيل أكثر من نموذج في نفس الوقت.":
+    "Pick the model that fits your trade — a café tends to prefer stamps, a pharmacy points, a car wash cashback. You can run more than one at a time.",
+  "النظام يربط كل منح برقم الفاتورة وقيمتها، ويكشف الشذوذ آليًا، ويحتفظ بسجل تدقيق غير قابل للحذف. ما يظهر هنا اقتراح للمراجعة لا اتهامًا — والقرار لك.":
+    "The system ties every grant to an invoice number and amount, flags anomalies automatically, and keeps an audit log that cannot be deleted. What appears here is a suggestion to review, not an accusation — the decision is yours.",
+  "«العملية سليمة» تغلق الإشارة بلا أي تغيير على الرصيد. «مخالفة» تعكس النقاط الممنوحة بقيود مضادة — والقيود الأصلية تبقى في السجل.":
+    "“Transaction is fine” closes the flag without touching any balance. “Not legitimate” reverses the granted points with counter-entries — and the original entries stay in the log.",
+  "حساب مستقل لكل كاشير شرطٌ لكشف الاحتيال: الحساب المشترك بين اثنين يجعل نسبة أي نمط مشبوه إلى شخص بعينه مستحيلة.":
+    "A separate account per cashier is what makes fraud detectable: an account shared by two people makes it impossible to trace a suspicious pattern to a person.",
+  "الكاشير يؤكّد العمليات ولا يرى التقارير ولا يضيف موظفين.":
+    "A cashier confirms transactions; they do not see reports and cannot add staff.",
+  "مؤسسة ← علامة تجارية ← فرع ← نقطة بيع ← مستخدم. بناء هذا التسلسل لاحقًا يعني ترحيل بيانات مؤلمًا وإعادة كتابة الصلاحيات والتقارير معًا.":
+    "Organisation → brand → branch → till → user. Building this hierarchy later means a painful data migration and rewriting permissions and reports at the same time.",
+  "الرسائل تُحسب بالفعلي المُرسَل. تجاوز الحد بيوقف الحملات بس — ما بيوقفش تسجيل النقاط ولا صرف المكافآت عند الصندوق.":
+    "Messages are charged on what is actually sent. Going over the limit only stops campaigns — it never stops points being recorded or rewards being redeemed at the till.",
+  "عميل لا يمكن الوصول إليه — لن تُحتسب عليك تكلفتهم.":
+    "customers could not be reached — you are not charged for them.",
+  "لم يعودوا خلال ضعف متوسط فترة زيارتهم المعتادة.":
+    "They have not come back within twice their usual gap between visits.",
+  "معدل الاستبدال يظهر هنا بعد أول مكافأة يصرفها عميل.":
+    "The redemption rate appears here after the first reward a customer takes.",
+  "تظهر المقارنة بعد أول فواتير مسجّلة على البرنامج.":
+    "The comparison appears once the first invoices are recorded on the programme.",
+  "— تقدير يعتمد على هامش نموذجي، والهامش الحقيقي تعرفه أنت.":
+    "— an estimate based on a typical margin; you are the one who knows your real margin.",
+  "وحدة. تقصير مدة الصلاحية يخفضه.": "units. A shorter expiry brings it down.",
+  ". أرصدة العملاء الحالية لا تتغيّر — وهذا مقصود: تغيير رصيد عميل بأثر رجعي بلا أن يفعل شيئًا يفقده الثقة.":
+    ". Existing customer balances do not change — deliberately: moving someone's balance retroactively, without them doing anything, is how you lose their trust.",
+  ". لحذف برنامج الولاء نهائيًا أو تصدير كل بياناتك، تواصل مع فريق ولائي — الإجراء يدوي عمدًا لأنه غير قابل للتراجع.":
+    ". To delete the loyalty programme for good, or export all your data, contact the Walaee team — the process is manual on purpose, because it cannot be undone.",
+  "بيانات عملائك ملكك. ولائي يعالجها نيابةً عنك، ولا تُشارك مع أي متجر آخر على المنصة.":
+    "Your customer data is yours. Walaee processes it on your behalf, and it is never shared with any other shop on the platform.",
+  "يُستخدم في بطاقة العميل. تغييره يحتاج مراجعة الفريق حتى لا تفقد البطاقة تباينها مع النص الأبيض.":
+    "Used on the customer's card. Changing it needs a review by the team so the card keeps enough contrast with white text.",
+  "أرسلنا الفاتورة إلى شاشة الكاشير. ستُضاف نقاطك فور تأكيده — لا تغلق التطبيق قبل ذلك.":
+    "We sent the invoice to the cashier's screen. Your points land the moment they confirm — do not close the app before then.",
+  "بالمتابعة أنت توافق على تلقّي رسائل من المتاجر التي تنضم إليها. يمكنك إلغاء الموافقة في أي وقت من صفحة حسابك.":
+    "By continuing you agree to receive messages from the shops you join. You can withdraw that consent any time from your account page.",
+  "سنرسل كود تأكيد إلى رقمك. بعد التأكيد تُمحى بياناتك الشخصية ولا يمكن استرجاعها.":
+    "We will send a confirmation code to your number. Once confirmed, your personal data is erased and cannot be recovered.",
+  "تُمحى بياناتك الشخصية نهائيًا. سجلات المعاملات تبقى بمعرّف مجهول لأن أرصدة المتاجر محسوبة عليها.":
+    "Your personal data is erased for good. Transaction records stay under an anonymous identifier, because shop balances are calculated from them.",
+  "هننبّهك قبلها. الرصيد ده خاص بـ": "We will warn you before then. This balance belongs to",
+  "وحده.": "alone.",
+  "مفيش متجر بالمواصفات دي لسه. جرّب محافظة تانية أو شيل التصفية.":
+    "No shop matches that yet. Try another governorate, or clear the filter.",
+  "كل نقطة على الخريطة فرع شغّال فعلًا ببرنامج ولاء على المنصة. اضغط على أي محافظة تشوف متاجرها.":
+    "Every dot on the map is a branch actually running a loyalty programme on the platform. Tap any governorate to see its shops.",
+  "كل الأسعار بالجنيه المصري شهريًا. تقدر تغيّر باقتك أو توقفها في أي وقت، وبياناتك بتفضل معاك.":
+    "All prices are in Egyptian pounds per month. You can change or stop your plan any time, and your data stays with you.",
+  "عايز تشوفها شغّالة قبل ما تقرّر؟ لوحة التجربة مفتوحة بحسابات جاهزة — مالك ومدير وكاشير.":
+    "Want to see it working before you decide? The demo is open with ready-made accounts — owner, manager and cashier.",
+  "استخدم الرقم الذي سجّله مالك المتجر لك. لكل موظف حساب مستقل.":
+    "Use the number the shop owner registered for you. Every staff member has their own account.",
+  "نسيت كلمة المرور؟ مالك المتجر يستطيع إعادة ضبطها لك من صفحة الموظفين.":
+    "Forgotten your password? The shop owner can reset it for you from the staff page.",
+  "باقي الصفحة يعمل. جرّب مرة أخرى بعد لحظات، أو ادخل إلى التطبيق مباشرةً.":
+    "The rest of the page still works. Try again in a moment, or go straight to the app.",
+  "منصة مصرية — تعمل بالجنيه وبالعربية": "An Egyptian platform — in pounds, in Arabic",
+  "منصة مصرية لإدارة برامج الولاء متعدّدة المتاجر. مبنية بالعربية وبالجنيه من أول سطر.":
+    "An Egyptian platform for running multi-merchant loyalty programmes. Built in Arabic and in pounds from the first line.",
+  "ولائي منصة لإدارة برامج الولاء للمتاجر: نقاط، أختام، زيارات، واسترداد نقدي. تشتغل من الصندوق برقم تليفون العميل — من غير جهاز جديد، ومن غير ما يحمّل تطبيق.":
+    "Walaee runs loyalty programmes for shops: points, stamps, visits and cashback. It works from the till using the customer's phone number — no new device, and nothing for them to install.",
+
+  /* ══════════════ جُمل بأرقام داخلها ══════════════
+     `{name}` يُستبدَل عند العرض. الموضع يتغيّر بين اللغتين، وهذا
+     سبب وجود الاسم أصلًا: «خلال ٩٠ يومًا» تصير "over the last 90
+     days" — الرقم في وسط الجملة هنا وفي آخرها هناك. */
+  "في {gov}": "in {gov}",
+  "انضم لـ{n} متجرًا شغّالين على المنصة دلوقتي.":
+    "Join {n} shops already running on the platform.",
+  "كل {unit} تقرّبك من المكافأة.": "Every {unit} brings you closer to the reward.",
+  "عندك {what}": "You have {what}",
+  "من {n} {unit}": "of {n} {unit}",
+  "{branches} فرعًا لـ{brands} متجرًا في {govs} محافظة.":
+    "{branches} branches across {brands} shops in {govs} governorates.",
+  "فرعًا في": "branches across",
+  "و{n} غيرها": "and {n} more",
+  "مستهدف · تكلفة مقدَّرة": "targeted · estimated cost",
+  "من {n} عميل مسجّل": "of {n} enrolled customers",
+  "{repeat} من {active} نشط": "{repeat} of {active} active",
+  "{n} وحدة غير مستبدَلة": "{n} units not yet redeemed",
+  "لكل جنيه": "per pound",
+  "قواعد {name}": "{name} rules",
+  "على {n} فاتورة": "across {n} invoices",
+  "خلال {range}": "over the last {range}",
+  "{n} مرة": "{n} times",
+  "داخل النطاق الصحي ({min}–{max}٪).": "Inside the healthy range ({min}–{max}%).",
+  "«{title}» أعلى من الحد الموصى به.": "“{title}” is above the recommended ceiling.",
+  "{n} مكافآت أعلى من الحد الموصى به.": "{n} rewards are above the recommended ceiling.",
+  "{brands} متجرًا · {branches} فرعًا · {govs} محافظة":
+    "{brands} shops · {branches} branches · {govs} governorates",
+  "مؤسسة مشتركة من": "subscribed organisations of",
+  "{n} فرعًا": "{n} branches",
+  "{n} جديد في ٣٠ يومًا": "{n} new in 30 days",
+  "{n} قيدًا في الدفتر": "{n} entries in the ledger",
+  "سداد {number}": "Settle {number}",
+  "فشل الطلب ({status})": "The request failed ({status})",
+  "الكود {code}": "Code {code}",
+  "{n} فرع": "{n} branches",
+
+  /* ══════════════ شظايا تجاور رقمًا ══════════════
+     نصّ قصير يقع قبل تعبير أو بعده: «{عدد} فرعًا». لا يصحّ ضمّه
+     إلى الرقم في مفتاح واحد لأن الرقم يتغيّر، ولا تركه بالعربية
+     لأنه يظهر إلى جانبه على الشاشة. */
+  "آخر": "Last",
+  "من": "of",
+  "و": "and",
+  "٪": "%",
+  "فرع ·": "branches ·",
+  "· تحتاج": "· you need",
+  "شهرًا": "months",
+  "موظفًا": "staff",
+  "متأخرة السداد": "past due",
+  "ينتهي": "ends",
+  "رصيدك الحالي": "Your balance is now",
+  "رصيد رسائلك": "Your message balance is",
+  "رصيدك صالح حتى": "Your balance is valid until",
+  "عند الاكتمال تحصل على": "When it is complete you get",
+  "عملية تحتاج مراجعتك": "transactions need your review",
+  "روجعت هذه الإشارة في": "This flag was reviewed on",
+  "العلامة أُنشئت": "The brand was created on",
+  "اعرض هذا الرمز للعميل —": "Show this code to the customer —",
+  "باقتك:": "Your plan:",
+  "القيمة النقدية لما مُنح ولم يُستبدَل بعد —":
+    "The cash value of what has been granted and not yet redeemed —",
+  "، فالقيمة المعقولة للمكافأة بين": ", so a sensible reward value is between",
+
+  /* ══════════════ تسميات تأتي من الخلفية ══════════════
+     هذه ليست نصوص شاشة بل `*_label` تُرسلها الخلفية مشتقّةً من
+     `choices` في النماذج: حالة عملية، سبب قيد، وحدة مكافأة، قناة
+     رسالة، قاعدة شذوذ. لا تُترجَم في Django بل هنا، لأن القاموس
+     واحد — ولو تُرجمت هناك لصار للمنتج مصدرا ترجمة ينحرف أحدهما
+     عن الآخر بلا أن يكشفه شيء. */
+
+  /* أسباب القيود */
+  "منح": "Earned",
+  "انتهاء صلاحية": "Expired",
+  "عكس": "Reversal",
+  "تسوية": "Adjustment",
+  "مكافأة انضمام": "Joining bonus",
+
+  /* حالات العمليات */
+  "معلّقة": "Pending",
+  "مؤكّدة": "Confirmed",
+
+  /* حالات الاستبدال */
+  "بانتظار الصرف": "Awaiting redemption",
+  "مصروفة": "Redeemed",
+  "منتهية": "Expired",
+
+  /* حالات العضوية */
+  "محظورة": "Blocked",
+
+  /* قنوات الرسائل */
+  "إشعار التطبيق": "In-app notification",
+  "واتساب": "WhatsApp",
+  "رسالة نصية": "SMS",
+
+  /* حالات مهامّ الرسائل */
+  "في الطابور": "Queued",
+  "وصلت": "Delivered",
+  "قُرئت": "Read",
+  "تُخطّيت": "Skipped",
+
+  /* حالات الفواتير والاشتراك */
+  "صادرة": "Issued",
+  "مدفوعة": "Paid",
+  "تجريبي": "Trial",
+  "متأخر السداد": "Past due",
+  "ملغى": "Cancelled",
+
+  "لا أحد": "Nobody",
+  "عميل واحد": "customer",
+  "عميلان": "customers",
+  "عملاء": "customers",
+  "عميلًا": "customers",
+
+  /* أدوار حسابات التجربة */
+  "مدير المنصة": "Platform admin",
+  "مالك المتجر": "Shop owner",
+  "مدير الفرع": "Branch manager",
+
+  /* حركات رصيد الرسائل */
+  "شحن": "Top-up",
+  "منحة شهرية": "Monthly grant",
+  "استرداد": "Refund",
+
+  /* قواعد كشف الشذوذ */
+  "نفس العميل عدة مرات في دقائق": "The same customer several times within minutes",
+  "كاشير يؤكّد عمليات كثيرة بسرعة": "A cashier confirming many transactions quickly",
+  "مبلغ مستدير كبير": "A large round amount",
+  "الكاشير يمنح نقاطًا لرقمه": "A cashier granting points to their own number",
+  "فاتورة أكبر بكثير من متوسط الفرع": "An invoice far above the branch average",
+
+  /* ══════════════ أسماء الأماكن ══════════════
+     المحافظات والمدن بيانات المنصة لا بيانات التاجر — مكتوبة في
+     `tenancy/geo.py` و`tenancy/network.py`، فترجمتها ليست اختراعًا
+     على أحد. النقل بالحرف اللاتيني المعتاد دوليًا (Cairo لا
+     al-Qāhira): الخريطة الإنجليزية تُقرأ بجوار أي خريطة أخرى.
+
+     أسماء العلامات والفروع تبقى بالعربية — تلك يكتبها التاجر. */
+
+  "متاجر {gov}": "Shops in {gov}",
+
+  /* المحافظات */
+  "القاهرة": "Cairo",
+  "الجيزة": "Giza",
+  "القليوبية": "Qalyubia",
+  "الإسكندرية": "Alexandria",
+  "البحيرة": "Beheira",
+  "كفر الشيخ": "Kafr El Sheikh",
+  "الغربية": "Gharbia",
+  "المنوفية": "Monufia",
+  "الدقهلية": "Dakahlia",
+  "دمياط": "Damietta",
+  "الشرقية": "Sharqia",
+  "بورسعيد": "Port Said",
+  "الإسماعيلية": "Ismailia",
+  "السويس": "Suez",
+  "الفيوم": "Faiyum",
+  "بني سويف": "Beni Suef",
+  "المنيا": "Minya",
+  "أسيوط": "Asyut",
+  "سوهاج": "Sohag",
+  "قنا": "Qena",
+  "الأقصر": "Luxor",
+  "أسوان": "Aswan",
+  "البحر الأحمر": "Red Sea",
+  "الوادي الجديد": "New Valley",
+  "مطروح": "Matrouh",
+  "شمال سيناء": "North Sinai",
+  "جنوب سيناء": "South Sinai",
+
+  /* المدن */
+  "الجونة": "El Gouna",
+  "الخارجة": "Kharga",
+  "الزقازيق": "Zagazig",
+  "العاشر من رمضان": "10th of Ramadan",
+  "العريش": "Arish",
+  "الغردقة": "Hurghada",
+  "المحلة الكبرى": "Mahalla El Kubra",
+  "المنصورة": "Mansoura",
+  "بنها": "Benha",
+  "دمنهور": "Damanhur",
+  "دهب": "Dahab",
+  "شبرا الخيمة": "Shubra El Kheima",
+  "شبين الكوم": "Shibin El Kom",
+  "شرم الشيخ": "Sharm El Sheikh",
+  "طنطا": "Tanta",
+  "مرسى علم": "Marsa Alam",
+  "مرسى مطروح": "Marsa Matrouh",
+  "ميت غمر": "Mit Ghamr",
+  "٦ أكتوبر": "6th of October",
+
+  /* ══════════════ التفضيلات ══════════════ */
+  "المظهر واللغة": "Appearance and language",
+  "نهاري": "Light",
+  "ليلي": "Dark",
+  "النظام": "System",
+  "السمة": "Theme",
+  "اللغة": "Language",
+  "حساب محذوف": "Deleted account",
+
+  /* ══════════════ إعادة تصميم تطبيق العميل ══════════════ */
+  "نشاطك الأخير": "Recent activity",
+  "باقي {n} {unit} في {brand}": "{n} {unit} to go at {brand}",
+  "جاهزة الآن — من {brand}": "Ready now — at {brand}",
+  "{n} جاهزة الآن و{m} قريبة": "{n} ready now, {m} coming up",
+  "قريبة منك": "Almost there",
+  "جنيهًا أنفقتها": "EGP spent",
+  "بطاقاتك النشطة": "Your active cards",
+  "المحفظة": "Wallet",
+  "ابحث عن متجر أو فئة أو مدينة…": "Search a store, category or city…",
+  "لا يوجد متجر بهذا الاسم": "No store by that name",
+  "جرّب اسم فئة أو مدينة، أو اعرض الكل.": "Try a category or a city, or show all.",
+  "متجرًا": "stores",
+
+  /* ══════════════ حروف أيام الأسبوع ══════════════
+     شريط السلسلة في تطبيق العميل. الخادم يرسل حرفًا عربيًا واحدًا
+     لكل يوم (`WEEKDAY_LETTERS` مرتّبة من الاثنين إلى الأحد)،
+     وتركه كما هو كان يترك سبعة حروف عربية وسط شاشة إنجليزية.
+     الحرفان المكرّران (T للثلاثاء والخميس، S للسبت والأحد) هما
+     العُرف الإنجليزي نفسه. */
+  "ن": "M",
+  "ث": "T",
+  "ر": "W",
+  "خ": "T",
+  "ج": "F",
+  "س": "S",
+  "ح": "S",
+
+  "أهلًا {name}": "Hi {name}",
+};

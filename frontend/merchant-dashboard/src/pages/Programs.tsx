@@ -11,16 +11,17 @@ import { useState } from "react";
 import {
   Badge,
   Button,
-  Empty,
   ErrorBox,
   Field,
+  Icon,
   Loading,
   Modal,
   fmt,
+  t,
   useAction,
   useApi,
 } from "@walaee/shared";
-import type { Program, Reward } from "@walaee/shared";
+import type { Program } from "@walaee/shared";
 
 import { actions, queries } from "../lib/queries";
 import { atLeast } from "../lib/session";
@@ -36,23 +37,35 @@ const TYPES = [
 
 export function Programs() {
   const programs = useApi((signal) => queries.programs(signal), []);
-  const rewards = useApi((signal) => queries.rewards(signal), []);
 
   const [editing, setEditing] = useState<Program | null>(null);
   const [creatingProgram, setCreatingProgram] = useState(false);
-  const [creatingReward, setCreatingReward] = useState(false);
 
   return (
     <div className="stack gap-lg">
-      <header className="row between wrap">
-        <div>
-          <h1>البرامج والمكافآت</h1>
-          <p className="t-sm muted">قواعد المنح وما يمكن للعميل استبداله</p>
+      <section className="card card-p tint-o">
+        <div className="row-t">
+          <span className="ibox o" style={{ background: "#fff" }}>
+            <Icon name="layers" size={20} />
+          </span>
+          <div className="grow">
+            <b>{t("ستة نماذج ولاء داخل نظام واحد")}</b>
+            <p className="t-sm muted mt-1">
+              {t("اختر النموذج المناسب لنشاطك — المقهى يفضّل الأختام، والصيدلية النقاط، وغسيل السيارات الاسترداد النقدي. ويمكنك تشغيل أكثر من نموذج في نفس الوقت.")}
+            </p>
+          </div>
         </div>
+      </section>
+
+      <div className="row between wrap-f">
+        <h3 className="t-lg">{t("برامجك")}</h3>
         {atLeast("owner") && (
-          <Button onClick={() => setCreatingProgram(true)}>برنامج جديد</Button>
+          <Button size="md" onClick={() => setCreatingProgram(true)}>
+            <Icon name="plus" size={15} />
+            {t("برنامج جديد")}
+          </Button>
         )}
-      </header>
+      </div>
 
       {programs.loading && <Loading />}
       {programs.error != null && (
@@ -67,7 +80,7 @@ export function Programs() {
                 <div className="row" style={{ gap: 8 }}>
                   <span className="w-7">{program.name}</span>
                   <Badge tone={program.is_active ? "green" : "muted"}>
-                    {program.is_active ? "نشط" : "متوقف"}
+                    {program.is_active ? t("نشط") : t("متوقف")}
                   </Badge>
                   <Badge tone="violet">
                     {TYPES.find((t) => t.value === program.type)?.label ??
@@ -76,11 +89,11 @@ export function Programs() {
                 </div>
                 {program.rule && (
                   <p className="t-sm muted">
-                    <span className="num">{program.rule.earn_rate}</span>{" "}
-                    {program.unit_label} لكل جنيه
+                    <span className="num">{fmt.number(program.rule.earn_rate, 2)}</span>{" "}
+                    {t(program.unit_label)} {t("لكل جنيه")}
                     {Number(program.rule.min_invoice) > 0 && (
                       <>
-                        {" · أقل فاتورة "}
+                        {t(" · أقل فاتورة ")}
                         <span className="num">
                           {fmt.money(program.rule.min_invoice)}
                         </span>
@@ -88,15 +101,15 @@ export function Programs() {
                     )}
                     {program.rule.expiry_months && (
                       <>
-                        {" · صلاحية "}
-                        <span className="num">{program.rule.expiry_months}</span>{" "}
-                        شهرًا
+                        {t(" · صلاحية ")}
+                        <span className="num">{fmt.number(program.rule.expiry_months)}</span>{" "}
+                        {t("شهرًا")}
                       </>
                     )}
                     {program.rule.welcome_bonus > 0 && (
                       <>
-                        {" · ترحيب "}
-                        <span className="num">{program.rule.welcome_bonus}</span>
+                        {t(" · ترحيب ")}
+                        <span className="num">{fmt.number(program.rule.welcome_bonus)}</span>
                       </>
                     )}
                   </p>
@@ -105,7 +118,7 @@ export function Programs() {
 
               {atLeast("owner") && (
                 <Button variant="ghost" onClick={() => setEditing(program)}>
-                  تعديل القواعد
+                  {t("تعديل القواعد")}
                 </Button>
               )}
             </div>
@@ -113,28 +126,10 @@ export function Programs() {
         ))}
       </div>
 
-      <section className="stack gap">
-        <div className="row between wrap">
-          <h2>المكافآت</h2>
-          <Button variant="ghost" onClick={() => setCreatingReward(true)}>
-            مكافأة جديدة
-          </Button>
-        </div>
-
-        {rewards.data?.length === 0 && (
-          <Empty
-            icon="🎁"
-            title="لا توجد مكافآت"
-            hint="بلا مكافأة قريبة المنال لا يجد العميل سببًا ليعود."
-          />
-        )}
-
-        <div className="stack gap">
-          {rewards.data?.map((reward) => (
-            <RewardRow key={reward.id} reward={reward} onChange={rewards.reload} />
-          ))}
-        </div>
-      </section>
+      <div className="dash-split">
+        {atLeast("owner") && <LiabilityCard />}
+        <CardPreview />
+      </div>
 
       <RuleModal
         program={editing}
@@ -154,58 +149,134 @@ export function Programs() {
         }}
       />
 
-      <NewRewardModal
-        open={creatingReward}
-        programs={programs.data ?? []}
-        onClose={() => setCreatingReward(false)}
-        onCreated={() => {
-          setCreatingReward(false);
-          rewards.reload();
-        }}
-      />
     </div>
   );
 }
 
-function RewardRow({
-  reward,
-  onChange,
-}: {
-  reward: Reward;
-  onChange: () => void;
-}) {
-  const toggle = useAction(actions.updateReward);
+/**
+ * الالتزام القائم بجوار قواعد البرنامج.
+ *
+ * مكانه هنا لا في لوحة المعلومات: هذا الرقم **نتيجة** للقواعد
+ * أعلاه — معدل المنح وصلاحية الرصيد وثمن المكافآت. وضعه بجوارها
+ * يجعل أثر أي تعديل مرئيًا في نفس الشاشة بدل أن يُكتشَف بعد شهر.
+ */
+function LiabilityCard() {
+  const liability = useApi((signal) => queries.liability(signal), []);
+
+  if (liability.loading) return <Loading />;
+  if (liability.error != null || !liability.data) return null;
+
+  const data = liability.data;
 
   return (
-    <div className="reward-row">
-      <div className="grow">
-        <p className="w-7">{reward.title}</p>
-        <p className="t-sm muted">
-          <span className="num">{fmt.number(reward.cost_amount)}</span>{" "}
-          {reward.unit_label ?? "نقطة"} · تكلفتها عليك{" "}
-          <span className="num">{fmt.money(reward.merchant_cost ?? "0")}</span>
-          {reward.stock !== null && (
-            <>
-              {" · المخزون "}
-              <span className="num">{fmt.number(reward.stock)}</span>
-            </>
+    <section className="card card-p tint-a">
+      <div className="row-t">
+        <span className="ibox a" style={{ background: "#fff" }}>
+          <Icon name="wallet" size={20} />
+        </span>
+        <div className="grow">
+          <b className="t-sm">{t("الالتزام القائم الآن")}</b>
+          <p className="t-2xl w-8 num mt-1">
+            {fmt.money(data.estimated_value)}
+          </p>
+          <p className="t-xs muted mt-1">
+            {t("القيمة النقدية لما مُنح ولم يُستبدَل بعد —")}{" "}
+            <span className="num">{fmt.number(data.total_units)}</span> {t("وحدة. تقصير مدة الصلاحية يخفضه.")}
+          </p>
+
+          {data.by_program.length > 1 && (
+            <div className="stack gap mt-3">
+              {data.by_program.map((line) => (
+                <div key={line.program_id} className="row between t-sm">
+                  <span>{line.program_name}</span>
+                  <span className="num w-7">
+                    {fmt.money(line.estimated_value)}
+                  </span>
+                </div>
+              ))}
+            </div>
           )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * معاينة البطاقة كما يراها العميل.
+ *
+ * نفس مكوّن البطاقة في تطبيق العميل ونفس أنماطه من المكتبة
+ * المشتركة — لا رسم توضيحي. التاجر يضبط قاعدة هنا ويرى أثرها على
+ * ما سيصل عميله، وهو الشيء الوحيد الذي يهمّه من كل هذه الحقول.
+ */
+function CardPreview() {
+  const brand = useApi((signal) => queries.brand(signal), []);
+  const programs = useApi((signal) => queries.programs(signal), []);
+  const rewards = useApi((signal) => queries.rewards(signal), []);
+
+  if (!brand.data) return null;
+
+  const program = programs.data?.find((p) => p.is_active) ?? programs.data?.[0];
+  const reward = [...(rewards.data ?? [])]
+    .filter((r) => r.is_active !== false)
+    .sort((a, b) => Number(a.cost_amount) - Number(b.cost_amount))[0];
+
+  const goal = reward ? Number(reward.cost_amount) : 0;
+  // قيمة معروضة لا رصيد عميل: سبعون بالمئة من الهدف تُظهر الشريط
+  // في حالته الوسطى، وهي الحالة التي يراها التاجر أكثر من غيرها.
+  const shown = goal ? Math.round(goal * 0.7) : 0;
+
+  return (
+    <section className="card">
+      <div className="card-hd">
+        <h3>{t("معاينة البطاقة عند العميل")}</h3>
+      </div>
+      <div className="card-p">
+        <div style={{ maxWidth: 300, marginInline: "auto" }}>
+          <div
+            className="lcard"
+            style={{ "--brand": brand.data.primary_color } as React.CSSProperties}
+          >
+            <div className="lc-top">
+              <span className="lc-logo">
+                {brand.data.name.trim().charAt(0)}
+              </span>
+              <div className="grow">
+                <p className="lc-name">{brand.data.name}</p>
+                <p className="lc-cat">{brand.data.category || t("متجر")}</p>
+              </div>
+            </div>
+
+            <div className="lc-mid">
+              <div>
+                <p className="lc-val num">{fmt.number(shown)}</p>
+                <p className="lc-unit">
+                  {goal
+                    ? t("من {n} {unit}", {
+                        n: fmt.number(goal),
+                        unit: t(program?.unit_label ?? ""),
+                      })
+                    : (program?.unit_label ?? t("نقطة"))}
+                </p>
+              </div>
+              {reward && <span className="lc-rew">{reward.title}</span>}
+            </div>
+
+            {goal > 0 && (
+              <div className="lc-bar">
+                <i style={{ width: "70%" }} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <p className="t-sm muted center mt-2">
+          {reward
+            ? t("هكذا يراها عميلك داخل التطبيق مباشرةً.")
+            : t("أضف مكافأة ليظهر للعميل هدف يسعى إليه.")}
         </p>
       </div>
-
-      <Button
-        variant="ghost"
-        loading={toggle.loading}
-        onClick={async () => {
-          const done = await toggle.run(reward.id, {
-            is_active: !reward.is_active,
-          });
-          if (done) onChange();
-        }}
-      >
-        {reward.is_active ? "إيقاف" : "تفعيل"}
-      </Button>
-    </div>
+    </section>
   );
 }
 
@@ -229,7 +300,7 @@ function RuleModal({
   return (
     <Modal
       open
-      title={`قواعد ${program.name}`}
+      title={t("قواعد {name}", { name: program.name })}
       onClose={onClose}
       footer={
         <>
@@ -243,22 +314,20 @@ function RuleModal({
               }
             }}
           >
-            حفظ
+            {t("حفظ")}
           </Button>
           <Button variant="ghost" onClick={onClose}>
-            تراجع
+            {t("تراجع")}
           </Button>
         </>
       }
     >
       <div className="stack gap">
         <div className="notice">
-          التعديل يسري على <strong>المنح الجديدة فقط</strong>. أرصدة العملاء
-          الحالية لا تتغيّر — وهذا مقصود: تغيير رصيد عميل بأثر رجعي بلا أن
-          يفعل شيئًا يفقده الثقة.
+          {t("التعديل يسري على")} <strong>{t("المنح الجديدة فقط")}</strong>{t(". أرصدة العملاء الحالية لا تتغيّر — وهذا مقصود: تغيير رصيد عميل بأثر رجعي بلا أن يفعل شيئًا يفقده الثقة.")}
         </div>
 
-        <Field label="معدل المنح" hint={`كم ${program.unit_label} لكل جنيه`}>
+        <Field label={t("معدل المنح")} hint={`كم ${t(program.unit_label)} {t("لكل جنيه")}`}>
           <input
             className="input num"
             type="number"
@@ -270,8 +339,8 @@ function RuleModal({
         </Field>
 
         <Field
-          label="أقل فاتورة مؤهّلة"
-          hint="يمنع تفتيت الفواتير للحصول على منح متكررة"
+          label={t("أقل فاتورة مؤهّلة")}
+          hint={t("يمنع تفتيت الفواتير للحصول على منح متكررة")}
         >
           <input
             className="input num"
@@ -284,8 +353,8 @@ function RuleModal({
         </Field>
 
         <Field
-          label="السقف اليومي للعميل"
-          hint="اتركه فارغًا لبلا سقف — السقف يغلق باب الاحتيال الداخلي"
+          label={t("السقف اليومي للعميل")}
+          hint={t("اتركه فارغًا لبلا سقف — السقف يغلق باب الاحتيال الداخلي")}
         >
           <input
             className="input num"
@@ -298,8 +367,8 @@ function RuleModal({
         </Field>
 
         <Field
-          label="صلاحية الرصيد بالأشهر"
-          hint="تُجدَّد مع كل عملية — العميل المنتظم لا يفقد رصيده"
+          label={t("صلاحية الرصيد بالأشهر")}
+          hint={t("تُجدَّد مع كل عملية — العميل المنتظم لا يفقد رصيده")}
         >
           <input
             className="input num"
@@ -310,7 +379,7 @@ function RuleModal({
           />
         </Field>
 
-        <Field label="مكافأة الانضمام" hint="تُمنح مرة واحدة عند أول عملية">
+        <Field label={t("مكافأة الانضمام")} hint={t("تُمنح مرة واحدة عند أول عملية")}>
           <input
             className="input num"
             type="number"
@@ -342,7 +411,7 @@ function NewProgramModal({
   return (
     <Modal
       open={open}
-      title="برنامج جديد"
+      title={t("برنامج جديد")}
       onClose={onClose}
       footer={
         <Button
@@ -356,21 +425,21 @@ function NewProgramModal({
             }
           }}
         >
-          إنشاء
+          {t("إنشاء")}
         </Button>
       }
     >
       <div className="stack gap">
-        <Field label="الاسم" hint="يظهر للعميل في بطاقته">
+        <Field label={t("الاسم")} hint={t("يظهر للعميل في بطاقته")}>
           <input
             className="input"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="مثال: نقاط الذهب"
+            placeholder={t("مثال: نقاط الذهب")}
           />
         </Field>
 
-        <Field label="النموذج">
+        <Field label={t("النموذج")}>
           <select
             className="input"
             value={type}
@@ -378,116 +447,10 @@ function NewProgramModal({
           >
             {TYPES.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.label)}
               </option>
             ))}
           </select>
-        </Field>
-
-        {create.error != null && <ErrorBox error={create.error} />}
-      </div>
-    </Modal>
-  );
-}
-
-function NewRewardModal({
-  open,
-  programs,
-  onClose,
-  onCreated,
-}: {
-  open: boolean;
-  programs: Program[];
-  onClose: () => void;
-  onCreated: () => void;
-}) {
-  const [form, setForm] = useState({
-    title: "",
-    cost_amount: "",
-    merchant_cost: "",
-    program_id: "",
-  });
-  const create = useAction(actions.createReward);
-
-  const programId = form.program_id || programs[0]?.id || "";
-
-  return (
-    <Modal
-      open={open}
-      title="مكافأة جديدة"
-      onClose={onClose}
-      footer={
-        <Button
-          loading={create.loading}
-          disabled={!form.title.trim() || !form.cost_amount || !programId}
-          onClick={async () => {
-            const done = await create.run({
-              title: form.title.trim(),
-              cost_amount: form.cost_amount,
-              merchant_cost: form.merchant_cost || "0",
-              program_id: programId,
-            });
-            if (done) {
-              setForm({
-                title: "",
-                cost_amount: "",
-                merchant_cost: "",
-                program_id: "",
-              });
-              onCreated();
-            }
-          }}
-        >
-          إضافة
-        </Button>
-      }
-    >
-      <div className="stack gap">
-        <Field label="البرنامج">
-          <select
-            className="input"
-            value={programId}
-            onChange={(e) => setForm({ ...form, program_id: e.target.value })}
-          >
-            {programs.map((program) => (
-              <option key={program.id} value={program.id}>
-                {program.name}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field label="عنوان المكافأة">
-          <input
-            className="input"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            placeholder="مثال: قهوة مجانية"
-          />
-        </Field>
-
-        <Field label="التكلفة بالوحدات" hint="كم يدفع العميل من رصيده">
-          <input
-            className="input num"
-            type="number"
-            min="1"
-            value={form.cost_amount}
-            onChange={(e) => setForm({ ...form, cost_amount: e.target.value })}
-          />
-        </Field>
-
-        <Field
-          label="تكلفتها عليك بالجنيه"
-          hint="يُحسب بها الالتزام القائم — رقم خاطئ هنا يعطيك التزامًا خاطئًا"
-        >
-          <input
-            className="input num"
-            type="number"
-            step="0.01"
-            min="0"
-            value={form.merchant_cost}
-            onChange={(e) => setForm({ ...form, merchant_cost: e.target.value })}
-          />
         </Field>
 
         {create.error != null && <ErrorBox error={create.error} />}
