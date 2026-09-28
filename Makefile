@@ -4,8 +4,11 @@
 
 COMPOSE     := docker compose -f docker-compose.dev.yml
 # ملف النشر في الجذر لأن منصات النشر تبحث عنه هناك بلا
-# سؤال — راجع التعليق في رأس docker-compose.yml
-PROD        := docker compose --env-file .env -f docker-compose.yml
+# سؤال — راجع التعليق في رأس docker-compose.yml.
+# والملف الثاني يُمرَّر صراحةً: تمرير `-f` يعطّل تحميل ملف
+# التجاوز تلقائيًا، وبدونه لا يُنشَر منفذ فلا يُفتح التطبيق
+# من المتصفّح على جهاز التطوير.
+PROD        := docker compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml
 PY          := .venv/Scripts/python.exe
 MANAGE      := cd backend && ../$(PY) manage.py
 

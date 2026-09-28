@@ -70,7 +70,6 @@ REDIS_URL=redis://redis:6379/0
 CELERY_BROKER_URL=redis://redis:6379/1
 CELERY_RESULT_BACKEND=redis://redis:6379/2
 
-WEB_PORT=8080
 ```
 
 لتوليد المفتاح:
@@ -274,7 +273,7 @@ DEMO_LOGIN_CODE=
 | `password authentication failed for user "walaee"` بعد تغيير `.env` | حجم قاعدة قديم: postgres يضبط كلمة المرور عند **أول** تهيئة ويحتفظ بها، فتغييرها في `.env` لا يغيّر ما في الحجم | استعمل كلمة المرور الأصلية، أو احذف الحجم وابدأ من جديد: `docker compose down -v` (⚠ يمسح البيانات) |
 | `Database is uninitialized and superuser password is not specified` | نفس السبب — لكن الرسالة الآن تأتي من `postgres` وتسمّي المتغيّر | املأ `POSTGRES_PASSWORD` |
 | `Domain ... attached to service "web" which does not exist` | مسار Compose يشير إلى ملف لا يحوي الخدمات | المسار هو `docker-compose.yml` في الجذر |
-| فشل النشر بتعارض منافذ | `8080` مشغول على الخادم | غيّر `WEB_PORT` |
+| `Bind for 0.0.0.0:8080 failed: port is already allocated` | نسخة قديمة من `docker-compose.yml` كانت تنشر منفذًا على المضيف، والمنفذ محجوز لتطبيق آخر | حدّث المستودع: ملف النشر لم يعد ينشر منفذًا، وTraefik يصل عبر الشبكة |
 | صفحة بيضاء على `/app/` أو `/merchant/` بلا خطأ | `base` في Vite و`basename` في الموجّه غير متطابقين | يتحددان من `VITE_BASE` — لا تغيّر أحدهما وحده |
 | كل فحص صحي يردّ 400 | `ALLOWED_HOSTS` لا يشمل `web` و`api` | أضفهما |
 | نقاط تُمنح مرتين | نسختان من `beat` | `replicas: 1` — إلزامي |
