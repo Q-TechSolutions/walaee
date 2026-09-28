@@ -13,7 +13,7 @@
 
 ---
 
-## مقتطف `infra/docker/docker-compose.prod.yml`
+## مقتطف `docker-compose.yml`
 
 ```yaml
 services:

@@ -12,25 +12,39 @@
 
 ---
 
-> 🛠 **أنت على فرع `main` — الإنتاج.**
-> العرض التقديمي والنموذج التفاعلي على فرعَي `demo` و `client`،
-> ولا يتقاطعان مع هذا الفرع في أي ملف.
+## 🔗 مباشر
+
+| | الرابط |
+|---|---|
+| **المنصة** | <https://walaee.deplois.net> |
+| تطبيق العميل | <https://walaee.deplois.net/app/> |
+| لوحة المتجر | <https://walaee.deplois.net/merchant/> |
+| لوحة المنصة | <https://walaee.deplois.net/admin/> |
+| **النموذج التفاعلي** | <https://walaee.deplois.net/demo/> |
+| الدليل العام (API) | <https://walaee.deplois.net/api/v1/public/network> |
+
+الدخول بحسابات معلنة — الجدول في [docs/DEPLOY.md](docs/DEPLOY.md#الحسابات).
+هذا **نشر عرض** لا إنتاج بعملاء حقيقيين.
 
 ---
 
-## الفروع — ثلاثة منفصلة تمامًا
+## الفروع
 
 | الفرع | ماذا يحوي | يُنشَر على |
 |---|---|---|
-| **`main`** | 🛠 **الإنتاج** — backend · frontend · infra | نطاق المنصة |
-| **`demo`** | 📘 العرض الكامل — النموذج التفاعلي والتقارير والتحليل | نطاق داخلي |
+| **`main`** | 🛠 **الإنتاج** — backend · frontend · infra · `docs/demo` | `walaee.deplois.net` |
+| **`demo`** | 📘 العرض الكامل — النموذج والتقارير والتحليل | نطاق داخلي |
 | **`client`** | 👁 العرض المصغّر — ما يراه العميل فقط | نطاق العميل |
 
-**لا يوجد أي تداخل:** فرع الإنتاج لا يحوي ملف عرض واحد، وفرعا العرض
-لا يحويان سطر كود منتج. تحقّق بنفسك:
+`main` يحوي **نسخة من النموذج التفاعلي وحده** في `docs/demo/`، تُخدَم على
+`/demo/` من نفس الحاوية. هو التصميم المعتمد الذي تُقاس عليه الشاشات، ومن
+يفتح رابط المشروع يحتاج أن يرى الاثنين جنبًا إلى جنب بلا نشر ثانٍ.
+
+ما يبقى على فرع `demo` وحده: التقارير والتحليل والخطة والتسعير والفريق —
+أي شيء ليس واجهة. ولا يحوي فرعا العرض سطر كود منتج:
 
 ```bash
-git ls-tree --name-only main     # backend frontend infra …
+git ls-tree --name-only main     # backend frontend infra docs …
 git ls-tree --name-only demo     # docs Dockerfile nginx.conf …
 git ls-tree --name-only client   # docs Dockerfile nginx.conf
 ```
@@ -123,7 +137,7 @@ make prod-build && make prod-up
 ثم التهيئة مرة واحدة:
 
 ```bash
-docker compose --env-file .env -f infra/docker/docker-compose.prod.yml   exec api python manage.py bootstrap_platform     --admin-phone 01000000000 --org "مؤسستك"     --brand "علامتك" --owner-phone 01011111111
+docker compose --env-file .env -f docker-compose.yml   exec api python manage.py bootstrap_platform     --admin-phone 01000000000 --org "مؤسستك"     --brand "علامتك" --owner-phone 01011111111
 ```
 
 سبع حاويات على منفذ واحد: `/` الصفحة العامة · `/app/` تطبيق العميل ·

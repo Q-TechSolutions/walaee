@@ -2,10 +2,10 @@
 # التشغيل من جذر المستودع.  `make help` يعرض كل شيء.
 .DEFAULT_GOAL := help
 
-COMPOSE     := docker compose
-# ‏--env-file إلزامي: Compose يقرأ متغيرات التداخل من الملف
-# المجاور لملف compose لا من جذر المستودع
-PROD        := docker compose --env-file .env -f infra/docker/docker-compose.prod.yml
+COMPOSE     := docker compose -f docker-compose.dev.yml
+# ملف النشر في الجذر لأن منصات النشر تبحث عنه هناك بلا
+# سؤال — راجع التعليق في رأس docker-compose.yml
+PROD        := docker compose --env-file .env -f docker-compose.yml
 PY          := .venv/Scripts/python.exe
 MANAGE      := cd backend && ../$(PY) manage.py
 

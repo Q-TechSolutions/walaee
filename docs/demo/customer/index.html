@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#4B1E9E">
+<title>ولائي — تطبيق العميل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap">
+<noscript><link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/css/theme.css?v=14">
+<link rel="stylesheet" href="../assets/css/mobile.css?v=14">
+<style>
+  .stage{display:flex;align-items:center;gap:34px;}
+  .sidepanel{width:280px;color:#fff;}
+  .sidepanel h2{font-size:23px;margin-bottom:6px;}
+  .sidepanel p{font-size:13px;color:#A79BC9;line-height:1.8;margin-bottom:22px;}
+  .sidepanel .grp{margin-bottom:20px;}
+  .sidepanel .grp b{display:block;font-size:11px;letter-spacing:1.5px;color:#7E6FA8;margin-bottom:9px;font-weight:800;}
+  .jump{display:flex;align-items:center;gap:9px;width:100%;padding:9px 12px;border-radius:11px;
+    background:rgba(255,255,255,.06);color:#DDD5F0;font-size:13px;font-weight:600;margin-bottom:6px;
+    transition:var(--t);border:1px solid rgba(255,255,255,.07);text-align:start;}
+  .jump:hover{background:rgba(255,255,255,.13);color:#fff;transform:translateX(-3px);}
+  .jump svg{width:16px;height:16px;opacity:.75;flex:none;}
+  .jump.hot{background:linear-gradient(120deg,#F97316,#FB923C);color:#fff;border-color:transparent;}
+  .backlink{display:inline-flex;align-items:center;gap:7px;color:#8E7EBB;font-size:12.5px;font-weight:700;margin-bottom:26px;}
+  .backlink:hover{color:#fff;}
+  @media(max-width:920px){.stage{flex-direction:column;gap:22px;}.sidepanel{width:392px;max-width:100%;}}
+</style>
+</head>
+<body class="phone-body">
+
+<div class="stage">
+  <div class="sidepanel">
+    <a class="backlink" href="../index.html">&#8594; كل الواجهات</a>
+    <h2>تطبيق العميل</h2>
+    <p>تطبيق ويب تقدّمي (PWA) — بدون تحميل من المتجر، يشتغل على أي جهاز.</p>
+
+    <div class="grp"><b>الرحلة الكاملة</b>
+      <button class="jump hot" onclick="CUS.onb()">▸ ابدأ من التسجيل (٣ خطوات)</button>
+      <button class="jump hot" onclick="CUS.scan()">▸ رحلة المسح والكسب</button>
+    </div>
+
+    <div class="grp"><b>الشاشات</b>
+      <button class="jump" onclick="CUS.setTab('home')">الرئيسية — محفظة البطاقات</button>
+      <button class="jump" onclick="CUS.go('card',1)">بطاقة أختام — كافيه</button>
+      <button class="jump" onclick="CUS.go('card',2)">بطاقة نقاط — مخبز</button>
+      <button class="jump" onclick="CUS.setTab('rewards')">المكافآت والاستبدال</button>
+      <button class="jump" onclick="CUS.setTab('stores')">المتاجر والاكتشاف</button>
+      <button class="jump" onclick="CUS.go('activity')">سجل النشاط</button>
+      <button class="jump" onclick="CUS.setTab('me')">حسابي والخصوصية</button>
+    </div>
+
+    <div class="grp"><b>تفاصيل تستحق النظر</b>
+      <button class="jump" onclick="CUS.redeem('خصم ٢٥٪ على الحلويات')">شاشة كود الاستبدال</button>
+      <button class="jump" onclick="CUS.amount()">تأكيد قيمة الفاتورة</button>
+    </div>
+  </div>
+
+  <div class="device">
+    <div class="screen">
+      <div id="screen"></div>
+      <div id="overlay" style="display:none"></div>
+      <div class="tabbar" id="tabbar"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/icons.js?v=14"></script>
+<script src="../assets/js/ui.js?v=14"></script>
+<script src="../assets/js/data.js?v=14"></script>
+<script src="../assets/js/customer.js?v=14"></script>
+<script src="../assets/js/switcher.js?v=14"></script>
+<script>
+  /* وضع التضمين: ?bare=1 — يخفي اللوحة الجانبية ويجعل الشاشة تملأ الإطار (للعرض التقديمي) */
+  if (/[?&]bare=1/.test(location.search)) {
+    document.body.classList.add('bare');
+    var sp = document.querySelector('.sidepanel'); if (sp) sp.style.display = 'none';
+    var st = document.querySelector('.stage'); if (st) st.style.gap = '0';
+  }
+  CUS.init();
+</script>
+</body>
+</html>

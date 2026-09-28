@@ -19,7 +19,7 @@ cd "$ROOT"
 
 DEST="${1:-$ROOT/backups}"
 KEEP_DAYS="${BACKUP_KEEP_DAYS:-14}"
-COMPOSE="docker compose --env-file .env -f infra/docker/docker-compose.prod.yml"
+COMPOSE="docker compose --env-file .env -f docker-compose.yml"
 
 DB_USER="$(grep -E '^POSTGRES_USER=' .env | cut -d= -f2- || echo walaee)"
 DB_NAME="$(grep -E '^POSTGRES_DB=' .env | cut -d= -f2- || echo walaee)"

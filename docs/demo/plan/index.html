@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ولائي — خطة التطوير الشاملة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap">
+<noscript><link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/css/theme.css?v=14">
+<style>
+body{background:var(--canvas);}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px 90px;}
+.top{background:linear-gradient(160deg,#3A1078,#4B1E9E 58%,#2E0B63);color:#fff;
+  margin:0 -22px 34px;padding:46px 44px 40px;position:relative;overflow:hidden;}
+.top::after{content:'';position:absolute;inset-inline-end:-90px;top:-90px;width:300px;height:300px;
+  background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%);border-radius:50%;}
+.top a.back{color:#B9A3EE;font-size:12.5px;font-weight:700;display:inline-block;margin-bottom:18px;}
+.top a.back:hover{color:#fff;}
+.top h1{font-size:36px;letter-spacing:-1px;position:relative;}
+.top p{color:#C4B4E8;margin-top:9px;font-size:14px;max-width:640px;line-height:1.85;position:relative;}
+.top .strip{display:flex;gap:26px;margin-top:26px;flex-wrap:wrap;position:relative;}
+.top .strip div b{display:block;font-size:23px;font-weight:800;}
+.top .strip div span{font-size:11.5px;color:#B9A3EE;font-weight:600;}
+
+h2.sec{font-size:22px;margin:44px 0 6px;display:flex;align-items:center;gap:12px;}
+h2.sec .n{width:32px;height:32px;border-radius:10px;background:var(--violet-700);color:#fff;
+  display:grid;place-items:center;font-size:14px;font-weight:800;flex:none;}
+p.lead{color:var(--muted);font-size:13.5px;margin-bottom:18px;line-height:1.85;}
+h3.sub{font-size:15px;margin:26px 0 10px;color:var(--violet-800);}
+
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px;}
+th{background:var(--violet-800);color:#fff;padding:11px 14px;text-align:start;font-size:12.5px;font-weight:700;}
+td{padding:11px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:nth-child(even) td{background:var(--canvas-2);}
+td.c,th.c{text-align:center;white-space:nowrap;}
+
+.stack{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.sk{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;}
+.sk b{display:block;font-size:13.5px;margin-bottom:8px;color:var(--violet-800);}
+.sk li{font-size:12.5px;color:var(--ink-2);padding:3px 0;display:flex;gap:7px;font-weight:600;}
+.sk li i{color:var(--green-600);font-style:normal;font-weight:800;}
+.sk .why{font-size:11.5px;color:var(--muted);margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);line-height:1.65;}
+
+.ph{background:var(--surface);border:1px solid var(--line);border-right:5px solid var(--violet-700);
+  border-radius:var(--r-lg);padding:18px 20px;margin-bottom:14px;}
+.ph.p0{border-right-color:#DC2626;} .ph.p1{border-right-color:#4B1E9E;}
+.ph.p2{border-right-color:#2563EB;} .ph.p3{border-right-color:#16A34A;}
+.ph.p4{border-right-color:#F97316;} .ph.p5{border-right-color:#CA8A04;}
+.ph .hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+.ph .hd b{font-size:16px;}
+.ph .tag{font-size:11px;font-weight:800;padding:3px 11px;border-radius:99px;background:var(--violet-100);color:var(--violet-700);}
+.ph .tag.t{background:var(--line-2);color:var(--muted);}
+.ph .cols{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;}
+.ph h5{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:6px;letter-spacing:.4px;}
+.ph li{font-size:12.5px;padding:2.5px 0;color:var(--ink-2);display:flex;gap:7px;font-weight:500;}
+.ph li i{color:var(--violet-600);font-style:normal;font-weight:800;flex:none;}
+.dod{background:var(--green-50);border:1px solid #CFEBDB;border-radius:12px;padding:11px 14px;margin-top:12px;}
+.dod b{font-size:12px;color:var(--green-700);display:block;margin-bottom:4px;}
+.dod span{font-size:12.5px;color:var(--ink-2);line-height:1.7;}
+
+.gantt{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;overflow-x:auto;}
+.gantt .grow-row{display:flex;align-items:center;gap:12px;margin-bottom:9px;min-width:660px;}
+.gantt .lbl{width:150px;font-size:12.5px;font-weight:700;flex:none;}
+.gantt .track{flex:1;height:26px;background:var(--line-2);border-radius:8px;position:relative;}
+.gantt .b{position:absolute;height:100%;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:10.5px;font-weight:800;color:#fff;}
+.gantt .scale{display:flex;gap:0;margin:10px 0 0 0;padding-inline-start:162px;min-width:660px;}
+.gantt .scale span{flex:1;text-align:center;font-size:10.5px;color:var(--faint);font-weight:700;}
+
+.risk{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.rk{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:15px;}
+.rk .t{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:7px;}
+.rk b{font-size:13.5px;}
+.rk p{font-size:12.5px;color:var(--muted);line-height:1.75;}
+.pill{font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:99px;white-space:nowrap;}
+.p-h{background:var(--red-100);color:var(--red-600);}
+.p-m{background:var(--amber-100);color:#92400E;}
+.p-l{background:var(--line-2);color:var(--muted);}
+
+.note{background:var(--violet-50);border-right:4px solid var(--violet-700);border-radius:10px;
+  padding:14px 16px;font-size:13px;color:var(--ink-2);line-height:1.85;margin:16px 0;}
+.note b{color:var(--violet-800);}
+.warnbox{background:var(--red-50);border-right:4px solid var(--red-600);border-radius:10px;
+  padding:14px 16px;font-size:13px;color:var(--ink-2);line-height:1.85;margin:16px 0;}
+.warnbox b{color:var(--red-600);}
+
+.tree2{font-family:'Consolas','Courier New',monospace;font-size:12.5px;direction:ltr;text-align:left;
+  background:#14142B;color:#CFC3EC;border-radius:var(--r-lg);padding:20px;overflow-x:auto;line-height:1.85;}
+.tree2 b{color:#6EE7A8;} .tree2 i{color:#7E6FA8;font-style:normal;}
+
+.foot{text-align:center;margin-top:56px;padding-top:24px;border-top:2px solid var(--line);color:var(--violet-700);font-weight:800;}
+@media(max-width:820px){.stack,.risk,.ph .cols,.cols2{grid-template-columns:1fr;}}
+@media(max-width:680px){
+  .wrap{padding-inline:16px;}
+  .top{margin-inline:-16px;padding:26px 20px 22px;}
+  .top h1{font-size:24px;} .top p{font-size:12.5px;}
+  .top .strip{gap:16px;} .top .strip div b{font-size:19px;}
+  h2.sec{font-size:18px;margin:32px 0 6px;}
+  h2.sec .n{width:27px;height:27px;font-size:12px;}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;}
+  table td,table th{min-width:120px;}
+  table td:first-child,table th:first-child{min-width:160px;}
+  table td.c,table th.c{min-width:70px;}
+  .ph{padding:14px 15px;} .ph .hd b{font-size:14px;}
+  .gantt{padding:14px;}
+  .tree2{font-size:10.5px;padding:14px;}
+  .rk{padding:13px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <a class="back" href="../index.html">&#8594; العودة لمعرض الواجهات</a>
+  <h1>خطة التطوير الشاملة</h1>
+  <p>خطة تنفيذ من الصفر حتى الإطلاق التجاري، مبنية مباشرة على مخرجات التحليل الشامل —
+     كل مرحلة تعالج مشاكل محددة بأرقامها، ولها معيار قبول لا يُتجاوز إلا بتحققه.</p>
+  <div class="strip">
+    <div><b>٦</b><span>مراحل تنفيذ</span></div>
+    <div><b>٨–١٤</b><span>أسبوعًا للتسليم</span></div>
+    <div><b>٣</b><span>باقات حسب النطاق</span></div>
+    <div><b>٢٤</b><span>شاشة مصممة</span></div>
+    <div><b>٧٠–١٣٠</b><span>ألف جنيه</span></div>
+  </div>
+</div>
+
+<!-- ============ 1 ============ -->
+<h2 class="sec"><span class="n">١</span> المبادئ الحاكمة للتنفيذ</h2>
+<p class="lead">خمس قواعد تُحسم قبل السطر الأول من الكود، وتُراجَع عند كل قرار تقني.</p>
+<table>
+<thead><tr><th class="c">#</th><th>المبدأ</th><th>ما يعنيه عمليًا</th></tr></thead>
+<tbody>
+<tr><td class="c">١</td><td><b>آلية إثبات الشراء أولًا</b></td><td>لا يُبنى أي شيء قبل أن تعمل دورة «رمز ← مسح ← تأكيد ← نقطة» في أقل من ١٠ ثوانٍ عند الكاشير. هذه هي المخاطرة رقم واحد وتُختبر أولًا.</td></tr>
+<tr><td class="c">٢</td><td><b>التسلسل الهرمي من اليوم صفر</b></td><td>مؤسسة ← علامة ← فرع ← نقطة بيع ← مستخدم. تعديله لاحقًا يكلّف ٣–٦ أشهر ترحيل بيانات.</td></tr>
+<tr><td class="c">٣</td><td><b>القيمة قبل الشبكة</b></td><td>المنتج يجب أن يستحق سعره حتى لو كان المتجر هو الوحيد على المنصة. الشبكة مكافأة إضافية لا شرط للقيمة.</td></tr>
+<tr><td class="c">٤</td><td><b>كل تكلفة متغيرة مقيسة</b></td><td>كل رسالة وكل عملية لها تكلفة معروفة وظاهرة في الواجهة. لا تكلفة مخفية على المنصة.</td></tr>
+<tr><td class="c">٥</td><td><b>الحوكمة ليست مرحلة لاحقة</b></td><td>كشف الاحتيال، سجل التدقيق، وصلاحية النقاط تُبنى مع النواة لا بعدها.</td></tr>
+</tbody>
+</table>
+
+<!-- ============ 2 ============ -->
+<h2 class="sec"><span class="n">٢</span> الحزمة التقنية المقترحة</h2>
+<p class="lead">اختيارات محافظة ومُجرَّبة — الهدف سرعة التسليم والاستقرار، لا استعراض تقني.</p>
+<div class="stack">
+  <div class="sk"><b>الخلفية (Backend)</b>
+    <ul>
+      <li><i>›</i> Django + Django REST Framework</li>
+      <li><i>›</i> PostgreSQL 16 — قاعدة البيانات الأساسية</li>
+      <li><i>›</i> Redis — تخزين مؤقت وطوابير</li>
+      <li><i>›</i> Celery — المهام غير المتزامنة</li>
+      <li><i>›</i> JWT + صلاحيات على مستوى الكيان</li>
+    </ul>
+    <div class="why">Django يختصر شهورًا في لوحة الإدارة والصلاحيات والهجرات، وهو الخيار الأنسب لمنتج ثقيل على البيانات والقواعد.</div>
+  </div>
+  <div class="sk"><b>الواجهات (Frontend)</b>
+    <ul>
+      <li><i>›</i> تطبيق العميل: PWA (React أو Vue)</li>
+      <li><i>›</i> Service Worker + العمل دون اتصال</li>
+      <li><i>›</i> لوحة التاجر والإدارة: SPA</li>
+      <li><i>›</i> دعم RTL كامل من البداية</li>
+      <li><i>›</i> نظام تصميم موحّد (المطبَّق في هذا الديمو)</li>
+    </ul>
+    <div class="why">PWA يوفّر ٢٥–٤٠ ألف دولار سنويًا مقابل تطبيقين أصليين، ويلغي احتكاك التحميل عند الكاشير.</div>
+  </div>
+  <div class="sk"><b>البنية والتشغيل</b>
+    <ul>
+      <li><i>›</i> Docker + Docker Compose</li>
+      <li><i>›</i> Nginx كوكيل عكسي</li>
+      <li><i>›</i> نشر على Hetzner / DigitalOcean</li>
+      <li><i>›</i> GitHub Actions للتكامل المستمر</li>
+      <li><i>›</i> Sentry + مراقبة زمن التشغيل</li>
+    </ul>
+    <div class="why">مزوّد اقتصادي في البداية؛ الانتقال إلى سحابة أكبر يكون قرارًا مبنيًا على حاجة فعلية لا على افتراض.</div>
+  </div>
+  <div class="sk"><b>القنوات والتكاملات</b>
+    <ul>
+      <li><i>›</i> Web Push — القناة الافتراضية (مجاني)</li>
+      <li><i>›</i> WhatsApp Business API — رسائل خدمية</li>
+      <li><i>›</i> مزوّد SMS محلي — لـ OTP فقط</li>
+      <li><i>›</i> بوابة دفع محلية للاشتراكات</li>
+      <li><i>›</i> تكامل POS — المرحلة الخامسة</li>
+    </ul>
+    <div class="why">ترتيب القنوات بالتكلفة يخفض التكلفة المتغيرة لكل عميل بما يتجاوز ٨٠٪.</div>
+  </div>
+  <div class="sk"><b>الجودة والاختبار</b>
+    <ul>
+      <li><i>›</i> pytest — تغطية منطق النقاط ١٠٠٪</li>
+      <li><i>›</i> اختبارات تكامل لدورة المنح كاملة</li>
+      <li><i>›</i> اختبار حِمل قبل كل مرحلة توسّع</li>
+      <li><i>›</i> اختبار ميداني حقيقي عند الكاشير</li>
+    </ul>
+    <div class="why">منطق النقاط له أثر مالي مباشر على التاجر — أي خطأ فيه يساوي فقدان الثقة نهائيًا.</div>
+  </div>
+  <div class="sk"><b>الأمان والامتثال</b>
+    <ul>
+      <li><i>›</i> تشفير عند النقل والتخزين</li>
+      <li><i>›</i> عزل منطقي لبيانات كل متجر</li>
+      <li><i>›</i> سجل تدقيق غير قابل للتعديل</li>
+      <li><i>›</i> قانون ١٥١/٢٠٢٠ المصري و PDPL</li>
+      <li><i>›</i> عقد معالجة بيانات (DPA) لكل تاجر</li>
+    </ul>
+    <div class="why">مراجعة قانونية بـ ١,٠٠٠–٣,٠٠٠ دولار توفّر أضعافها، وتفتح باب التفاوض مع السلاسل.</div>
+  </div>
+</div>
+
+<!-- ============ 3 ============ -->
+<h2 class="sec"><span class="n">٣</span> نموذج البيانات الأساسي</h2>
+<p class="lead">أهم قرار معماري في المشروع كله. بناؤه صحيحًا الآن يكلّف أيامًا، وتعديله لاحقًا يكلّف شهورًا.</p>
+<div class="tree2">
+Organization  <i>— المؤسسة (كيان الفوترة والتعاقد)</i><br>
+ └─ Brand  <i>— العلامة التجارية (هوية، برامج ولاء)</i><br>
+&nbsp;&nbsp;&nbsp;&nbsp;└─ Branch  <i>— الفرع (موقع، ساعات عمل، مخزون مكافآت)</i><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ Terminal  <i>— نقطة البيع (تولّد رمز QR الديناميكي)</i><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ StaffUser  <i>— الكاشير (حساب مستقل + صلاحيات)</i><br><br>
+<b>LoyaltyProgram</b>  <i>— برنامج ينتمي لـ Brand، من ٦ أنواع</i><br>
+ ├─ ProgramRule  <i>— القواعد: معدل المنح، السقوف، الصلاحية</i><br>
+ └─ Reward  <i>— المكافأة: التكلفة على العميل والتكلفة على التاجر</i><br><br>
+<b>Customer</b>  <i>— العميل (هوية واحدة عبر كل المنصة)</i><br>
+ └─ Membership  <i>— عضوية العميل في Brand معيّن</i><br>
+&nbsp;&nbsp;&nbsp;&nbsp;└─ <b>Balance</b>  <i>— الرصيد (منفصل لكل Brand — المرحلة ١)</i><br><br>
+<b>Transaction</b>  <i>— العملية: الفاتورة + القيمة + Terminal + StaffUser</i><br>
+ ├─ LedgerEntry  <i>— قيد المنح/الخصم (لا يُعدَّل، يُعكس فقط)</i><br>
+ ├─ Redemption  <i>— الاستبدال + كود التحقق</i><br>
+ └─ AuditLog  <i>— سجل تدقيق غير قابل للحذف</i><br><br>
+<b>FraudSignal</b>  <i>— إشارة شذوذ مرتبطة بـ Transaction</i><br>
+<b>Campaign</b> → <b>MessageJob</b>  <i>— الحملة والرسائل بتكلفتها الفعلية</i>
+</div>
+<div class="warnbox"><b>قرار حاسم:</b> جدول <b>LedgerEntry</b> يجب أن يكون <b>append-only</b> — لا تحديث ولا حذف. أي تصحيح يتم بقيد عكسي جديد.
+هذا هو ما يجعل «الالتزام القائم» رقمًا يمكن الدفاع عنه أمام التاجر ومراجعه المحاسبي، وما يجعل كشف الاحتيال ممكنًا أصلًا.</div>
+
+<!-- ============ 4 ============ -->
+<h2 class="sec"><span class="n">٤</span> مراحل التنفيذ الست</h2>
+<p class="lead">كل مرحلة لها مخرجات ومعيار قبول. لا يُبدأ في مرحلة قبل تحقق معيار سابقتها.</p>
+
+<div class="ph p0">
+  <div class="hd"><b>المرحلة صفر — حسم القرارات الوجودية</b>
+    <span class="tag">أسبوعان</span><span class="tag t">قبل الكود</span><span class="tag">بدون تكلفة تطوير</span></div>
+  <div class="cols">
+    <div><h5>المخرجات</h5><ul>
+      <li><i>›</i> تحديد آلية إثبات الشراء نهائيًا (م‑01)</li>
+      <li><i>›</i> حسم نموذج النقاط: منفصل لكل متجر في المرحلة ١ (م‑02)</li>
+      <li><i>›</i> اختيار القطاع الواحد والبقعة الجغرافية (م‑03، م‑04)</li>
+      <li><i>›</i> اعتماد هيكل التسعير والجدار المجاني (م‑05، م‑06)</li>
+      <li><i>›</i> توحيد الاسم <b>walaee</b> وحجز النطاق والعلامة (م‑16)</li>
+      <li><i>›</i> ٥ مقابلات ميدانية مع تجّار من القطاع المختار</li>
+    </ul></div>
+    <div><h5>لماذا هذه المرحلة</h5>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.8">هذه هي أرخص مرحلة في المشروع وأعلاها عائدًا. كل قرار يُؤجَّل هنا يتحول إلى إعادة كتابة كود لاحقًا.
+      لا تُصرف جنيهًا واحدًا على التطوير قبل انتهائها.</p></div>
+  </div>
+  <div class="dod"><b>معيار القبول</b><span>وثيقة قرارات موقّعة من المؤسسين تُجيب على الأسئلة الستة، ومصدّقة بخمس مقابلات تجّار حقيقية.</span></div>
+</div>
+
+<div class="ph p1">
+  <div class="hd"><b>المرحلة الأولى — النواة وآلية إثبات الشراء</b>
+    <span class="tag">الأسابيع ١–٦</span><span class="tag t">أعلى مخاطرة</span></div>
+  <div class="cols">
+    <div><h5>المخرجات</h5><ul>
+      <li><i>›</i> نموذج البيانات الهرمي كاملًا (م‑11)</li>
+      <li><i>›</i> المصادقة بالهاتف + OTP + إدارة الجلسات</li>
+      <li><i>›</i> توليد رمز QR ديناميكي على مستوى Terminal</li>
+      <li><i>›</i> دورة المنح كاملة: رمز ← مسح ← قيمة ← تأكيد ← قيد</li>
+      <li><i>›</i> LedgerEntry بنمط append-only + AuditLog</li>
+      <li><i>›</i> المسار اليدوي البديل (رقم هاتف + رقم فاتورة)</li>
+    </ul></div>
+    <div><h5>ما لا يُبنى الآن</h5><ul>
+      <li><i>›</i> الحملات والرسائل</li>
+      <li><i>›</i> التقارير المتقدمة</li>
+      <li><i>›</i> أي شيء يُسمّى ذكاءً اصطناعيًا</li>
+      <li><i>›</i> الفوترة والاشتراكات</li>
+    </ul></div>
+  </div>
+  <div class="dod"><b>معيار القبول</b><span>عملية كاملة من دخول العميل حتى تسجيل النقطة في <b>أقل من ١٠ ثوانٍ</b> عند كاشير حقيقي — مقيسة بساعة إيقاف في متجر فعلي، لا في بيئة تطوير.</span></div>
+</div>
+
+<div class="ph p2">
+  <div class="hd"><b>المرحلة الثانية — نماذج الولاء والواجهات</b>
+    <span class="tag">الأسابيع ٧–١٤</span></div>
+  <div class="cols">
+    <div><h5>المخرجات</h5><ul>
+      <li><i>›</i> النماذج الستة: نقاط، أختام، زيارات، كاش باك، مكافآت، هدايا</li>
+      <li><i>›</i> محرك القواعد: معدل المنح، السقوف، الصلاحية، العكس عند المرتجع (م‑08)</li>
+      <li><i>›</i> تطبيق العميل PWA كاملًا: محفظة، بطاقة، مسح، مكافآت، حساب</li>
+      <li><i>›</i> لوحة التاجر: المعلومات، الكاشير، العملاء، البرنامج، المكافآت</li>
+      <li><i>›</i> مؤشر «الالتزام القائم» بالعملة المحلية</li>
+      <li><i>›</i> ضوابط الاحتيال والسقوف وكشف الشذوذ (م‑07)</li>
+    </ul></div>
+    <div><h5>معايير الجودة</h5><ul>
+      <li><i>›</i> تغطية اختبارات ١٠٠٪ لمنطق النقاط</li>
+      <li><i>›</i> دعم RTL كامل بلا استثناء</li>
+      <li><i>›</i> زمن تحميل أول شاشة أقل من ٢ ثانية على شبكة ٣G</li>
+      <li><i>›</i> يعمل على iOS 15+ و Android 9+</li>
+    </ul></div>
+  </div>
+  <div class="dod"><b>معيار القبول</b><span>تاجر واحد حقيقي يشغّل برنامج ولاء كامل لمدة أسبوعين دون تدخل من الفريق التقني.</span></div>
+</div>
+
+<div class="ph p3">
+  <div class="hd"><b>المرحلة الثالثة — التجريب المغلق</b>
+    <span class="tag">الأسابيع ١٥–٢٠</span><span class="tag t">٥–١٠ متاجر</span></div>
+  <div class="cols">
+    <div><h5>المخرجات</h5><ul>
+      <li><i>›</i> إطلاق مع ٥–١٠ متاجر داخل البقعة المختارة</li>
+      <li><i>›</i> قياس زمن العملية عند الكاشير يوميًا</li>
+      <li><i>›</i> عدّة تفعيل المتجر: ستاند QR، ملصقات، دليل الكاشير</li>
+      <li><i>›</i> تدفق التسجيل الذاتي للتاجر (Self-onboarding)</li>
+      <li><i>›</i> Web Push + طلب التثبيت على الشاشة الرئيسية (م‑13)</li>
+      <li><i>›</i> تصحيح الاحتكاك بناءً على ملاحظات ميدانية</li>
+    </ul></div>
+    <div><h5>ما يُقاس يوميًا</h5><ul>
+      <li><i>›</i> معدل تفعيل التاجر (الهدف &gt; ٦٠٪)</li>
+      <li><i>›</i> عملاء مسجّلون لكل متجر (الهدف &gt; ١٠٠/شهر)</li>
+      <li><i>›</i> زمن العملية عند الكاشير</li>
+      <li><i>›</i> نسبة تفعيل الإشعارات</li>
+    </ul></div>
+  </div>
+  <div class="dod"><b>معيار القبول</b><span>٦٠٪ من متاجر التجربة سجّلت ١٠ عمليات أو أكثر في أول أسبوعين — وإلا فالمشكلة في الآلية لا في التسويق، والعودة للمرحلة الأولى إلزامية.</span></div>
+</div>
+
+<div class="ph p4">
+  <div class="hd"><b>المرحلة الرابعة — التسويق والإيراد</b>
+    <span class="tag">الأسابيع ٢١–٣٢</span><span class="tag t">بدء التحصيل</span></div>
+  <div class="cols">
+    <div><h5>المخرجات</h5><ul>
+      <li><i>›</i> الاشتراكات والفوترة وبوابة الدفع (م‑05)</li>
+      <li><i>›</i> الجدار المجاني وحدوده الكمّية</li>
+      <li><i>›</i> الحملات وترتيب القنوات بالتكلفة + رصيد الرسائل (م‑10)</li>
+      <li><i>›</i> التقارير والتحليلات وتصدير البيانات</li>
+      <li><i>›</i> الامتثال الكامل و DPA وحقوق العميل (م‑09)</li>
+      <li><i>›</i> لوحة إدارة المنصة ومؤشرات الصحة الثمانية</li>
+    </ul></div>
+    <div><h5>الهدف التجاري</h5><ul>
+      <li><i>›</i> ٣٠ متجرًا مفعّلًا في البقعة الأولى</li>
+      <li><i>›</i> أول ١٠ اشتراكات مدفوعة</li>
+      <li><i>›</i> تكلفة استحواذ مقيسة لكل تاجر</li>
+      <li><i>›</i> احتفاظ التاجر بعد ٣ أشهر &gt; ٨٠٪</li>
+    </ul></div>
+  </div>
+  <div class="dod"><b>معيار القبول</b><span>احتفاظ التاجر بعد ٣ أشهر فوق ٨٠٪، <b>و</b> ارتفاع قابل للقياس في تكرار شراء العميل داخل المتاجر المشتركة. هذان الرقمان — لا غيرهما — يقرران استمرار المشروع.</span></div>
+</div>
+
+<div class="ph p5">
+  <div class="hd"><b>المرحلة الخامسة — التوسّع والتكامل</b>
+    <span class="tag">الشهور ٩–١٨</span><span class="tag t">مشروط بالمرحلة ٤</span></div>
+  <div class="cols">
+    <div><h5>المخرجات</h5><ul>
+      <li><i>›</i> تكامل نقاط البيع مع أشهر نظامين في السوق</li>
+      <li><i>›</i> واجهات API العامة والتوثيق</li>
+      <li><i>›</i> عملة الشبكة التي تمنحها المنصة (المرحلة ٢ من م‑02)</li>
+      <li><i>›</i> التحليلات التنبؤية بقواعد إحصائية (م‑12)</li>
+      <li><i>›</i> قناة الشركاء غير المباشرة (موزّعو أنظمة POS)</li>
+      <li><i>›</i> تكرار النموذج في بقع جغرافية جديدة</li>
+    </ul></div>
+    <div><h5>شرط الدخول</h5>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.8">لا تُبدأ هذه المرحلة إلا بعد تحقق معيار المرحلة الرابعة كاملًا.
+      التوسّع فوق أساس غير مُثبت هو السبب الأول لموت هذا النوع من المنصات.</p></div>
+  </div>
+  <div class="dod"><b>معيار القبول</b><span>تكرار نجاح البقعة الأولى في بقعة ثانية بنفس المؤشرات أو أفضل — إثبات أن النموذج قابل للنسخ وليس صدفة.</span></div>
+</div>
+
+<!-- ============ 5 ============ -->
+<h2 class="sec"><span class="n">٥</span> الجدول الزمني</h2>
+<div class="gantt">
+  <div class="grow-row"><div class="lbl">م.صفر — القرارات</div><div class="track"><div class="b" style="background:#DC2626;inset-inline-start:0;width:8%">٢ أسبوع</div></div></div>
+  <div class="grow-row"><div class="lbl">م.١ — النواة</div><div class="track"><div class="b" style="background:#4B1E9E;inset-inline-start:8%;width:22%">٦ أسابيع</div></div></div>
+  <div class="grow-row"><div class="lbl">م.٢ — النماذج والواجهات</div><div class="track"><div class="b" style="background:#2563EB;inset-inline-start:30%;width:28%">٨ أسابيع</div></div></div>
+  <div class="grow-row"><div class="lbl">م.٣ — التجريب المغلق</div><div class="track"><div class="b" style="background:#16A34A;inset-inline-start:58%;width:20%">٦ أسابيع</div></div></div>
+  <div class="grow-row"><div class="lbl">م.٤ — التسويق والإيراد</div><div class="track"><div class="b" style="background:#F97316;inset-inline-start:78%;width:22%">١٢ أسبوعًا</div></div></div>
+  <div class="scale"><span>الشهر ١</span><span>٢</span><span>٣</span><span>٤</span><span>٥</span><span>٦</span><span>٧</span><span>٨</span></div>
+</div>
+<div class="note"><b>ما الذي يغطّيه سعر الباقة من هذا الجدول؟</b>
+عقد البناء يغطّي <b>المرحلتين ١ و٢</b> (النواة والمنتج) بنطاق مثبّت مسبقًا — ولهذا يُسلَّم في ٨–١٤ أسبوعًا بدل ١٤ أسبوعًا مفتوحة، لأن قرارات <b>المرحلة صفر</b> تكون محسومة قبل التعاقد.
+أما <b>المرحلة ٣</b> (التجريب الميداني) و<b>المرحلة ٤</b> (التسويق والمبيعات) فهما تشغيل يقوم به مالك المنصة بعد التسليم، وليسا جزءًا من سعر الباقة —
+ويدخل ضمنهما دعم الشهر الأول المشمول في كل الباقات.</div>
+
+<div class="note"><b>ملاحظة على الجدول:</b> المرحلة الخامسة (التوسّع) غير مُدرجة لأنها <b>مشروطة</b> بتحقق معيار المرحلة الرابعة.
+جدولتها مسبقًا يخلق ضغطًا للتوسّع قبل الإثبات — وهو بالضبط الخطأ الذي يقتل منصات الشبكة.</div>
+
+<!-- ============ 6 ============ -->
+<h2 class="sec"><span class="n">٦</span> الباقات والأسعار</h2>
+<p class="lead">السعر يتحدّد بنطاق ما تطلبه — لا تدفع مقابل ما لا تحتاجه. كل الأسعار بالجنيه المصري، تسليم مفتاح في اليد.</p>
+
+<table>
+<thead><tr><th>الباقة</th><th class="c">السعر</th><th class="c">مدة التسليم</th><th>النطاق</th></tr></thead>
+<tbody>
+<tr><td><b>الأساسية</b></td><td class="c"><b>٧٠,٠٠٠ ج</b></td><td class="c">٨ أسابيع</td>
+    <td>المنصة كاملة بواجهاتها الثلاث — بدون واجهات برمجية وبدون ذكاء اصطناعي</td></tr>
+<tr><td><b>المتقدمة</b></td><td class="c"><b>٩٠,٠٠٠ ج</b></td><td class="c">١١ أسبوعًا</td>
+    <td>الأساسية + واجهات برمجية كاملة للربط بالأنظمة الخارجية — بدون ذكاء اصطناعي</td></tr>
+<tr><td><b>الشاملة</b></td><td class="c"><b>١٣٠,٠٠٠ ج</b></td><td class="c">١٤ أسبوعًا</td>
+    <td>المتقدمة + محرك التحليل والذكاء الاصطناعي والتقارير الذكية</td></tr>
+</tbody>
+</table>
+
+<h3 class="sub">٦.١ — ما الذي يشمله كل سعر بالتفصيل</h3>
+<table>
+<thead><tr><th>البند</th><th class="c">الأساسية<br><span style="font-weight:400">٧٠ ألف</span></th><th class="c">المتقدمة<br><span style="font-weight:400">٩٠ ألف</span></th><th class="c">الشاملة<br><span style="font-weight:400">١٣٠ ألف</span></th></tr></thead>
+<tbody>
+<tr><td>تطبيق العميل (PWA) بكل شاشاته</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>لوحة صاحب المتجر</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>لوحة إدارة المنصة</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>نماذج الولاء الستة</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>آلية إثبات الشراء (QR ديناميكي + مسار يدوي)</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>ضوابط الاحتيال وسجل التدقيق</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>التسلسل الهرمي للفروع والكاشيرين</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>التقارير والتحليلات الأساسية</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td><b>الدومين + الاستضافة + دعم فني شهر</b></td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>تدريب الفريق وتسليم كود المصدر</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>واجهات برمجية REST موثّقة</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>Webhooks للأحداث اللحظية</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>جاهزية الربط بأنظمة نقاط البيع والمتاجر الإلكترونية</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>مفاتيح API وصلاحيات لكل تكامل</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td></tr>
+<tr><td>محرك تحليل وذكاء اصطناعي</td><td class="c">—</td><td class="c">—</td><td class="c">✓</td></tr>
+<tr><td>تنبؤ بالعملاء المعرّضين للفقدان</td><td class="c">—</td><td class="c">—</td><td class="c">✓</td></tr>
+<tr><td>اقتراح قيمة المكافأة المثلى وأفضل توقيت للحملة</td><td class="c">—</td><td class="c">—</td><td class="c">✓</td></tr>
+<tr><td>تقارير ذكية وتوصيات تلقائية وتحليل الشرائح</td><td class="c">—</td><td class="c">—</td><td class="c">✓</td></tr>
+</tbody>
+</table>
+
+<h3 class="sub">٦.٢ — ما لا يشمله السعر</h3>
+<table>
+<thead><tr><th>البند</th><th>التقدير</th><th>ملاحظة</th></tr></thead>
+<tbody>
+<tr><td>رسائل SMS و واتساب</td><td>استهلاك فعلي</td><td>تُشحن برصيد. الإشعارات داخل التطبيق مجانية تمامًا.</td></tr>
+<tr><td>تجديد الاستضافة والدومين</td><td>~١٨,٠٠٠ ج / سنة</td><td>بعد السنة الأولى. تختلف مع نمو عدد المتاجر.</td></tr>
+<tr><td>الدعم بعد الشهر الأول</td><td>٣,٥٠٠ – ٧,٠٠٠ ج / شهر</td><td>عقد صيانة اختياري: إصلاحات، تحديثات أمنية، متابعة.</td></tr>
+<tr><td>تكامل POS مخصّص</td><td>يُسعّر حسب النظام</td><td>الباقة المتقدمة تُسلّم <b>الجاهزية</b>؛ الربط بنظام بعينه نطاق منفصل.</td></tr>
+<tr><td>بوابة الدفع ورسوم التحصيل</td><td>٢.٥٪ – ٢.٩٪</td><td>رسوم المزوّد على كل عملية تحصيل اشتراك.</td></tr>
+<tr><td>مراجعة قانونية للامتثال</td><td>٢٠,٠٠٠ – ٤٠,٠٠٠ ج</td><td>لمرة واحدة، موصى بها قبل الإطلاق التجاري (راجع م‑09).</td></tr>
+</tbody>
+</table>
+
+<h3 class="sub">٦.٣ — جدول الدفعات المقترح</h3>
+<table>
+<thead><tr><th class="c">الدفعة</th><th class="c">النسبة</th><th>الاستحقاق</th><th class="c">الأساسية</th><th class="c">المتقدمة</th><th class="c">الشاملة</th></tr></thead>
+<tbody>
+<tr><td class="c">الأولى</td><td class="c">٤٠٪</td><td>عند التعاقد وبدء العمل</td><td class="c">٢٨,٠٠٠</td><td class="c">٣٦,٠٠٠</td><td class="c">٥٢,٠٠٠</td></tr>
+<tr><td class="c">الثانية</td><td class="c">٣٠٪</td><td>عند تسليم النواة وآلية إثبات الشراء تعمل</td><td class="c">٢١,٠٠٠</td><td class="c">٢٧,٠٠٠</td><td class="c">٣٩,٠٠٠</td></tr>
+<tr><td class="c">الثالثة</td><td class="c">٣٠٪</td><td>عند التسليم النهائي والنشر على الاستضافة</td><td class="c">٢١,٠٠٠</td><td class="c">٢٧,٠٠٠</td><td class="c">٣٩,٠٠٠</td></tr>
+</tbody>
+</table>
+
+<h3 class="sub">٦.٤ — متى تُسترد التكلفة؟</h3>
+<table>
+<thead><tr><th>الباقة</th><th class="c">التكلفة</th><th class="c">تجّار مدفوعون<br>للاسترداد في ٦ شهور</th><th class="c">في ١٢ شهرًا</th><th>الملاحظة</th></tr></thead>
+<tbody>
+<tr><td>الأساسية</td><td class="c">٧٠,٠٠٠ ج</td><td class="c"><b>١٠ تجّار</b></td><td class="c">٥ تجّار</td><td>أسرع مسار لإثبات النموذج</td></tr>
+<tr><td>المتقدمة</td><td class="c">٩٠,٠٠٠ ج</td><td class="c">١٢ تاجرًا</td><td class="c">٦ تجّار</td><td>الفارق ٢٠ ألفًا مقابل فتح باب السلاسل والتكاملات</td></tr>
+<tr><td>الشاملة</td><td class="c">١٣٠,٠٠٠ ج</td><td class="c">١٨ تاجرًا</td><td class="c">٩ تجّار</td><td>الذكاء الاصطناعي يحتاج بيانات ٦–١٢ شهرًا ليعطي قيمته</td></tr>
+</tbody>
+</table>
+<div class="note"><b>الحساب:</b> بمتوسط اشتراك <b>١,٢٥٠ ج شهريًا</b> لكل تاجر مدفوع (باقة Starter)، وبدون احتساب رسوم التفعيل أو رصيد الحملات — وهما يرفعان متوسط الإيراد ٣٠–٤٠٪ ويقصّران المدة أكثر.
+هدف البقعة الأولى (<b>٣٠ متجرًا</b>) = ٣٧,٥٠٠ ج شهريًا، أي أن الباقة الأساسية تُسترد بالكامل في <b>أقل من شهرين</b> بعد بلوغ الهدف.</div>
+
+<div class="warnbox"><b>توصية صريحة على اختيار الباقة:</b> ابدأ بـ<b>الأساسية</b> أو <b>المتقدمة</b>.
+محرك الذكاء الاصطناعي في الباقة الشاملة يحتاج ٦–١٢ شهرًا من البيانات الحقيقية قبل أن يعطي قيمة تُذكر (مشكلة البيانات الباردة — م‑12)،
+فشراؤه اليوم يعني الدفع مقدّمًا مقابل قيمة مؤجّلة. الترقية إليه لاحقًا ممكنة بفارق السعر، وستكون حينها مبنيّة على بيانات فعلية.</div>
+
+<!-- ============ 7 ============ -->
+<h2 class="sec"><span class="n">٦.٥</span> المنافسة والتمايز</h2>
+<p class="lead">السوق ليس فارغًا. هذه الخريطة التنافسية الصريحة وما نملكه ولا يملكه غيرنا.</p>
+<table>
+<thead><tr><th>المحور</th><th class="c">ولائي</th><th class="c">ولاء مدمج<br><span style="font-weight:400">في نظام نقاط البيع</span></th>
+<th class="c">إضافة متجر<br><span style="font-weight:400">إلكتروني</span></th><th class="c">تطبيق كوبونات</th><th class="c">حل خاص<br><span style="font-weight:400">تبنيه السلسلة</span></th></tr></thead>
+<tbody>
+<tr><td><b>تعدد نماذج الولاء في نظام واحد</b></td><td class="c" style="color:#16A34A;font-weight:800">٦ نماذج</td>
+    <td class="c">نموذج واحد غالبًا</td><td class="c">نقاط فقط</td><td class="c">خصم فقط</td><td class="c">حسب الطلب</td></tr>
+<tr><td><b>هوية عميل موحّدة عبر متاجر مختلفة</b></td><td class="c" style="color:#16A34A;font-weight:800">✓</td>
+    <td class="c">—</td><td class="c">—</td><td class="c">✓</td><td class="c">—</td></tr>
+<tr><td>يعمل بلا أجهزة إضافية</td><td class="c" style="color:#16A34A;font-weight:800">✓</td>
+    <td class="c">يحتاج نظام POS</td><td class="c">أونلاين فقط</td><td class="c">✓</td><td class="c">حسب البناء</td></tr>
+<tr><td>يعمل في المتجر الفعلي وأونلاين</td><td class="c" style="color:#16A34A;font-weight:800">الاثنان</td>
+    <td class="c">المتجر فقط</td><td class="c">أونلاين فقط</td><td class="c">الاثنان</td><td class="c">حسب البناء</td></tr>
+<tr><td>مؤشر الالتزام المالي وضوابط الاحتيال</td><td class="c" style="color:#16A34A;font-weight:800">✓</td>
+    <td class="c">نادرًا</td><td class="c">—</td><td class="c">—</td><td class="c">مكلف</td></tr>
+<tr><td>التكلفة الشهرية على التاجر</td><td class="c">١,٢٥٠ – ٧,٥٠٠ ج</td><td class="c">مجاني ضمن POS</td>
+    <td class="c">٥٠٠ – ٢,٠٠٠ ج</td><td class="c">عمولة لكل عملية</td><td class="c">مئات الآلاف بناءً</td></tr>
+</tbody>
+</table>
+
+<div class="warnbox"><b>أخطر منافس: الولاء المدمج المجاني في أنظمة نقاط البيع.</b>
+هو أقرب لنقطة البيع، ولا يكلّف التاجر شيئًا إضافيًا. المنافسة معه على «ميزة أفضل» معركة خاسرة —
+لأنه سيقلّد أي ميزة بسيطة خلال أشهر.</div>
+
+<div class="note"><b>ما لا يستطيع أي منافس تقليده بسهولة:</b>
+<b>(١) تعدد نماذج الولاء داخل نظام واحد</b> — نظام POS مقفول على نموذج واحد لأن تعديله يمس نواته.
+<b>(٢) هوية العميل الموحّدة عبر متاجر مختلفة</b> — وهذه مستحيلة على أي نظام مغلق لأنها تتطلب شبكة مستقلة عن المتجر.
+<br>هذان المحوران هما الخندق الحقيقي — وكل جهد التمايز يجب أن يتركّز فيهما، لا في ميزات تُقلَّد.</div>
+
+<h2 class="sec"><span class="n">٧</span> المخاطر وخطط التعامل</h2>
+<div class="risk">
+  <div class="rk"><div class="t"><b>آلية إثبات الشراء بطيئة عند الكاشير</b><span class="pill p-h">مرتفعة</span></div>
+    <p>لو استغرقت العملية أكثر من ١٥ ثانية سيرفضها الكاشير عمليًا مهما كان المنتج جميلًا.<br>
+    <b>الخطة:</b> اختبار ميداني بساعة إيقاف من الأسبوع السادس، ومسار يدوي بديل جاهز، وتكامل POS كحل جذري في المرحلة الخامسة.</p></div>
+
+  <div class="rk"><div class="t"><b>بطء اكتساب المتاجر</b><span class="pill p-h">مرتفعة</span></div>
+    <p>البيع للمتاجر الصغيرة ميداني وبطيء ومكلف — وهي المخاطرة رقم واحد في المشروع كله، أكبر من أي مخاطرة تقنية.<br>
+    <b>الخطة:</b> كثافة جغرافية بدل انتشار واسع، استهداف السلاسل (عقد = ٢٠ متجرًا)، وبناء قناة شركاء غير مباشرة.</p></div>
+
+  <div class="rk"><div class="t"><b>منافس يضيف ولاء مدمجًا مجانًا</b><span class="pill p-h">مرتفعة</span></div>
+    <p>أنظمة نقاط البيع أقرب لنقطة البيع منك وتستطيع إضافة ولاء بسيط بلا تكلفة.<br>
+    <b>الخطة:</b> الخندق هو الشبكة والهوية الموحّدة للعميل عبر المتاجر — وهو ما لا يستطيع نظام POS مقفول تقديمه. عمّق هذا وليس الميزات.</p></div>
+
+  <div class="rk"><div class="t"><b>تكلفة الرسائل تلتهم الهامش</b><span class="pill p-m">متوسطة</span></div>
+    <p>مزوّد دولي قد يجعل تكلفة OTP وحدها ثمانية آلاف دولار عند ٢٠٠ ألف عميل.<br>
+    <b>الخطة:</b> تعاقد مبكر مع مزوّد محلي، Web Push كقناة افتراضية، وبيع الحملات بنظام رصيد مستهلك بهامش.</p></div>
+
+  <div class="rk"><div class="t"><b>احتيال داخلي يفسد البيانات</b><span class="pill p-m">متوسطة</span></div>
+    <p>كاشير يمنح نقاطًا لنفسه يفقدك ثقة التاجر ويلوّث البيانات التحليلية معًا.<br>
+    <b>الخطة:</b> الضوابط تُبنى مع النواة لا بعدها — حساب لكل كاشير، سقوف، كشف شذوذ، وسجل تدقيق غير قابل للحذف.</p></div>
+
+  <div class="rk"><div class="t"><b>نفاد النقد قبل الوصول للكثافة</b><span class="pill p-h">مرتفعة</span></div>
+    <p>السبب الأول لموت منصات الشبكة — لا الفشل التقني ولا المنافسة.<br>
+    <b>الخطة:</b> ابدأ بالسيناريو الاقتصادي، وأمّن ١٨–٢٤ شهرًا من النقد التشغيلي، ولا توظّف فريق مبيعات قبل إثبات الاحتفاظ.</p></div>
+
+  <div class="rk"><div class="t"><b>ترحيل نموذج البيانات لاحقًا</b><span class="pill p-m">متوسطة</span></div>
+    <p>إضافة الفروع والسلاسل بعد الإطلاق تعني إعادة كتابة الصلاحيات والتقارير وترحيلًا مؤلمًا.<br>
+    <b>الخطة:</b> التسلسل الهرمي كامل من الأسبوع الأول حتى لو لم يُستخدم — التكلفة الإضافية أيام معدودة.</p></div>
+
+  <div class="rk"><div class="t"><b>مخالفة قوانين حماية البيانات</b><span class="pill p-m">متوسطة</span></div>
+    <p>غرامات فعلية، وخسارة صفقات السلاسل التي تسأل «من يملك بيانات عملائي؟».<br>
+    <b>الخطة:</b> مراجعة قانونية لمرة واحدة قبل الإطلاق التجاري، وعقد معالجة بيانات جاهز لكل تاجر.</p></div>
+</div>
+
+<!-- ============ 8 ============ -->
+<h2 class="sec"><span class="n">٨</span> المؤشرات التي تُراجَع أسبوعيًا</h2>
+<table>
+<thead><tr><th>المؤشر</th><th class="c">الهدف</th><th>لماذا هو مهم</th><th class="c">من المرحلة</th></tr></thead>
+<tbody>
+<tr><td>معدل تفعيل التاجر</td><td class="c">&gt; ٦٠٪</td><td>أهم مؤشر مبكر — يكشف إن كانت آلية إثبات الشراء تعمل فعلًا</td><td class="c">٣</td></tr>
+<tr><td>احتفاظ التاجر بعد ٣ أشهر</td><td class="c">&gt; ٨٠٪</td><td>يقرر إن كان المنتج يستحق البناء عليه أصلًا</td><td class="c">٤</td></tr>
+<tr><td>عملاء جدد لكل متجر شهريًا</td><td class="c">&gt; ١٠٠</td><td>يقيس فاعلية رحلة التسجيل عند الكاشير</td><td class="c">٣</td></tr>
+<tr><td>ارتفاع تكرار الشراء</td><td class="c">&gt; ١٥٪</td><td>القيمة الوحيدة التي تبرر السعر — بلا هذا الرقم لا يوجد منتج</td><td class="c">٤</td></tr>
+<tr><td>معدل استبدال المكافآت</td><td class="c">٢٥–٤٥٪</td><td>يكشف إن كانت المكافآت واقعية أم بعيدة المنال</td><td class="c">٣</td></tr>
+<tr><td>استرداد تكلفة الاستحواذ</td><td class="c">&lt; ٣ أشهر</td><td>معادلة البقاء المالية</td><td class="c">٤</td></tr>
+<tr><td>نمو الإيراد الشهري المتكرر</td><td class="c">&gt; ١٢٪</td><td>لغة المستثمر الوحيدة</td><td class="c">٤</td></tr>
+<tr><td>التكلفة المتغيرة لكل عميل نشط</td><td class="c">&lt; ٠.٠٥ $</td><td>تحرس الهامش من تكلفة الرسائل والبنية</td><td class="c">٢</td></tr>
+</tbody>
+</table>
+
+<div class="warnbox"><b>القاعدة الذهبية:</b> مؤشران فقط يقرران مصير المشروع — <b>احتفاظ التاجر بعد ٣ أشهر فوق ٨٠٪</b>،
+و<b>ارتفاع قابل للقياس في تكرار شراء العميل</b>. كل ما عدا ذلك تفاصيل. لا تجمع تمويلًا كبيرًا ولا توسّع جغرافيًا قبل أن يثبت هذان الرقمان.</div>
+
+<div class="foot">ولائي… كلنا كسبانين.</div>
+</div>
+<script src="../assets/js/switcher.js?v=14"></script>
+</body>
+</html>

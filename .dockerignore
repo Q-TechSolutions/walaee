@@ -32,6 +32,10 @@ backend/media
 
 # التوثيق لا يدخل الصورة
 docs
+# العرض التفاعلي يُنسخ إلى صورة الحافة، فيجب أن يبقى في سياق
+# البناء رغم استبعاد `docs` كلها — راجع Dockerfile.web
+!docs/demo
+!docs/demo/**
 *.md
 !backend/apps/*/README.md
 

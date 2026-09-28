@@ -59,8 +59,8 @@ cp .env.example .env
 DJANGO_SETTINGS_MODULE=config.settings.prod
 DEBUG=0
 SECRET_KEY=<٥٠ محرفًا عشوائيًا>
-ALLOWED_HOSTS=walaee.example.com,web,api
-CSRF_TRUSTED_ORIGINS=https://walaee.example.com
+ALLOWED_HOSTS=walaee.deplois.net,web,api
+CSRF_TRUSTED_ORIGINS=https://walaee.deplois.net
 
 POSTGRES_PASSWORD=<كلمة مرور قوية>
 POSTGRES_HOST=postgres
@@ -101,7 +101,7 @@ make prod-logs        # للمتابعة
 
 ```bash
 docker compose --env-file .env \
-  -f infra/docker/docker-compose.prod.yml up -d --build
+  -f docker-compose.yml up -d --build
 ```
 
 > `--env-file .env` إلزامي. Compose يقرأ متغيرات التداخل `${...}` من الملف
@@ -116,7 +116,7 @@ docker compose --env-file .env \
 ## ثالثًا: التهيئة — مرة واحدة
 
 ```bash
-docker compose --env-file .env -f infra/docker/docker-compose.prod.yml \
+docker compose --env-file .env -f docker-compose.yml \
   exec api python manage.py bootstrap_platform \
     --admin-phone 01000000000 \
     --org "اسم المؤسسة" \
@@ -158,10 +158,10 @@ make harden-db
 | الحقل | القيمة |
 |---|---|
 | النوع | Docker Compose |
-| المستودع | `github.com/mohamedN2018/walaee` |
+| المستودع | `github.com/mohamedN2018/walaee` أو `github.com/Q-TechSolutions/walaee` |
 | الفرع | `main` |
-| مسار Compose | `infra/docker/docker-compose.prod.yml` |
-| النطاق | نطاقك → الخدمة `web` → المنفذ `80` |
+| مسار Compose | `docker-compose.yml` — **الجذر، اتركه كما هو** |
+| النطاق | `walaee.deplois.net` → الخدمة `web` → المنفذ `80` |
 
 ### متغيرات البيئة
 
@@ -172,7 +172,7 @@ Compose كملف بيئة، فينتفي شرط `--env-file` هناك.
 
 ١. افتح طرفية حاوية `api` من Dokploy ونفّذ `bootstrap_platform`.
 ٢. نفّذ تشديد قاعدة البيانات.
-٣. افتح `https://نطاقك/healthz` — يجب أن يردّ `{"status":"ok","database":"ok"}`.
+٣. افتح `https://walaee.deplois.net/healthz` — يجب أن يردّ `{"status":"ok","database":"ok"}`.
 
 ---
 
@@ -184,7 +184,7 @@ Compose كملف بيئة، فينتفي شرط `--env-file` هناك.
 بعد `bootstrap_platform`:
 
 ```bash
-docker compose --env-file .env -f infra/docker/docker-compose.prod.yml   exec api python manage.py demo_accounts --with-data
+docker compose --env-file .env -f docker-compose.yml   exec api python manage.py demo_accounts --with-data
 ```
 
 **أو — الأسهل —** اضبط هذه في `.env` قبل التشغيل، فتُنشأ الحسابات
@@ -276,7 +276,7 @@ DEMO_LOGIN_CODE=
 
 ```bash
 make prod-logs                    # السجلات
-docker compose --env-file .env -f infra/docker/docker-compose.prod.yml ps
+docker compose --env-file .env -f docker-compose.yml ps
 ```
 
 ### نسخة احتياطية
@@ -323,7 +323,7 @@ make prod-up
 ### تدقيق سلامة الأرصدة
 
 ```bash
-docker compose --env-file .env -f infra/docker/docker-compose.prod.yml \
+docker compose --env-file .env -f docker-compose.yml \
   exec api python -c "
 import django, os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE','config.settings.prod'); django.setup()

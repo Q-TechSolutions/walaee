@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>ولائي — دليل الفريق ودورة التطوير (داخلي)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap">
+<noscript><link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/css/theme.css?v=14">
+<link rel="stylesheet" href="../assets/css/arch.css?v=14">
+<style>
+body.team{background:#0E0C18;color:#DDD5F0;}
+.wrap{max-width:1200px;}
+.ibanner{background:repeating-linear-gradient(45deg,#3A1078,#3A1078 14px,#2E0B63 14px,#2E0B63 28px);
+  margin:0 -22px;padding:9px 22px;text-align:center;font-size:11.5px;font-weight:800;color:#FDBA74;
+  letter-spacing:1px;border-bottom:2px solid #F97316;position:sticky;top:0;z-index:40;}
+.thead{background:linear-gradient(150deg,#14142B,#241A45 60%,#3A1078);margin:0 -22px 30px;
+  padding:40px 44px 34px;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.1);}
+.thead::after{content:'';position:absolute;inset-inline-end:-90px;top:-90px;width:320px;height:320px;
+  background:radial-gradient(circle,rgba(249,115,22,.24),transparent 70%);border-radius:50%;}
+.thead a.back{color:#B9A3EE;font-size:12.5px;font-weight:700;display:inline-block;margin-bottom:14px;position:relative;}
+.thead a.back:hover{color:#fff;}
+.thead h1{font-size:clamp(24px,3.2vw,36px);color:#fff;letter-spacing:-1px;position:relative;}
+.thead p{color:#A08FCB;margin-top:9px;font-size:13.5px;max-width:720px;line-height:1.85;position:relative;}
+
+.toclist{background:rgba(14,12,24,.94);border-bottom:1px solid rgba(255,255,255,.1);top:34px;}
+.toclist a{color:#8E7EBB;}
+.toclist a:hover{background:rgba(255,255,255,.08);color:#fff;}
+.toclist a.on{background:#F97316;color:#fff;}
+
+h2.as{color:#fff;} h2.as .n{background:#F97316;}
+h3.h3{color:#C4B4F5;}
+p.lead{color:#8E7EBB;}
+
+/* ---------- بطاقة دور ---------- */
+.role{background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;margin-bottom:16px;
+  transition:var(--t);}
+.role:hover{border-color:rgba(255,255,255,.24);box-shadow:0 18px 44px rgba(0,0,0,.4);}
+.role .rh{padding:15px 18px;display:flex;align-items:center;gap:13px;flex-wrap:wrap;
+  border-bottom:1px solid rgba(255,255,255,.08);}
+.role .rav{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
+  font-size:19px;flex:none;color:#fff;}
+.role .rh b{font-size:16px;color:#fff;display:block;}
+.role .rh span{font-size:11.5px;color:#8E7EBB;font-weight:600;}
+.role .rmeta{margin-inline-start:auto;display:flex;gap:7px;flex-wrap:wrap;}
+.role .rmeta i{font-style:normal;font-size:10.5px;font-weight:800;padding:3px 10px;border-radius:99px;
+  background:rgba(255,255,255,.09);color:#CFC3EC;border:1px solid rgba(255,255,255,.1);}
+.role .rbody{padding:16px 18px;display:grid;grid-template-columns:1.25fr 1fr;gap:20px;}
+.role h5{font-size:11px;letter-spacing:1.2px;color:#7E6FA8;font-weight:800;margin-bottom:8px;}
+.role li{font-size:12.5px;padding:3.5px 0;color:#CFC3EC;display:flex;gap:8px;line-height:1.7;}
+.role li::before{content:'▹';color:#F97316;flex:none;font-weight:800;}
+.role .out li::before{content:'◆';color:#4ADE80;}
+.role .tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.role .tools span{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px;
+  background:rgba(109,59,214,.28);color:#C4B4F5;font-family:'Consolas',monospace;}
+.role .dod2{margin:14px 18px 16px;background:rgba(22,163,74,.13);border:1px solid rgba(74,222,128,.24);
+  border-radius:11px;padding:10px 13px;font-size:12px;color:#CFC3EC;line-height:1.75;}
+.role .dod2 b{color:#6EE7A8;display:block;margin-bottom:3px;font-size:11.5px;}
+.r-pm .rav{background:#4B1E9E;} .r-tl .rav{background:#6D3BD6;} .r-be .rav{background:#16A34A;}
+.r-fe .rav{background:#2563EB;} .r-ux .rav{background:#DB2777;} .r-qa .rav{background:#CA8A04;}
+.r-do .rav{background:#F97316;} .r-fo .rav{background:#0891B2;}
+
+/* ---------- جداول داكنة ---------- */
+table.at{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);}
+table.at th{background:#241A45;color:#C4B4F5;}
+table.at td{border-bottom-color:rgba(255,255,255,.07);color:#CFC3EC;}
+table.at tr:nth-child(even) td{background:rgba(255,255,255,.025);}
+table.at code{background:rgba(109,59,214,.3);color:#C4B4F5;}
+table.at td:first-child{color:#fff;}
+
+/* ---------- RACI ---------- */
+.raci td.c,.raci th.c{text-align:center;font-weight:800;}
+.raci .R{color:#4ADE80;} .raci .A{color:#FDBA74;} .raci .C{color:#93C5FD;} .raci .I{color:#7E6FA8;}
+
+/* ---------- دورة الحياة ---------- */
+.cyc{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;}
+.cy{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;
+  padding:14px 12px;text-align:center;position:relative;transition:var(--t);}
+.cy:hover{background:rgba(255,255,255,.1);transform:translateY(-4px);}
+.cy .ci{width:38px;height:38px;border-radius:12px;margin:0 auto 9px;display:grid;place-items:center;
+  font-size:16px;font-weight:800;color:#fff;}
+.cy b{font-size:12.5px;color:#fff;display:block;margin-bottom:4px;}
+.cy span{font-size:10.5px;color:#8E7EBB;line-height:1.6;display:block;}
+.cy::after{content:'←';position:absolute;inset-inline-start:-11px;top:50%;transform:translateY(-50%);
+  color:#4B1E9E;font-size:15px;font-weight:800;}
+.cy:first-child::after{display:none;}
+
+/* ---------- سبرنت ---------- */
+.spr{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;}
+.sp{min-width:172px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:13px;padding:13px;flex:1;}
+.sp .sn{font-size:10.5px;font-weight:800;color:#F97316;letter-spacing:1px;margin-bottom:6px;}
+.sp b{font-size:13px;color:#fff;display:block;margin-bottom:7px;}
+.sp li{font-size:11px;color:#9A8CC0;padding:2px 0;display:flex;gap:6px;line-height:1.6;}
+.sp li::before{content:'·';color:#6D3BD6;font-weight:800;}
+
+/* ---------- تدفق Git ---------- */
+.gitflow{background:#0A0812;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:20px;
+  font-family:'Consolas','Courier New',monospace;font-size:12px;line-height:2;direction:ltr;text-align:left;
+  color:#CFC3EC;overflow-x:auto;}
+.gitflow .b1{color:#4ADE80;} .gitflow .b2{color:#93C5FD;} .gitflow .b3{color:#FDBA74;}
+.gitflow .cm2{color:#5F6C8C;}
+
+/* ---------- ملاحظات ---------- */
+.nt{background:rgba(109,59,214,.15);border-inline-start-color:#6D3BD6;color:#CFC3EC;}
+.nt b{color:#C4B4F5;}
+.nt.dn{background:rgba(220,38,38,.14);border-inline-start-color:#DC2626;} .nt.dn b{color:#FCA5A5;}
+.nt.ok{background:rgba(22,163,74,.14);border-inline-start-color:#16A34A;} .nt.ok b{color:#6EE7A8;}
+.code{background:#0A0812;}
+.foot{color:#8E7EBB;border-top-color:rgba(255,255,255,.1);}
+.legend span{color:#8E7EBB;}
+
+@media(max-width:1000px){.cyc{grid-template-columns:repeat(3,1fr);} .cy::after{display:none;}}
+@media(max-width:820px){.role .rbody{grid-template-columns:1fr;} .cyc{grid-template-columns:1fr;}}
+</style>
+</head>
+<body class="team">
+<div class="wrap">
+
+<div class="ibanner">مستند داخلي للفريق التقني — غير مخصّص للعرض على العميل أو المستثمر</div>
+
+<div class="thead">
+  <a class="back" href="../index.html">&#8594; العودة لمعرض الواجهات</a>
+  <h1>دليل الفريق ودورة حياة التطوير</h1>
+  <p>مَن يعمل ماذا، ومتى، وبأي معيار يُقبل عمله. هذا المستند يحسم الأدوار والمسؤوليات ونقاط التسليم
+     بين التخصصات، بحيث لا يوجد بند بلا صاحب ولا تسليم بلا معيار قبول.</p>
+</div>
+
+<nav class="toclist" id="toc">
+  <a href="#t1">دورة الحياة</a><a href="#t2">الأدوار</a><a href="#t3">مصفوفة RACI</a>
+  <a href="#t4">تسلسل السبرنت</a><a href="#t5">سير العمل و Git</a><a href="#t6">تعريف الجاهز والمنجز</a>
+  <a href="#t7">نقاط التسليم</a><a href="#t8">الطوارئ</a>
+</nav>
+
+<!-- ═══════════ 1 · دورة الحياة ═══════════ -->
+<h2 class="as" id="t1"><span class="n">١</span> دورة حياة تطوير البرمجيات</h2>
+<p class="lead">ست مراحل متكررة كل أسبوعين. كل مرحلة لها مالك واحد لا أكثر.</p>
+
+<div class="cyc">
+  <div class="cy"><div class="ci" style="background:#4B1E9E">١</div><b>التحليل</b>
+    <span>تحويل الطلب إلى قصص قابلة للتقدير</span></div>
+  <div class="cy"><div class="ci" style="background:#DB2777">٢</div><b>التصميم</b>
+    <span>واجهات وتدفقات معتمدة قبل الكود</span></div>
+  <div class="cy"><div class="ci" style="background:#16A34A">٣</div><b>التنفيذ</b>
+    <span>خلفية وواجهات بالتوازي على عقد API متفق</span></div>
+  <div class="cy"><div class="ci" style="background:#CA8A04">٤</div><b>الاختبار</b>
+    <span>آلي ثم يدوي ثم ميداني</span></div>
+  <div class="cy"><div class="ci" style="background:#F97316">٥</div><b>النشر</b>
+    <span>تدريجي مع إمكانية تراجع فوري</span></div>
+  <div class="cy"><div class="ci" style="background:#2563EB">٦</div><b>المتابعة</b>
+    <span>مراقبة وقياس ثم تغذية راجعة</span></div>
+</div>
+
+<div class="nt"><b>قاعدة الحلقة:</b> لا تبدأ مرحلة قبل أن يُقفل مخرج سابقتها رسميًا.
+أكثر ما يُهدر الوقت في هذا النوع من المشاريع هو بدء البرمجة على تصميم لم يُعتمد، ثم إعادة العمل مرتين.</div>
+
+<!-- ═══════════ 2 · الأدوار ═══════════ -->
+<h2 class="as" id="t2"><span class="n">٢</span> الأدوار والمسؤوليات</h2>
+<p class="lead">ثمانية أدوار. في الفريق المصغّر يجمع الشخص الواحد أكثر من دور — لكن <b>المسؤولية تبقى منفصلة ومعرّفة</b>.</p>
+
+<!-- Product Owner -->
+<div class="role r-pm">
+  <div class="rh"><div class="rav">◎</div>
+    <div><b>مالك المنتج · Product Owner</b><span>صاحب القرار في «ماذا» و«لماذا» — لا في «كيف»</span></div>
+    <div class="rmeta"><i>١ شخص</i><i>دوام جزئي</i><i>غالبًا المؤسس</i></div></div>
+  <div class="rbody">
+    <div><h5>المسؤوليات</h5><ul>
+      <li>تحويل قرارات المرحلة صفر إلى قصص مستخدم مرتّبة بالأولوية</li>
+      <li>حسم التعارضات: أي ميزة تُؤجَّل عند ضيق الوقت</li>
+      <li>اعتماد كل تسليم قبل عرضه على العميل</li>
+      <li>التواصل مع التجّار الأوائل ونقل ملاحظاتهم للفريق</li>
+      <li>مراجعة المؤشرات الأسبوعية واتخاذ القرار بناءً عليها</li>
+    </ul></div>
+    <div><h5>المخرجات</h5><ul class="out">
+      <li>سجل المنتج (Backlog) مرتّب ومحدّث</li>
+      <li>معايير قبول مكتوبة لكل قصة</li>
+      <li>محضر قرارات كل سبرنت</li>
+    </ul>
+    <h5 style="margin-top:14px">الأدوات</h5>
+    <div class="tools"><span>Linear/Jira</span><span>Notion</span><span>Figma (تعليق)</span></div></div>
+  </div>
+  <div class="dod2"><b>معيار قبول عمله</b>
+    أي قصة تدخل السبرنت يجب أن تكون مفهومة للمطوّر <b>بلا سؤال إضافي</b>. لو احتاج المطوّر أن يسأل «قصدك إيه؟» فالقصة غير جاهزة.</div>
+</div>
+
+<!-- Tech Lead -->
+<div class="role r-tl">
+  <div class="rh"><div class="rav">◈</div>
+    <div><b>القائد التقني · Tech Lead / Architect</b><span>صاحب القرار المعماري وحارس الجودة</span></div>
+    <div class="rmeta"><i>١ شخص</i><i>دوام كامل</i><i>٦ أشهر</i></div></div>
+  <div class="rbody">
+    <div><h5>المسؤوليات</h5><ul>
+      <li>اعتماد نموذج البيانات والهجرات — لا تُدمج هجرة بلا مراجعته</li>
+      <li>كتابة محرك القيود بنفسه (<code style="font-family:Consolas">ledger/services.py</code>) — أخطر جزء في النظام</li>
+      <li>مراجعة كل طلب دمج يمس الرصيد أو الصلاحيات أو الفوترة</li>
+      <li>تعريف عقد API قبل بدء الخلفية والواجهة بالتوازي</li>
+      <li>تفكيك القصص إلى مهام تقنية مقدّرة بالساعات</li>
+      <li>حسم أي خلاف تقني خلال ٢٤ ساعة — لا نقاش مفتوح</li>
+    </ul></div>
+    <div><h5>المخرجات</h5><ul class="out">
+      <li>مخطط قاعدة البيانات والهجرات الأولى</li>
+      <li>عقد OpenAPI معتمد قبل السبرنت الثاني</li>
+      <li>قوالب طلبات الدمج ومعايير المراجعة</li>
+      <li>سجل قرارات معمارية (ADR) لكل قرار غير رجعي</li>
+    </ul>
+    <h5 style="margin-top:14px">الأدوات</h5>
+    <div class="tools"><span>dbdiagram</span><span>drf-spectacular</span><span>GitHub Reviews</span></div></div>
+  </div>
+  <div class="dod2"><b>معيار قبول عمله</b>
+    مطوّر جديد ينضم للفريق يستطيع تشغيل المشروع محليًا وفهم تدفق المنح <b>خلال يوم عمل واحد</b> من التوثيق وحده.</div>
+</div>
+
+<!-- Backend -->
+<div class="role r-be">
+  <div class="rh"><div class="rav">◧</div>
+    <div><b>مطوّر الخلفية · Backend Developer</b><span>Django · DRF · Celery · PostgreSQL</span></div>
+    <div class="rmeta"><i>١–٢ شخص</i><i>دوام كامل</i><i>أثقل حِمل</i></div></div>
+  <div class="rbody">
+    <div><h5>المسؤوليات</h5><ul>
+      <li>تنفيذ النماذج والهجرات بالتسلسل الهرمي الكامل من اليوم الأول</li>
+      <li>بناء نقاط API طبقًا للعقد المعتمد — لا انحراف عنه بلا إخطار</li>
+      <li>محرك القواعد للنماذج الستة وحساب المنح لكل نموذج</li>
+      <li>تدوير رموز QR في Redis مع TTL والتحقق من الاستهلاك مرة واحدة</li>
+      <li>ضوابط الاحتيال والسقوف اليومية وسجل التدقيق</li>
+      <li>مهام Celery والطوابير المعزولة</li>
+      <li>كتابة اختبارات وحدة لكل منطق مالي — <b>لا استثناء</b></li>
+    </ul></div>
+    <div><h5>المخرجات</h5><ul class="out">
+      <li>API عاملة وموثّقة تلقائيًا</li>
+      <li>تغطية اختبارات ١٠٠٪ لتطبيق <code style="font-family:Consolas">ledger</code></li>
+      <li>بيانات بذرة (seed) لتشغيل بيئة تطوير كاملة بأمر واحد</li>
+      <li>سكربتات ترحيل قابلة للتراجع</li>
+    </ul>
+    <h5 style="margin-top:14px">الأدوات</h5>
+    <div class="tools"><span>Django 5</span><span>DRF</span><span>Celery</span><span>pytest</span><span>ruff</span></div></div>
+  </div>
+  <div class="dod2"><b>معيار قبول عمله</b>
+    اختبار التزامن (ضغطتان متزامنتان على «تأكيد») ينجح، والرصيد يتغيّر <b>مرة واحدة فقط</b>. بدون هذا لا يُدمج الكود مهما كان جاهزًا.</div>
+</div>
+
+<!-- Frontend -->
+<div class="role r-fe">
+  <div class="rh"><div class="rav">◨</div>
+    <div><b>مطوّر الواجهات · Frontend Developer</b><span>PWA للعميل + لوحتا التاجر والإدارة</span></div>
+    <div class="rmeta"><i>١–٢ شخص</i><i>دوام كامل</i><i>RTL إلزامي</i></div></div>
+  <div class="rbody">
+    <div><h5>المسؤوليات</h5><ul>
+      <li>بناء تطبيق العميل كـ PWA: Service Worker، تثبيت على الشاشة، عمل دون اتصال</li>
+      <li>قراءة QR من كاميرا المتصفح ومعالجة رفض الإذن بسلاسة</li>
+      <li>لوحتا التاجر والإدارة بكل جداولها ورسومها</li>
+      <li>تطبيق نظام التصميم كما هو — لا ألوان ولا مسافات خارج المتغيّرات</li>
+      <li>حالات التحميل والخطأ والفراغ لكل شاشة — <b>ليست اختيارية</b></li>
+      <li>دعم RTL كامل واختبار على أجهزة حقيقية لا محاكيات فقط</li>
+    </ul></div>
+    <div><h5>المخرجات</h5><ul class="out">
+      <li>ثلاث واجهات مبنية ومربوطة بالـ API</li>
+      <li>مكتبة مكوّنات مشتركة موثّقة</li>
+      <li>تقرير Lighthouse: أداء وإتاحة فوق ٩٠</li>
+    </ul>
+    <h5 style="margin-top:14px">الأدوات</h5>
+    <div class="tools"><span>Vite</span><span>React/Vue</span><span>Workbox</span><span>html5-qrcode</span></div></div>
+  </div>
+  <div class="dod2"><b>معيار قبول عمله</b>
+    الشاشة تعمل على <b>iOS 15 و Android 9</b> بشبكة ٣G، وتحمّل أول محتوى في أقل من ثانيتين، وكل حالة خطأ لها رسالة مفهومة بالعربية.</div>
+</div>
+
+<!-- UI/UX -->
+<div class="role r-ux">
+  <div class="rh"><div class="rav">◐</div>
+    <div><b>مصمم التجربة · UI/UX Designer</b><span>يسبق المطوّر بسبرنت كامل</span></div>
+    <div class="rmeta"><i>١ شخص</i><i>٤ أشهر</i><i>جزئي لاحقًا</i></div></div>
+  <div class="rbody">
+    <div><h5>المسؤوليات</h5><ul>
+      <li>تسليم التصاميم <b>قبل</b> سبرنت التنفيذ بأسبوعين — لا تصميم أثناء البرمجة</li>
+      <li>نظام تصميم موحّد: ألوان، مسافات، خطوط، مكوّنات، حالات</li>
+      <li>تصميم حالات التحميل والخطأ والفراغ لكل شاشة</li>
+      <li>اختبار الاستخدام مع ٥ مستخدمين حقيقيين قبل كل إطلاق</li>
+      <li>مراجعة الواجهة المنفَّذة مقابل التصميم (Design QA)</li>
+    </ul></div>
+    <div><h5>المخرجات</h5><ul class="out">
+      <li>ملف Figma بمكتبة مكوّنات مرتبطة</li>
+      <li>تدفقات المستخدم لكل رحلة رئيسية</li>
+      <li>تقرير اختبار استخدام بملاحظات مرتّبة</li>
+    </ul>
+    <h5 style="margin-top:14px">الأدوات</h5>
+    <div class="tools"><span>Figma</span><span>Maze</span><span>Design Tokens</span></div></div>
+  </div>
+  <div class="dod2"><b>معيار قبول عمله</b>
+    <b>الكاشير يفهم شاشته بلا تدريب.</b> إن احتاجت شرحًا فالتصميم فشل — والفشل هنا يكلّف تبنّي المنتج كله.</div>
+</div>
+
+<!-- QA -->
+<div class="role r-qa">
+  <div class="rh"><div class="rav">◍</div>
+    <div><b>مهندس الجودة · QA Engineer</b><span>خط الدفاع الأخير قبل جيب التاجر</span></div>
+    <div class="rmeta"><i>١ شخص</i><i>٤ أشهر</i><i>يبدأ من السبرنت ٢</i></div></div>
+  <div class="rbody">
+    <div><h5>المسؤوليات</h5><ul>
+      <li>كتابة حالات الاختبار من معايير القبول قبل انتهاء التنفيذ</li>
+      <li>اختبار المنطق المالي بسيناريوهات حافة: رصيد صفر، مرتجع، تأكيد مزدوج، انتهاء صلاحية أثناء العملية</li>
+      <li>اختبار الصلاحيات: كل دور × كل نقطة — أهم اختبار أمني</li>
+      <li>الاختبار الميداني بساعة إيقاف عند كاشير حقيقي</li>
+      <li>تتبّع العيوب حتى الإغلاق ومنع تكرارها</li>
+    </ul></div>
+    <div><h5>المخرجات</h5><ul class="out">
+      <li>مجموعة اختبارات انحدار تعمل قبل كل نشر</li>
+      <li>تقرير زمن العملية عند الكاشير لكل إصدار</li>
+      <li>سجل عيوب مصنّف بالخطورة</li>
+    </ul>
+    <h5 style="margin-top:14px">الأدوات</h5>
+    <div class="tools"><span>pytest</span><span>Playwright</span><span>schemathesis</span><span>locust</span></div></div>
+  </div>
+  <div class="dod2"><b>معيار قبول عمله</b>
+    صفر عيوب حرجة مفتوحة عند النشر، و<b>زمن العملية عند الكاشير أقل من ١٠ ثوانٍ</b> مقيسًا في متجر حقيقي لا في بيئة تطوير.</div>
+</div>
+
+<!-- DevOps -->
+<div class="role r-do">
+  <div class="rh"><div class="rav">◉</div>
+    <div><b>مهندس التشغيل · DevOps Engineer</b><span>البنية والنشر والمراقبة والنسخ الاحتياطي</span></div>
+    <div class="rmeta"><i>١ شخص</i><i>جزئي ٣ أشهر</i><i>ثم عند الحاجة</i></div></div>
+  <div class="rbody">
+    <div><h5>المسؤوليات</h5><ul>
+      <li>تجهيز بيئات: تطوير، تجريب (Staging)، إنتاج — <b>متطابقة</b> عبر Docker</li>
+      <li>خط تكامل ونشر مستمر: فحص، اختبار، بناء، هجرة، نشر</li>
+      <li>نشر بلا انقطاع مع تراجع تلقائي عند فشل الفحص الصحي</li>
+      <li>نسخ احتياطي يومي مشفّر + <b>اختبار استرجاع شهري فعلي</b></li>
+      <li>مراقبة: زمن التشغيل، زمن الاستجابة، الأخطاء، التكلفة</li>
+      <li>إدارة الأسرار — لا مفتاح داخل المستودع أبدًا</li>
+      <li>ضبط تحديد المعدل و TLS ورؤوس الأمان</li>
+    </ul></div>
+    <div><h5>المخرجات</h5><ul class="out">
+      <li>Dockerfile و compose للإنتاج</li>
+      <li>خط CI/CD كامل مع بوابات جودة</li>
+      <li>لوحة مراقبة وتنبيهات</li>
+      <li>دليل استرجاع من الكوارث مُختبَر</li>
+    </ul>
+    <h5 style="margin-top:14px">الأدوات</h5>
+    <div class="tools"><span>Docker</span><span>Dokploy</span><span>GitHub Actions</span><span>Sentry</span><span>pgBackRest</span></div></div>
+  </div>
+  <div class="dod2"><b>معيار قبول عمله</b>
+    <b>استرجاع قاعدة البيانات من نسخة احتياطية يتم فعليًا في أقل من ٣٠ دقيقة</b> — مُثبتًا بتجربة حقيقية شهريًا، لا بالثقة في الأداة.</div>
+</div>
+
+<!-- Field Ops -->
+<div class="role r-fo">
+  <div class="rh"><div class="rav">◭</div>
+    <div><b>التشغيل الميداني · Field Ops</b><span>الدور الذي ينساه الجميع — وهو المخاطرة رقم واحد</span></div>
+    <div class="rmeta"><i>١–٢ شخص</i><i>من الشهر ٥</i><i>غير تقني</i></div></div>
+  <div class="rbody">
+    <div><h5>المسؤوليات</h5><ul>
+      <li>ضم المتاجر داخل البقعة الجغرافية المختارة</li>
+      <li>تركيب عُدّة التفعيل: ستاند QR، ملصقات، دليل الكاشير</li>
+      <li><b>تدريب الكاشير وجهًا لوجه</b> — لا فيديو ولا PDF</li>
+      <li>المتابعة الأسبوعية لأول شهر لكل متجر جديد</li>
+      <li>نقل الاحتكاك الحقيقي للفريق التقني بلا تجميل</li>
+    </ul></div>
+    <div><h5>المخرجات</h5><ul class="out">
+      <li>تقرير أسبوعي بمعدل التفعيل لكل متجر</li>
+      <li>قائمة الاعتراضات المتكررة من التجّار</li>
+      <li>قياس زمن العملية في الميدان</li>
+    </ul>
+    <h5 style="margin-top:14px">الأدوات</h5>
+    <div class="tools"><span>CRM بسيط</span><span>واتساب</span><span>نموذج تقرير موحّد</span></div></div>
+  </div>
+  <div class="dod2"><b>معيار قبول عمله</b>
+    <b>٦٠٪ من المتاجر المنضمة تسجّل ١٠ عمليات أو أكثر خلال أسبوعين.</b> أقل من ذلك يعني أن المشكلة في المنتج لا في البيع — والعودة للفريق التقني إلزامية.</div>
+</div>
+
+<!-- ═══════════ 3 · RACI ═══════════ -->
+<h2 class="as" id="t3"><span class="n">٣</span> مصفوفة المسؤوليات (RACI)</h2>
+<p class="lead"><span class="raci"><b class="R">R</b> ينفّذ · <b class="A">A</b> يعتمد ويُسأل · <b class="C">C</b> يُستشار · <b class="I">I</b> يُبلَّغ</span></p>
+<table class="at raci">
+<thead><tr><th>النشاط</th><th class="c">PO</th><th class="c">Lead</th><th class="c">BE</th><th class="c">FE</th><th class="c">UX</th><th class="c">QA</th><th class="c">DevOps</th><th class="c">Field</th></tr></thead>
+<tbody>
+<tr><td>ترتيب أولويات المنتج</td><td class="c A">A</td><td class="c C">C</td><td class="c I">I</td><td class="c I">I</td><td class="c C">C</td><td class="c I">I</td><td class="c I">I</td><td class="c C">C</td></tr>
+<tr><td>نموذج البيانات والهجرات</td><td class="c I">I</td><td class="c A">A</td><td class="c R">R</td><td class="c I">I</td><td class="c">—</td><td class="c C">C</td><td class="c C">C</td><td class="c">—</td></tr>
+<tr><td>عقد API</td><td class="c I">I</td><td class="c A">A</td><td class="c R">R</td><td class="c C">C</td><td class="c">—</td><td class="c C">C</td><td class="c I">I</td><td class="c">—</td></tr>
+<tr><td><b>محرك القيود والرصيد</b></td><td class="c I">I</td><td class="c A">A</td><td class="c R">R</td><td class="c">—</td><td class="c">—</td><td class="c C">C</td><td class="c">—</td><td class="c">—</td></tr>
+<tr><td>تصميم الواجهات</td><td class="c A">A</td><td class="c C">C</td><td class="c I">I</td><td class="c C">C</td><td class="c R">R</td><td class="c I">I</td><td class="c">—</td><td class="c C">C</td></tr>
+<tr><td>تنفيذ الواجهات</td><td class="c I">I</td><td class="c A">A</td><td class="c C">C</td><td class="c R">R</td><td class="c C">C</td><td class="c C">C</td><td class="c">—</td><td class="c">—</td></tr>
+<tr><td>ضوابط الاحتيال</td><td class="c C">C</td><td class="c A">A</td><td class="c R">R</td><td class="c C">C</td><td class="c">—</td><td class="c R">R</td><td class="c I">I</td><td class="c C">C</td></tr>
+<tr><td>خط CI/CD والبيئات</td><td class="c I">I</td><td class="c C">C</td><td class="c C">C</td><td class="c I">I</td><td class="c">—</td><td class="c C">C</td><td class="c A">A</td><td class="c">—</td></tr>
+<tr><td><b>النشر للإنتاج</b></td><td class="c A">A</td><td class="c C">C</td><td class="c I">I</td><td class="c I">I</td><td class="c">—</td><td class="c C">C</td><td class="c R">R</td><td class="c I">I</td></tr>
+<tr><td>النسخ الاحتياطي والاسترجاع</td><td class="c I">I</td><td class="c C">C</td><td class="c I">I</td><td class="c">—</td><td class="c">—</td><td class="c I">I</td><td class="c A">A</td><td class="c">—</td></tr>
+<tr><td>الاختبار الميداني</td><td class="c A">A</td><td class="c I">I</td><td class="c I">I</td><td class="c I">I</td><td class="c C">C</td><td class="c R">R</td><td class="c">—</td><td class="c R">R</td></tr>
+<tr><td>ضم المتاجر وتدريبها</td><td class="c A">A</td><td class="c">—</td><td class="c">—</td><td class="c">—</td><td class="c I">I</td><td class="c I">I</td><td class="c">—</td><td class="c R">R</td></tr>
+<tr><td>الامتثال وحماية البيانات</td><td class="c A">A</td><td class="c R">R</td><td class="c R">R</td><td class="c C">C</td><td class="c C">C</td><td class="c C">C</td><td class="c R">R</td><td class="c I">I</td></tr>
+</tbody>
+</table>
+<div class="nt dn"><b>قاعدة صارمة:</b> لكل صف <b>حرف A واحد فقط</b>. تعدّد المعتمِدين يعني عمليًا أن لا أحد مسؤول —
+وهو السبب الأول لتعطّل القرارات في الفرق الصغيرة.</div>
+
+<!-- ═══════════ 4 · السبرنت ═══════════ -->
+<h2 class="as" id="t4"><span class="n">٤</span> تسلسل السبرنتات</h2>
+<p class="lead">سبرنت = أسبوعان. اثنا عشر سبرنتًا حتى نهاية المرحلة الرابعة.</p>
+<div class="spr">
+  <div class="sp"><div class="sn">SPRINT 0</div><b>التأسيس</b><ul>
+    <li>قرارات المرحلة صفر</li><li>تجهيز المستودع والبيئات</li><li>عقد API الأولي</li><li>نموذج البيانات</li></ul></div>
+  <div class="sp"><div class="sn">SPRINT 1–2</div><b>النواة</b><ul>
+    <li>المصادقة و OTP</li><li>التسلسل الهرمي</li><li>تدوير رموز QR</li><li>دورة المنح كاملة</li></ul></div>
+  <div class="sp"><div class="sn">SPRINT 3–4</div><b>الولاء</b><ul>
+    <li>النماذج الستة</li><li>محرك القواعد</li><li>الصلاحية والعكس</li><li>ضوابط الاحتيال</li></ul></div>
+  <div class="sp"><div class="sn">SPRINT 5–6</div><b>الواجهات</b><ul>
+    <li>تطبيق العميل PWA</li><li>لوحة التاجر</li><li>وضع الكاشير</li><li>الإشعارات</li></ul></div>
+  <div class="sp"><div class="sn">SPRINT 7–8</div><b>التجريب</b><ul>
+    <li>تسجيل التاجر ذاتيًا</li><li>عُدّة التفعيل</li><li>٥–١٠ متاجر</li><li>تصحيح الاحتكاك</li></ul></div>
+  <div class="sp"><div class="sn">SPRINT 9–12</div><b>الإيراد</b><ul>
+    <li>الاشتراكات والفوترة</li><li>الحملات والقنوات</li><li>التقارير</li><li>لوحة الإدارة</li></ul></div>
+</div>
+
+<h3 class="h3">طقوس ثابتة</h3>
+<table class="at">
+<thead><tr><th>الطقس</th><th>التوقيت</th><th>المدة</th><th>المخرج</th></tr></thead>
+<tbody>
+<tr><td>وقفة يومية</td><td>يوميًا ١٠:٠٠</td><td>١٥ دقيقة</td><td>ثلاثة أسئلة فقط — العوائق تُحل خارجها</td></tr>
+<tr><td>تخطيط السبرنت</td><td>أول يوم أحد</td><td>ساعتان</td><td>التزام بنطاق محدد لا يُزاد أثناء السبرنت</td></tr>
+<tr><td>عرض السبرنت</td><td>آخر خميس</td><td>ساعة</td><td>عرض شغّال — لا شرائح</td></tr>
+<tr><td>مراجعة استرجاعية</td><td>بعد العرض</td><td>٤٥ دقيقة</td><td>إجراءان قابلان للتنفيذ بمالك وتاريخ</td></tr>
+<tr><td>تهذيب السجل</td><td>منتصف السبرنت</td><td>ساعة</td><td>سجل جاهز للسبرنت التالي</td></tr>
+</tbody>
+</table>
+
+<!-- ═══════════ 5 · Git ═══════════ -->
+<h2 class="as" id="t5"><span class="n">٥</span> سير العمل و Git</h2>
+<div class="gitflow">
+<span class="b1">main</span>          <span class="cm2">──●────────────●──────────────●──</span>   <span class="cm2"># إنتاج · محمي · نشر تلقائي</span><br>
+                <span class="cm2">╲</span>            <span class="cm2">╱</span>              <span class="cm2">╱</span><br>
+<span class="b2">develop</span>       <span class="cm2">──●──●──●──●──●──●──●──●──●──</span>   <span class="cm2"># تجريب · نشر تلقائي على Staging</span><br>
+                <span class="cm2">╲</span>     <span class="cm2">╱</span>  <span class="cm2">╲</span>     <span class="cm2">╱</span><br>
+<span class="b3">feat/*</span>        <span class="cm2">──●──●──</span>   <span class="cm2">──●──●──</span>            <span class="cm2"># فرع لكل قصة · يُحذف بعد الدمج</span><br>
+<br>
+<span class="cm2">تسمية الفروع:</span><br>
+  <span class="b3">feat/</span>ledger-apply-entry      <span class="cm2"># ميزة جديدة</span><br>
+  <span class="b3">fix/</span>double-confirm-race      <span class="cm2"># إصلاح عيب</span><br>
+  <span class="b3">chore/</span>upgrade-django-5.1     <span class="cm2"># صيانة</span><br>
+<br>
+<span class="cm2">صيغة الالتزام (Conventional Commits):</span><br>
+  feat(ledger): add daily cap enforcement<br>
+  fix(pos): reject reused QR code within TTL<br>
+  test(ledger): cover concurrent confirm scenario
+</div>
+
+<h3 class="h3">بوابات الدمج — لا استثناء</h3>
+<table class="at">
+<thead><tr><th class="c">#</th><th>البوابة</th><th>المسؤول</th><th>يُرفض الدمج إذا</th></tr></thead>
+<tbody>
+<tr><td class="c">١</td><td>فحص التنسيق والأنماط</td><td>آلي (CI)</td><td>أي مخالفة في <code>ruff</code> أو <code>black</code></td></tr>
+<tr><td class="c">٢</td><td>الاختبارات الآلية</td><td>آلي (CI)</td><td>اختبار راسب أو تغطية <code>ledger</code> أقل من ١٠٠٪</td></tr>
+<tr><td class="c">٣</td><td>مراجعة الكود</td><td>Tech Lead</td><td>بلا موافقة واحدة على الأقل — واثنتان لكل ما يمس الرصيد</td></tr>
+<tr><td class="c">٤</td><td>مراجعة التصميم</td><td>UX</td><td>انحراف بصري عن التصميم المعتمد</td></tr>
+<tr><td class="c">٥</td><td>اختبار يدوي</td><td>QA</td><td>عيب حرج أو معيار قبول غير محقق</td></tr>
+<tr><td class="c">٦</td><td>فحص أمني</td><td>آلي (CI)</td><td>ثغرة عالية في <code>pip-audit</code> أو سر مكشوف</td></tr>
+</tbody>
+</table>
+
+<!-- ═══════════ 6 · DoR / DoD ═══════════ -->
+<h2 class="as" id="t6"><span class="n">٦</span> تعريف الجاهز وتعريف المنجز</h2>
+<div class="cols2">
+  <div>
+    <h3 class="h3">Definition of Ready — قبل دخول السبرنت</h3>
+    <table class="at"><tbody>
+    <tr><td>✓ القصة مكتوبة بصيغة «كـ… أريد… حتى…»</td></tr>
+    <tr><td>✓ معايير القبول محددة وقابلة للاختبار</td></tr>
+    <tr><td>✓ التصميم جاهز ومعتمد (إن كانت واجهة)</td></tr>
+    <tr><td>✓ عقد API متفق عليه (إن كانت تمس الخلفية)</td></tr>
+    <tr><td>✓ التبعيات معروفة وغير حاجبة</td></tr>
+    <tr><td>✓ مقدّرة من الفريق — لا من شخص واحد</td></tr>
+    <tr><td>✓ تُنجَز داخل سبرنت واحد — وإلا تُقسَّم</td></tr>
+    </tbody></table>
+  </div>
+  <div>
+    <h3 class="h3">Definition of Done — قبل الإغلاق</h3>
+    <table class="at"><tbody>
+    <tr><td>✓ الكود مدموج في <code>develop</code> وكل البوابات خضراء</td></tr>
+    <tr><td>✓ اختبارات وحدة وتكامل مكتوبة وناجحة</td></tr>
+    <tr><td>✓ التوثيق محدّث (API + README)</td></tr>
+    <tr><td>✓ حالات التحميل والخطأ والفراغ منفّذة</td></tr>
+    <tr><td>✓ RTL مضبوط ومختبَر على جهاز حقيقي</td></tr>
+    <tr><td>✓ QA اعتمدها على بيئة التجريب</td></tr>
+    <tr><td>✓ PO شاهدها تعمل واعتمدها</td></tr>
+    <tr><td>✓ منشورة على Staging وتعمل</td></tr>
+    </tbody></table>
+  </div>
+</div>
+<div class="nt ok"><b>لماذا هذان التعريفان تحديدًا؟</b> لأن أكثر ما يُفشل الفرق الصغيرة ليس ضعف المهارة،
+بل <b>الاختلاف الصامت على معنى «خلصت»</b>. تعريف مكتوب ومعلّق يحسم الجدل قبل أن يبدأ.</div>
+
+<!-- ═══════════ 7 · نقاط التسليم ═══════════ -->
+<h2 class="as" id="t7"><span class="n">٧</span> نقاط التسليم بين الأدوار</h2>
+<p class="lead">أخطر لحظة في أي مشروع هي انتقال العمل من يد إلى يد. هذه هي النقاط، وما يجب أن يُسلَّم فيها بالضبط.</p>
+<table class="at">
+<thead><tr><th>من</th><th>إلى</th><th>ما يُسلَّم</th><th>لا يبدأ المستلم قبل</th></tr></thead>
+<tbody>
+<tr><td>PO</td><td>UX</td><td>قصة بمعايير قبول + سياق المستخدم</td><td>وضوح «لماذا» لا «ماذا» فقط</td></tr>
+<tr><td>UX</td><td>Frontend</td><td>Figma بمكوّنات مرتبطة + كل الحالات + توكنات</td><td>وجود حالة تحميل وخطأ وفراغ لكل شاشة</td></tr>
+<tr><td>Tech Lead</td><td>BE + FE</td><td>عقد API نهائي + مخطط البيانات</td><td>اعتماد العقد من الطرفين معًا</td></tr>
+<tr><td>Backend</td><td>Frontend</td><td>نقاط عاملة + بيانات تجريبية + توثيق</td><td>إمكانية استدعاء كل نقطة من التوثيق التفاعلي</td></tr>
+<tr><td>BE + FE</td><td>QA</td><td>ميزة على Staging + خطوات إعادة الإنتاج</td><td>نجاح المسار السعيد يدويًا مرة واحدة</td></tr>
+<tr><td>QA</td><td>DevOps</td><td>اعتماد الإصدار + قائمة تحقق</td><td>صفر عيوب حرجة مفتوحة</td></tr>
+<tr><td>DevOps</td><td>Field Ops</td><td>إصدار منشور + ملاحظات التغيير بالعربية</td><td>نجاح الفحص الصحي واستقرار ٢٤ ساعة</td></tr>
+<tr><td>Field Ops</td><td>PO</td><td>تقرير ميداني بالأرقام والاعتراضات</td><td>ملاحظات من ٣ متاجر مختلفة على الأقل</td></tr>
+</tbody>
+</table>
+
+<!-- ═══════════ 8 · الطوارئ ═══════════ -->
+<h2 class="as" id="t8"><span class="n">٨</span> إجراءات الطوارئ</h2>
+<table class="at">
+<thead><tr><th>الحدث</th><th class="c">الخطورة</th><th>الاستجابة الفورية</th><th>المسؤول</th></tr></thead>
+<tbody>
+<tr><td><b>خطأ في الرصيد لدى تاجر</b></td><td class="c" style="color:#FCA5A5">حرجة</td><td>تجميد المنح لتلك العلامة فورًا · تحليل السجل · تصحيح بقيود عكسية · إبلاغ التاجر بالرقم الصحيح</td><td>Tech Lead</td></tr>
+<tr><td>انقطاع الخدمة</td><td class="c" style="color:#FCA5A5">حرجة</td><td>تراجع للإصدار السابق أولًا · التحليل لاحقًا · إشعار التجّار خلال ١٥ دقيقة</td><td>DevOps</td></tr>
+<tr><td>تسريب أو اشتباه تسريب بيانات</td><td class="c" style="color:#FCA5A5">حرجة</td><td>إبطال كل التوكنات · عزل الخدمة · إبلاغ قانوني خلال ٧٢ ساعة</td><td>Tech Lead + PO</td></tr>
+<tr><td>موجة احتيال من فرع</td><td class="c" style="color:#FDBA74">عالية</td><td>تعليق حساب الكاشير · مراجعة عملياته · عكس المنح المشبوهة</td><td>Backend + PO</td></tr>
+<tr><td>بطء العملية عند الكاشير</td><td class="c" style="color:#FDBA74">عالية</td><td>قياس فوري · تفعيل المسار اليدوي مؤقتًا · إصلاح قبل أي ميزة جديدة</td><td>QA + FE</td></tr>
+<tr><td>نفاد رصيد الرسائل</td><td class="c" style="color:#93C5FD">متوسطة</td><td>تحويل تلقائي للإشعارات المجانية · تنبيه التاجر</td><td>Backend</td></tr>
+</tbody>
+</table>
+
+<div class="nt dn"><b>القاعدة الذهبية للطوارئ:</b> في العطل الحرج — <b>استعِد الخدمة أولًا، وحلّل بعدها</b>.
+البحث عن السبب الجذري بينما النظام متوقف يضاعف الضرر. التراجع ليس فشلًا، بل إجراء مخطط له مسبقًا.</div>
+
+<div class="foot">مستند داخلي · ولائي · للفريق التقني فقط</div>
+</div>
+
+<script src="../assets/js/switcher.js?v=14"></script>
+<script>
+(function () {
+  var links = [].slice.call(document.querySelectorAll('.toclist a'));
+  var secs = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  function sync() {
+    var y = window.scrollY + 140, cur = 0;
+    secs.forEach(function (s, i) { if (s && s.offsetTop <= y) cur = i; });
+    links.forEach(function (a, i) { a.classList.toggle('on', i === cur); });
+    if (links[cur]) links[cur].scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }
+  window.addEventListener('scroll', sync, { passive: true });
+  sync();
+})();
+</script>
+</body>
+</html>

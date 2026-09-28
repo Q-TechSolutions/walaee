@@ -6,6 +6,7 @@
 #      /app/       تطبيق العميل (PWA)
 #      /merchant/  لوحة المتجر
 #      /admin/     لوحة إدارة المنصة
+#      /demo/      العرض التفاعلي — HTML ثابت
 #      /api/       تمرير إلى الخلفية
 #
 #  حاوية واحدة لا أربع: أربع حاويات تعني أربعة دومينات وأربع
@@ -54,6 +55,16 @@ COPY --from=builder /build/landing/dist/            /usr/share/nginx/html/
 COPY --from=builder /build/customer-pwa/dist/       /usr/share/nginx/html/app/
 COPY --from=builder /build/merchant-dashboard/dist/ /usr/share/nginx/html/merchant/
 COPY --from=builder /build/admin-panel/dist/        /usr/share/nginx/html/admin/
+
+# العرض التفاعلي — يُنسخ من المستودع لا من البناء: HTML ثابت بلا
+# أي خطوة ترجمة، ووضعه في مرحلة البناء كان سيعيد نسخه في كل
+# تغيير بالواجهات بلا سبب
+COPY docs/demo/ /usr/share/nginx/html/demo/
+
+# جذر تحدّي ACME. المجلد يُنشأ فارغًا: وجوده يجعل nginx يردّ 404
+# على تحدٍّ غير موجود بدل 500 على جذر مفقود — و404 هي الإجابة
+# الصحيحة حين يتولى Traefik الشهادة بنفسه
+RUN mkdir -p /var/www/certbot
 
 EXPOSE 80
 

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ولائي — لوحة إدارة المنصة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap">
+<noscript><link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/css/theme.css?v=14">
+<link rel="stylesheet" href="../assets/css/mobile.css?v=14">
+<link rel="stylesheet" href="../assets/css/dashboard.css?v=14">
+<style>.side{background:linear-gradient(180deg,#14142B,#0B0918);}</style>
+</head>
+<body class="dash">
+
+<div class="shell">
+  <aside class="side" id="side">
+    <div class="brand">
+      <a class="logo" href="../index.html">
+        <span class="mark" style="background:rgba(255,255,255,.14)"><svg viewBox="0 0 24 24"><path d="M21 3v7.5A10.5 10.5 0 0 1 10.5 21H3v-7.5A10.5 10.5 0 0 1 13.5 3z" fill="currentColor" opacity=".32"/><path d="M21 3c-2 10-8.5 16.5-18 18C5 11 11.5 4.5 21 3z" fill="currentColor"/></svg></span>
+        <span class="txt"><b>ولائي</b><span>لوحة إدارة المنصة</span></span>
+      </a>
+    </div>
+    <nav id="nav"></nav>
+    <div class="foot">
+      <div class="row">
+        <div class="av av-sm">م</div>
+        <div class="grow"><b style="font-size:12.5px;color:#fff">محمد نبيل</b>
+          <div style="font-size:10.5px;color:#A995DE">مالك المنصة</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topnav">
+      <div class="grow"><h1 id="pt">نظرة عامة</h1><div class="crumb" id="ps"></div></div>
+      <span class="badge bg-g"><span class="dot" style="background:currentColor"></span> كل الخدمات تعمل</span>
+      <button class="btn btn-line btn-sm" onclick="ADM.go('kpis')">مؤشرات الصحة</button>
+    </div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<script src="../assets/js/icons.js?v=14"></script>
+<script src="../assets/js/ui.js?v=14"></script>
+<script src="../assets/js/data.js?v=14"></script>
+<script src="../assets/js/admin.js?v=14"></script>
+<script src="../assets/js/switcher.js?v=14"></script>
+<script>ADM.init();</script>
+</body>
+</html>

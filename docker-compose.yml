@@ -1,71 +1,208 @@
 # ══════════════════════════════════════════════════════════
-#  بيئة التطوير المحلية للمشروع الفعلي
-#  ملاحظة: docker-compose.yml في جذر المستودع يخص موقع العرض فقط
-#  التشغيل:  cd project && docker compose -f docker-compose.dev.yml up -d
+#  ولائي — تركيبة النشر
+#
+#  هذا هو ملف النشر الوحيد، وموضعه في **جذر المستودع** مقصود:
+#  منصّات النشر التي تبني من Git — Dokploy وCoolify وما شابههما —
+#  تشغّل `docker compose -f ./docker-compose.yml` من الجذر بلا
+#  سؤال. ملفٌ في `infra/` يعني أن كل نشر يبدأ بتعديل إعداد في
+#  لوحة المنصة، وأن نسيانه يعطي رسالة لا تشرح نفسها:
+#  «Domain attached to service "web" which does not exist».
+#
+#  التشغيل يدويًا:
+#      docker compose --env-file .env up -d --build
+#  أو:  make prod-build && make prod-up
+#
+#  قاعدة البيانات والكاش للتطوير المحلي وحدهما في
+#  `docker-compose.dev.yml` — راجع `make up`.
 # ══════════════════════════════════════════════════════════
-name: walaee-dev
+name: walaee
+
+x-api-base: &api-base
+  build:
+    context: .
+    dockerfile: infra/docker/Dockerfile.backend
+  image: walaee-backend:latest
+  env_file: [.env]
+  # ══════════════════════════════════════════════════════════
+  #  عناوين الخدمات تُثبَّت هنا ولا تُقرأ من .env.
+  #
+  #  الملف الواحد يخدم مستهلكَين بحاجتين متناقضتين: التشغيل
+  #  المحلي (`make run`) يصل إلى قاعدة البيانات من المضيف عبر
+  #  المنفذ المنشور — `127.0.0.1:5433` — بينما الحاوية هنا تصل
+  #  إليها باسم الخدمة على شبكة Docker الداخلية.
+  #
+  #  وراثة قيمة المضيف داخل الحاوية تعني `127.0.0.1` = الحاوية
+  #  نفسها، فتفشل كل محاولة اتصال بلا أن يشير الخطأ إلى السبب.
+  #  والعطل لا يظهر عند تعديل .env بل عند إعادة إنشاء الحاوية
+  #  التالية — قد يكون ذلك بعد أسابيع، في نشر لا علاقة له به.
+  #
+  #  `environment` يعلو على `env_file` في Compose، فالتثبيت هنا
+  #  يجعل الوصلة الداخلية مستقلة عمّا في الملف مهما تغيّر.
+  # ══════════════════════════════════════════════════════════
+  environment:
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: "5432"
+    REDIS_URL: redis://redis:6379/0
+    CELERY_BROKER_URL: redis://redis:6379/1
+    CELERY_RESULT_BACKEND: redis://redis:6379/2
+  restart: unless-stopped
+  networks: [internal]
+  depends_on:
+    postgres: { condition: service_healthy }
+    redis: { condition: service_started }
 
 services:
+  # ── الحافة: الواجهات الأربع + العرض + تمرير /api ──
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.web
+    image: walaee-web:latest
+    restart: unless-stopped
+    depends_on:
+      api: { condition: service_started }
+    volumes:
+      - static:/var/www/static:ro
+      - media:/var/www/media:ro
+    # الخدمة الوحيدة على الشبكتين: `internal` لتصل إلى الخلفية،
+    # و`dokploy-network` ليصل إليها Traefik بالنطاق. بقية الخدمات
+    # لا يراها أحد من خارج الستاك — وهو المقصود.
+    networks: [internal, dokploy-network]
+    ports:
+      # للوصول المباشر بلا وكيل (تطوير أو خادم بلا Traefik).
+      # النطاق على Dokploy يمرّ عبر الشبكة لا عبر هذا المنفذ.
+      - "${WEB_PORT:-8080}:80"
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 192M }
+
+  api:
+    <<: *api-base
+    volumes:
+      - static:/app/staticfiles
+      - media:/app/media
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 1G }
+
+  # عامل معزول للطابور الحسّاس: حملة رسائل ضخمة يجب ألا توقف
+  # تدوير رموز الكاشير — docs/architecture/async-tasks.md
+  worker-realtime:
+    <<: *api-base
+    command: celery -A config worker -Q realtime -c 4 --max-tasks-per-child 200
+    # العامل لا يشغّل خادم ويب، وفحص الصورة الافتراضي (curl على
+    # المنفذ ٨٠٠٠) يفشل دائمًا فيبدو العامل معطّلًا وهو يعمل.
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping -d celery@$$HOSTNAME"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 512M }
+
+  worker-default:
+    <<: *api-base
+    command: >
+      celery -A config worker
+      -Q messaging,webhooks,analytics,billing,maintenance -c 2
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping -d celery@$$HOSTNAME"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 512M }
+
+  beat:
+    <<: *api-base
+    command: >
+      celery -A config beat
+      --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    # المجدول لا يستقبل نداءات inspect ولا يفتح منفذًا، فلا فحص
+    # صحي ذا معنى له. خروجه يُعالَج بـrestart لا بفحص كاذب.
+    healthcheck:
+      disable: true
+    # نسخة واحدة فقط — إلزامي. نسختان تعنيان تنفيذًا مزدوجًا لكل
+    # مهمة مجدولة: منح نقاط مرتين وإرسال رسائل مرتين وخصم رصيد مرتين.
+    deploy:
+      replicas: 1
+      resources:
+        limits: { cpus: "0.25", memory: 256M }
+
   postgres:
     image: postgres:16-alpine
-    container_name: walaee-postgres
     restart: unless-stopped
+    networks: [internal]
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-walaee}
       POSTGRES_USER: ${POSTGRES_USER:-walaee}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-walaee}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?مطلوب في .env}
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./infra/postgres:/docker-entrypoint-initdb.d:ro
-    ports:
-      - "5433:5432"
+      - ./infra/postgres/01-extensions.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-walaee}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 2G }
 
   redis:
     image: redis:7-alpine
-    container_name: walaee-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    networks: [internal]
+    # noeviction مقصود: Redis هنا ليس كاشًا فقط. يحمل رموز نقاط
+    # البيع وطوابير Celery، وطرد مفتاح منها يعني مسحًا فاشلًا عند
+    # الكاشير أو مهمة ضائعة. الامتلاء يجب أن يُصرَخ به لا أن يُبتلَع.
+    # aof-load-truncated: سجل AOF مبتور بعد إطفاء غير نظيف كان
+    # يمنع الإقلاع نهائيًا — حلقة إعادة تشغيل تُسقط الطوابير كلها.
+    # ما في Redis هنا قصير العمر (رموز بثوانٍ، طوابير)، فخسارة آخر
+    # أوامر قبل الانقطاع أهون بكثير من خدمة لا تقوم أصلًا.
+    command: >
+      redis-server --appendonly yes --aof-load-truncated yes
+      --maxmemory 200mb --maxmemory-policy noeviction
     volumes:
       - redisdata:/data
-    ports:
-      - "6380:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
+    deploy:
+      resources:
+        limits: { cpus: "0.25", memory: 256M }
 
-  # ══════════════════════════════════════════════════════
-  #  الخدمات التالية تُفعَّل بعد إنشاء ملفات المشروع
-  #  في مرحلة البناء — المرجع: docs/demo/architecture قسم ١٠
-  # ══════════════════════════════════════════════════════
-  # api:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: ../infra/docker/Dockerfile.backend
-  #   command: python manage.py runserver 0.0.0.0:8000
-  #   env_file: [.env]
-  #   volumes: ["./backend:/app"]
-  #   ports: ["8000:8000"]
-  #   depends_on:
-  #     postgres: {condition: service_healthy}
-  #     redis: {condition: service_healthy}
+networks:
+  # شبكة الستاك الداخلية — لا تُنشر ولا يصل إليها شيء من خارجه
+  internal:
+
+  # ══════════════════════════════════════════════════════════
+  #  شبكة Dokploy المشتركة، ينضم إليها `web` وحده.
   #
-  # worker-realtime:                  # عامل معزول للطابور الحسّاس
-  #   command: celery -A config worker -Q realtime -c 4
+  #  Traefik يعيش عليها، ولا يصل إلى حاوية خارجها مهما كانت
+  #  وسومها صحيحة — فيردّ 504 على نطاق «مُعدّ» في اللوحة.
   #
-  # worker-default:
-  #   command: celery -A config worker -Q messaging,webhooks,analytics,billing,maintenance -c 2
-  #
-  # beat:
-  #   command: celery -A config beat --scheduler django_celery_beat.schedulers:DatabaseScheduler
-  #   deploy: {replicas: 1}           # نسخة واحدة فقط — إلزامي
+  #  على خادم بلا Dokploy أنشئها مرة واحدة:
+  #      docker network create dokploy-network
+  #  أو احذف انضمام `web` إليها واستعمل المنفذ المنشور.
+  # ══════════════════════════════════════════════════════════
+  dokploy-network:
+    external: true
 
 volumes:
   pgdata:
   redisdata:
+  static:
+  media:
