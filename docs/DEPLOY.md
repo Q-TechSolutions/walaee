@@ -273,6 +273,7 @@ DEMO_LOGIN_CODE=
 | `password authentication failed for user "walaee"` بعد تغيير `.env` | حجم قاعدة قديم: postgres يضبط كلمة المرور عند **أول** تهيئة ويحتفظ بها، فتغييرها في `.env` لا يغيّر ما في الحجم | استعمل كلمة المرور الأصلية، أو احذف الحجم وابدأ من جديد: `docker compose down -v` (⚠ يمسح البيانات) |
 | `Database is uninitialized and superuser password is not specified` | نفس السبب — لكن الرسالة الآن تأتي من `postgres` وتسمّي المتغيّر | املأ `POSTGRES_PASSWORD` |
 | `Domain ... attached to service "web" which does not exist` | مسار Compose يشير إلى ملف لا يحوي الخدمات | المسار هو `docker-compose.yml` في الجذر |
+| 502 على `/api/` و`/healthz` بينما الصفحة العامة تُحمَّل، وسجل `api` سليم ويجيب على فحصه الصحي | `web` و`api` على شبكتين مختلفتين: المنصّة تضيف شبكتها إلى الخدمة صاحبة النطاق وقد تستبدل القائمة بدل أن تضيف إليها، فتفقد الحافة الشبكة الداخلية | مُعالَج: الخلفية على الشبكتين باسم `walaee-api`، فيعمل الوصل أيًّا كانت الشبكة المشتركة. راجع سجل `web`: `api could not be resolved` |
 | `Bind for 0.0.0.0:8080 failed: port is already allocated` | نسخة قديمة من `docker-compose.yml` كانت تنشر منفذًا على المضيف، والمنفذ محجوز لتطبيق آخر | حدّث المستودع: ملف النشر لم يعد ينشر منفذًا، وTraefik يصل عبر الشبكة |
 | صفحة بيضاء على `/app/` أو `/merchant/` بلا خطأ | `base` في Vite و`basename` في الموجّه غير متطابقين | يتحددان من `VITE_BASE` — لا تغيّر أحدهما وحده |
 | كل فحص صحي يردّ 400 | `ALLOWED_HOSTS` لا يشمل `web` و`api` | أضفهما |
