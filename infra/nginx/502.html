@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ولائي — الخدمة تُقلِع</title>
+<style>
+  :root {
+    --ink: #1a1630;
+    --muted: #6e6886;
+    --line: #e7e3f2;
+    --violet: #4b1e9e;
+    --canvas: #f6f4fc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #f3f0fa;
+      --muted: #9a93b0;
+      --line: #2b2640;
+      --violet: #a78bfa;
+      --canvas: #121022;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--canvas);
+    color: var(--ink);
+    font: 16px/1.75 system-ui, "Segoe UI", Tahoma, sans-serif;
+  }
+  main { width: min(520px, 100%); text-align: center; }
+  .mark {
+    width: 56px; height: 56px;
+    margin: 0 auto 22px;
+    border-radius: 18px;
+    display: grid; place-items: center;
+    background: linear-gradient(140deg, #6d3bd6, #3a1078);
+    color: #fff; font-size: 26px; font-weight: 800;
+  }
+  h1 { font-size: 23px; margin: 0 0 10px; }
+  p { color: var(--muted); margin: 0 0 18px; }
+  .note {
+    text-align: start;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 18px;
+    font-size: 14.5px;
+    color: var(--muted);
+  }
+  .note b { color: var(--ink); }
+  a { color: var(--violet); font-weight: 700; }
+  .foot { margin-top: 20px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="mark" aria-hidden="true">و</div>
+
+  <h1>الخدمة تُقلِع الآن</h1>
+  <p>الواجهة تعمل، والخلفية لم تردّ بعد. جرّب بعد دقيقة.</p>
+
+  <!-- الرسالة تخاطب اثنين: زائرًا يريد أن يعرف أن ينتظر، ومشغّلًا
+       يريد أن يعرف أين ينظر. الصفحة الافتراضية «502 Bad Gateway»
+       لا تفيد أيًّا منهما. -->
+  <div class="note">
+    <p style="margin:0 0 8px"><b>إن استمرّ هذا:</b></p>
+    راجع سجل حاوية <b>api</b>. تُطبع فيها رسالة صريحة تقول السبب —
+    كلمة مرور قاعدة البيانات، أو هجرة فاشلة، أو متغيّر بيئة ناقص.
+  </div>
+
+  <p class="foot">
+    <a href="/demo/">العرض التفاعلي</a> يعمل بلا خلفية —
+    افتحه ريثما تُقلِع الخدمة.
+  </p>
+</main>
+</body>
+</html>
