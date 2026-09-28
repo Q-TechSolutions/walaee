@@ -143,10 +143,23 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     networks: [internal]
+    # ══════════════════════════════════════════════════════
+    #  كلمة المرور بلا حارس `:?` عمدًا.
+    #
+    #  التداخل `${VAR:?...}` يُقيَّم وقت **قراءة** ملف compose —
+    #  قبل أن تُبنى صورة أو تبدأ حاوية. ومنصّة نشر لم تُملأ
+    #  متغيّراتها بعد تفشل عندئذٍ برسالة عن «تداخل متغيّر»، وهي
+    #  جملة لا تدلّ على تبويب Environment ولا على ما يُكتب فيه.
+    #
+    #  بلا الحارس تبدأ الحاوية ويقولها postgres نفسه بوضوح:
+    #  «Database is uninitialized and superuser password is not
+    #  specified» — يسمّي المتغيّر الناقص ويظهر في سجل الخدمة
+    #  التي تخصّه لا في خطأ بناء عام.
+    # ══════════════════════════════════════════════════════
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-walaee}
       POSTGRES_USER: ${POSTGRES_USER:-walaee}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?مطلوب في .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./infra/postgres/01-extensions.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro

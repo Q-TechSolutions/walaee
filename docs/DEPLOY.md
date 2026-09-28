@@ -165,8 +165,16 @@ make harden-db
 
 ### متغيرات البيئة
 
-الصقها في لوحة Dokploy كما هي في `.env` أعلاه. Dokploy يمرّرها إلى
-Compose كملف بيئة، فينتفي شرط `--env-file` هناك.
+افتح `.env.deploy.example` وانسخ **الملف كاملًا** إلى تبويب
+**Environment**، ثم غيّر `SECRET_KEY` و`POSTGRES_PASSWORD` وحدهما.
+
+> **أسطر التعليق لا تُضبط.** السطر الذي يبدأ بـ `#` يبقى تعليقًا في
+> `.env` الذي تولّده المنصّة، فلا يُقرأ منه متغيّر. هذا هو سبب
+> رسالة `required variable POSTGRES_PASSWORD is missing a value`
+> رغم أن «القيم ملصوقة» أمام من لصقها. الملف أعلاه بلا تعليقات على
+> القيم عمدًا.
+
+بعد الحفظ **أعد النشر** — المتغيّرات تُقرأ عند بدء النشر لا بعده.
 
 ### بعد أول نشر
 
@@ -262,6 +270,10 @@ DEMO_LOGIN_CODE=
 | Dokploy يتراجع عن نشر سليم | فحص الحاوية يستخدم `localhost` فيُحلّ إلى `::1` بينما nginx يربط IPv4 وحده | مُعالَج: الفحص يستخدم `127.0.0.1` ونginx يسمع على الاثنين |
 | `PermissionError: /app/staticfiles` | الحاوية تعمل بمستخدم غير جذري والحجم المسمّى أُنشئ بملكية root | المجلدان يُنشآن في الصورة بملكية التطبيق — لا تحذفهما من `Dockerfile.backend` |
 | عالق على «انتظار قاعدة البيانات» | كلمة المرور مختلفة بين `POSTGRES_PASSWORD` و`DATABASE_URL` | لا تضف `DATABASE_URL` إطلاقًا |
+| `required variable POSTGRES_PASSWORD is missing a value` | تبويب Environment فارغ، أو لُصقت فيه أسطر معلّقة بـ`#` فلم يُضبط منها شيء | انسخ `.env.deploy.example` كاملًا بلا تعليق على القيم، ثم أعد النشر |
+| `Database is uninitialized and superuser password is not specified` | نفس السبب — لكن الرسالة الآن تأتي من `postgres` وتسمّي المتغيّر | املأ `POSTGRES_PASSWORD` |
+| `Domain ... attached to service "web" which does not exist` | مسار Compose يشير إلى ملف لا يحوي الخدمات | المسار هو `docker-compose.yml` في الجذر |
+| فشل النشر بتعارض منافذ | `8080` مشغول على الخادم | غيّر `WEB_PORT` |
 | صفحة بيضاء على `/app/` أو `/merchant/` بلا خطأ | `base` في Vite و`basename` في الموجّه غير متطابقين | يتحددان من `VITE_BASE` — لا تغيّر أحدهما وحده |
 | كل فحص صحي يردّ 400 | `ALLOWED_HOSTS` لا يشمل `web` و`api` | أضفهما |
 | نقاط تُمنح مرتين | نسختان من `beat` | `replicas: 1` — إلزامي |
