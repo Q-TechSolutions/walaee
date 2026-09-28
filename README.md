@@ -101,7 +101,8 @@ walaee/
 │   ├── architecture/           ◆ عقد البناء المُلزِم
 │   └── planning/               القرارات والنطاق المعتمد
 │
-├── .env.example
+├── .env.local            # للتطوير
+├── .env.production       # للنشر
 ├── docker-compose.yml        بيئة التطوير المحلية
 └── Makefile
 ```
@@ -130,7 +131,7 @@ make web-merchant          # لوحة المتجر على 5174
 ### التشغيل على Docker كما في الإنتاج
 
 ```bash
-cp .env.example .env       # واضبط SECRET_KEY و POSTGRES_PASSWORD
+cp .env.local .env         # يعمل كما هو — لا قيمة تحتاج تغييرًا
 make prod-build && make prod-up
 ```
 

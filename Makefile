@@ -28,7 +28,7 @@ install:         ## تثبيت اعتماديات التطوير
 	$(PY) -m pip install -r backend/requirements/dev.txt
 
 env:             ## إنشاء .env من القالب
-	@test -f .env || cp .env.example .env
+	@test -f .env || cp .env.local .env
 	@echo "✓ .env جاهز — راجع القيم قبل التشغيل"
 
 # ══════════════ الخدمات المحلية ══════════════

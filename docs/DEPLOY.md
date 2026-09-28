@@ -50,7 +50,7 @@ Docker 24+ و Compose v2.
 ## أولًا: ملف البيئة
 
 ```bash
-cp .env.example .env
+cp .env.production .env
 ```
 
 ثم املأ **ما لا غنى عنه**:
@@ -165,7 +165,7 @@ make harden-db
 
 ### متغيرات البيئة
 
-افتح `.env.deploy.example` وانسخ **الملف كاملًا** إلى تبويب
+افتح `.env.production` وانسخ **الملف كاملًا** إلى تبويب
 **Environment**، ثم غيّر `SECRET_KEY` و`POSTGRES_PASSWORD` وحدهما.
 
 > **أسطر التعليق لا تُضبط.** السطر الذي يبدأ بـ `#` يبقى تعليقًا في
@@ -270,7 +270,8 @@ DEMO_LOGIN_CODE=
 | Dokploy يتراجع عن نشر سليم | فحص الحاوية يستخدم `localhost` فيُحلّ إلى `::1` بينما nginx يربط IPv4 وحده | مُعالَج: الفحص يستخدم `127.0.0.1` ونginx يسمع على الاثنين |
 | `PermissionError: /app/staticfiles` | الحاوية تعمل بمستخدم غير جذري والحجم المسمّى أُنشئ بملكية root | المجلدان يُنشآن في الصورة بملكية التطبيق — لا تحذفهما من `Dockerfile.backend` |
 | عالق على «انتظار قاعدة البيانات» | كلمة المرور مختلفة بين `POSTGRES_PASSWORD` و`DATABASE_URL` | لا تضف `DATABASE_URL` إطلاقًا |
-| `required variable POSTGRES_PASSWORD is missing a value` | تبويب Environment فارغ، أو لُصقت فيه أسطر معلّقة بـ`#` فلم يُضبط منها شيء | انسخ `.env.deploy.example` كاملًا بلا تعليق على القيم، ثم أعد النشر |
+| `required variable POSTGRES_PASSWORD is missing a value` | تبويب Environment فارغ، أو لُصقت فيه أسطر معلّقة بـ`#` فلم يُضبط منها شيء | انسخ `.env.production` كاملًا بلا تعليق على القيم، ثم أعد النشر |
+| `password authentication failed for user "walaee"` بعد تغيير `.env` | حجم قاعدة قديم: postgres يضبط كلمة المرور عند **أول** تهيئة ويحتفظ بها، فتغييرها في `.env` لا يغيّر ما في الحجم | استعمل كلمة المرور الأصلية، أو احذف الحجم وابدأ من جديد: `docker compose down -v` (⚠ يمسح البيانات) |
 | `Database is uninitialized and superuser password is not specified` | نفس السبب — لكن الرسالة الآن تأتي من `postgres` وتسمّي المتغيّر | املأ `POSTGRES_PASSWORD` |
 | `Domain ... attached to service "web" which does not exist` | مسار Compose يشير إلى ملف لا يحوي الخدمات | المسار هو `docker-compose.yml` في الجذر |
 | فشل النشر بتعارض منافذ | `8080` مشغول على الخادم | غيّر `WEB_PORT` |
@@ -280,7 +281,7 @@ DEMO_LOGIN_CODE=
 | ‏503 على مسارات الدخول بدل ٤٢٩ | `limit_req_status` الافتراضي في nginx هو ٥٠٣، فيظن العميل أن الخادم واقع ويعيد المحاولة بقوة | مُعالَج: `limit_req_status 429;` |
 | «Failed to fetch» على كل نداء API من المتصفح | `SECURE_SSL_REDIRECT=1` على نشر http بلا شهادة: كل نداء يُقابَل بـ301 إلى https لا يستمع إليه أحد | اضبطه `0` للنشر التجريبي. يبقى `1` خلف Traefik |
 | ‏502 على `/api/` بعد كل نشر بينما الخلفية «صحيّة» | nginx يحلّ اسم الخلفية مرة واحدة عند الإقلاع، والحاوية الجديدة تأخذ عنوانًا آخر | مُعالَج بـ`resolver 127.0.0.11` و`proxy_pass` عبر متغيّر — لا تُعِد كتلة `upstream` الثابتة |
-| الخلفية عالقة على «انتظار قاعدة البيانات» محليًا | `.env` يحمل قيم التطوير (`127.0.0.1:5433`) بينما الحاويات تحتاج `postgres:5432` | احتفظ بنسختين: `.env.dev.local` و`.env.prod.local`، وانسخ المطلوبة إلى `.env` |
+| الخلفية عالقة على «انتظار قاعدة البيانات» محليًا | `.env` منسوخ من `.env.production` بينما `make run` يعمل على المضيف ويحتاج `127.0.0.1:5433` | `cp .env.local .env` للعمل المحلي، و`.env.production` للخادم |
 
 ---
 
